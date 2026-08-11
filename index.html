@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloud &amp; Connectivity Hub | Zest4</title>
+
+<!-- PWA: manifest + icons -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#055491">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Zest4 Hub">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #055491;
+    --navy-dark: #033B66;
+    --cyan: #00B4EF;
+    --ink: #0B1F33;
+    --paper: #F5F8FB;
+    --paper-raised: #FFFFFF;
+    --line: #DCE6EF;
+    --muted: #5B7186;
+    --success: #1E9E6B;
+
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    --radius: 14px;
+    --max-w: 1180px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; }
+
+  img.logo-placeholder { display: block; }
+
+  .wrap {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* ---------- Skip link / focus ---------- */
+  .skip-link {
+    position: absolute;
+    left: -999px;
+    top: 0;
+    background: var(--navy);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 0 0 8px 0;
+    z-index: 100;
+  }
+  .skip-link:focus { left: 0; }
+
+  a:focus-visible,
+  button:focus-visible,
+  .tool-card:focus-visible {
+    outline: 3px solid var(--cyan);
+    outline-offset: 3px;
+  }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(245, 248, 251, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .topbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 32px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+  }
+
+  .brand-logo {
+    height: 48px;
+    width: auto;
+    display: block;
+  }
+
+  nav.primary-nav {
+    display: flex;
+    gap: 32px;
+  }
+
+  nav.primary-nav a {
+    text-decoration: none;
+    font-size: 14.5px;
+    font-weight: 500;
+    color: var(--navy-dark);
+    padding: 6px 2px;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+
+  nav.primary-nav a:hover { border-bottom-color: var(--cyan); }
+
+  @media (max-width: 720px) {
+    nav.primary-nav { display: none; }
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    padding: 88px 32px 64px;
+    overflow: hidden;
+    background:
+      radial-gradient(720px 420px at 82% -10%, rgba(0, 180, 239, 0.14), transparent 60%),
+      var(--paper);
+  }
+
+  .hero-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--navy);
+    background: #E7F3FC;
+    border: 1px solid #C9E7F9;
+    padding: 6px 12px;
+    border-radius: 100px;
+    margin-bottom: 24px;
+  }
+
+  .eyebrow .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 0 3px rgba(0, 180, 239, 0.25);
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(34px, 5vw, 56px);
+    line-height: 1.06;
+    letter-spacing: -0.01em;
+    color: var(--navy-dark);
+    max-width: 15ch;
+  }
+
+  h1 .accent { color: var(--cyan); }
+
+  .hero-sub {
+    margin-top: 22px;
+    max-width: 54ch;
+    font-size: 18px;
+    color: var(--muted);
+  }
+
+  .hero-actions {
+    margin-top: 36px;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 14.5px;
+    padding: 13px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    border: 1px solid transparent;
+  }
+
+  .btn-primary {
+    background: var(--navy);
+    color: #fff;
+    box-shadow: 0 8px 20px -8px rgba(5, 84, 145, 0.55);
+  }
+  .btn-primary:hover { background: var(--navy-dark); transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--navy-dark);
+    border-color: var(--line);
+  }
+  .btn-ghost:hover { border-color: var(--navy); }
+
+  /* Signal path signature */
+  .signal-path {
+    margin-top: 64px;
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .signal-path .pulse {
+    animation: travel 4.5s linear infinite;
+  }
+  .signal-path .pulse2 { animation-delay: 1.5s; }
+  .signal-path .pulse3 { animation-delay: 3s; }
+
+  @keyframes travel {
+    0% { offset-distance: 0%; opacity: 0; }
+    8% { opacity: 1; }
+    92% { opacity: 1; }
+    100% { offset-distance: 100%; opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .signal-path .pulse { animation: none; opacity: 0.9; }
+    html { scroll-behavior: auto; }
+  }
+
+  /* ---------- Section shell ---------- */
+  section.block {
+    padding: 72px 32px;
+  }
+
+  .block-head {
+    max-width: 640px;
+    margin-bottom: 40px;
+  }
+
+  .block-head .kicker {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .block-head h2 {
+    font-family: var(--font-display);
+    font-size: clamp(26px, 3vw, 34px);
+    color: var(--navy-dark);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .block-head p {
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 16px;
+  }
+
+  /* ---------- Tool cards ---------- */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+
+  @media (max-width: 980px) {
+    .tools-grid { grid-template-columns: 1fr; }
+  }
+
+  .tool-card {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px 26px 26px;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+
+  .tool-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px -24px rgba(5, 84, 145, 0.35);
+    border-color: #BFE0F5;
+  }
+
+  .tool-card.is-pending {
+    cursor: default;
+  }
+  .tool-card.is-pending:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--line);
+  }
+
+  .tool-index {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .tool-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: #E7F3FC;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 16px 0 20px;
+    color: var(--navy);
+  }
+
+  .tool-card h3 {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--navy-dark);
+    margin-bottom: 8px;
+  }
+
+  .tool-card p {
+    color: var(--muted);
+    font-size: 14.5px;
+    flex-grow: 1;
+  }
+
+  .tool-status {
+    margin-top: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+
+  .tool-status.live { color: var(--success); }
+  .tool-status.pending { color: var(--muted); }
+
+  .tool-status .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+  .tool-status.live .status-dot { background: var(--success); }
+  .tool-status.pending .status-dot { background: #B9C6D3; }
+
+  .tool-cta {
+    margin-top: 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .tool-card:hover .tool-cta { color: var(--navy-dark); }
+  .tool-cta svg { transition: transform 0.15s ease; }
+  .tool-card:hover .tool-cta svg { transform: translateX(3px); }
+
+  /* ---------- Resources ---------- */
+  .resources-shell {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 40px;
+  }
+
+  .file-group + .file-group {
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+  }
+
+  .file-group-title {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .file-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+  }
+
+  .file-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--paper);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+  }
+
+  .file-row:hover {
+    border-color: #BFE0F5;
+    background: var(--paper-raised);
+    transform: translateY(-1px);
+  }
+
+  .file-row .file-ext {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    padding: 3px 6px;
+    border-radius: 5px;
+    flex-shrink: 0;
+    line-height: 1.4;
+  }
+
+  .ext-xlsx { background: var(--success); }
+  .ext-docx { background: var(--navy); }
+  .ext-pdf  { background: #C4462E; }
+
+  .file-row-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .file-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy-dark);
+    line-height: 1.3;
+  }
+
+  .file-meta {
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+
+  /* ---------- How-to guides ---------- */
+  .guides-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+  }
+
+  @media (max-width: 720px) {
+    .guides-grid { grid-template-columns: 1fr; }
+  }
+
+  .guide-card {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px 26px 26px;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+
+  .guide-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px -24px rgba(5, 84, 145, 0.35);
+    border-color: #BFE0F5;
+  }
+
+  .guide-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+
+  .guide-steps {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  .guide-card h3 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--navy-dark);
+    margin-bottom: 8px;
+  }
+
+  .guide-card p {
+    color: var(--muted);
+    font-size: 14.5px;
+    flex-grow: 1;
+  }
+
+  .guide-card .tool-cta { margin-top: 18px; }
+
+  /* ---------- Help centres ---------- */
+  .helpcentre-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+  }
+
+  @media (max-width: 720px) {
+    .helpcentre-grid { grid-template-columns: 1fr; }
+  }
+
+  .helpcentre-card {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px 26px 26px;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+
+  .helpcentre-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px -24px rgba(5, 84, 145, 0.35);
+    border-color: #BFE0F5;
+  }
+
+  .helpcentre-head {
+    display: flex;
+    align-items: center;
+    margin-bottom: 22px;
+    height: 32px;
+  }
+
+  .helpcentre-logo {
+    height: 32px;
+    width: auto;
+    display: block;
+  }
+
+  .helpcentre-logo--callswitch {
+    height: 26px;
+  }
+
+  .helpcentre-card h3 {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--navy-dark);
+    margin-bottom: 8px;
+  }
+
+  .helpcentre-card p {
+    color: var(--muted);
+    font-size: 14.5px;
+    flex-grow: 1;
+  }
+
+  .helpcentre-card .tool-cta { margin-top: 18px; }
+
+  /* ---------- Contact & support ---------- */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+
+  @media (max-width: 980px) {
+    .contact-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 640px) {
+    .contact-grid { grid-template-columns: 1fr; }
+  }
+
+  .contact-card {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px 22px;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+
+  a.contact-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px -24px rgba(5, 84, 145, 0.35);
+    border-color: #BFE0F5;
+  }
+
+  .contact-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #E7F3FC;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--navy);
+    margin-bottom: 16px;
+    flex-shrink: 0;
+  }
+
+  .contact-card h3 {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--navy-dark);
+    margin-bottom: 6px;
+  }
+
+  .contact-card p {
+    color: var(--muted);
+    font-size: 14px;
+    flex-grow: 1;
+  }
+
+  .contact-value {
+    margin-top: 14px;
+    font-family: var(--font-mono);
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--navy);
+  }
+
+  .contact-card--phone {
+    grid-column: span 1;
+  }
+
+  .contact-phone-link {
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 600;
+    display: inline-block;
+  }
+  .contact-phone-link:hover { text-decoration: underline; }
+
+  .phone-options {
+    list-style: none;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .phone-options li {
+    font-size: 13.5px;
+    color: var(--muted);
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+  }
+
+  .phone-option-num {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--navy);
+    background: #E7F3FC;
+    padding: 2px 7px;
+    border-radius: 5px;
+    flex-shrink: 0;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 40px 32px;
+    margin-top: 24px;
+  }
+
+  .footer-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .footer-inner p {
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 20px;
+  }
+
+  .footer-links a {
+    font-size: 13.5px;
+    color: var(--navy);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .footer-links a:hover { text-decoration: underline; }
+
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to content</a>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#main" aria-label="Zest4 home">
+<svg class="brand-logo" role="img" aria-label="Zest4 — Cloud &amp; Connectivity" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 541.084 247.093" enable-background="new 0 0 541.084 247.093"
+	 xml:space="preserve">
+<g>
+	<g>
+		<path fill="#00B4EF" d="M351.254,138.337c-11.555,0-11.637-11.637-11.637-11.637v-46.95l8.109,0.02
+			c17.88,0,32.354-14.493,32.354-32.374c0-17.859-14.597-32.354-32.354-32.354c0,0-32.416,0.77-32.416,32.354
+			c0,1.622,0,7.988,0,7.988s-48.632,0-74.013,0s-25.422,26.413-25.422,26.413c0,8.738,4.259,16.441,10.806,21.227l56.013,31.967
+			c0.364,0.305,0.79,0.933,0.688,1.683c-0.081,0.669-0.627,1.501-1.702,1.641l-114.273,0.042c0,0-4.419-0.062-6.912-0.812
+			l42.976-42.974c3.589-3.69,5.799-8.739,5.799-14.313c0-6.202-2.777-11.777-7.137-15.548c-9.468-7.703-21.569-12.346-34.726-12.346
+			c-30.469,0-55.161,24.691-55.161,55.14c0,9.913,2.637,19.216,7.219,27.264c-9.752,2.939-18.914,3.468-22.705,3.569H42.692
+			c-1.075-0.143-1.622-0.994-1.701-1.663c-0.104-0.75,0.323-1.378,0.688-1.683l56.012-31.967
+			c6.549-4.786,10.806-12.489,10.806-21.227c0,0-0.042-26.413-25.422-26.413H26.939c-6.709,0-12.162,5.472-12.162,12.203
+			c0,6.711,5.453,12.163,12.162,12.163h56.217c1.014,0.082,1.803,0.73,1.803,1.724c0,0.608-0.303,1.255-0.832,1.6
+			c0,0-54.835,30.955-57.165,32.313c-2.332,1.339-12.185,7.501-12.185,21.793c0,23.434,24.043,25.46,24.043,25.46h56.661
+			c5.25,0,23.921-0.586,42.044-8.798c8.595,5.575,18.854,8.798,29.859,8.798h118.167c0,0,24.043-2.026,24.043-25.46
+			c0-14.292-9.853-20.454-12.183-21.793c-2.353-1.358-57.169-32.313-57.169-32.313c-0.527-0.345-0.83-0.992-0.83-1.6
+			c0-0.994,0.79-1.643,1.803-1.724h74.095v46.26c-0.06,2.736,0.162,16.197,9.834,26.272c4.52,4.724,12.832,10.357,26.677,10.357
+			h26.678c0.285,0,0.567,0,0.853-0.039c0.142,0.02,0.283,0.02,0.425,0.02h22.771c6.71,0,12.143-5.432,12.143-12.143
+			c0-6.709-5.433-12.164-12.143-12.164h-22.771L351.254,138.337z M339.617,47.173c0.062-4.5,3.71-8.129,8.209-8.129
+			c4.562,0,8.252,3.69,8.252,8.251c0,4.542-3.689,8.089-8.252,8.089h-8.209V47.173z M136.571,107.504
+			c0-17.009,13.807-30.813,30.835-30.813c5.615,0,10.866,1.541,15.408,4.175l-42.065,42.044
+			C138.113,118.389,136.571,113.138,136.571,107.504z"/>
+		<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="232.583" y1="69.4746" x2="265.082" y2="69.4746">
+			<stop  offset="0" style="stop-color:#055491"/>
+			<stop  offset="0.0331" style="stop-color:#00629D"/>
+			<stop  offset="0.0835" style="stop-color:#0073AC"/>
+			<stop  offset="0.1402" style="stop-color:#0083BC"/>
+			<stop  offset="0.2028" style="stop-color:#0092CA"/>
+			<stop  offset="0.2736" style="stop-color:#009ED6"/>
+			<stop  offset="0.3563" style="stop-color:#00A7E0"/>
+			<stop  offset="0.4586" style="stop-color:#00AEE8"/>
+			<stop  offset="0.6019" style="stop-color:#00B2ED"/>
+			<stop  offset="1" style="stop-color:#00B4EF"/>
+		</linearGradient>
+		<path opacity="0.5" fill="url(#SVGID_1_)" d="M258.714,79.763h-17.495c-1.014,0.062-1.805,0.71-1.805,1.703
+			c0,0.609,0.304,1.256,0.831,1.601c0,0,0.304,0.182,0.892,0.507c-5.047-2.353-8.554-7.479-8.554-13.421
+			c0-7.924,6.244-14.412,14.09-14.778h18.409v24.378L258.714,79.763z"/>
+		<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="267.4287" y1="121.9717" x2="296.6826" y2="121.9717">
+			<stop  offset="0" style="stop-color:#00B4EF"/>
+			<stop  offset="0.3981" style="stop-color:#00B2ED"/>
+			<stop  offset="0.5414" style="stop-color:#00AEE8"/>
+			<stop  offset="0.6437" style="stop-color:#00A7E0"/>
+			<stop  offset="0.7264" style="stop-color:#009ED6"/>
+			<stop  offset="0.7972" style="stop-color:#0092CA"/>
+			<stop  offset="0.8598" style="stop-color:#0083BC"/>
+			<stop  offset="0.9165" style="stop-color:#0073AC"/>
+			<stop  offset="0.9669" style="stop-color:#00629D"/>
+			<stop  offset="1" style="stop-color:#055491"/>
+		</linearGradient>
+		<path opacity="0.5" fill="url(#SVGID_2_)" d="M290.175,111.259c3.932,2.655,6.508,7.156,6.508,12.244
+			c0,8.15-6.609,14.759-14.76,14.759c-0.061,0-0.143,0-0.202-0.021c1.054-0.142,1.58-0.953,1.661-1.602
+			c0.103-0.77-0.323-1.398-0.688-1.704l-15.266-8.716l12.908-20.54L290.175,111.259z"/>
+		<linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="146.9736" y1="66.6094" x2="187.7197" y2="66.6094">
+			<stop  offset="0" style="stop-color:#00B4EF"/>
+			<stop  offset="0.3981" style="stop-color:#00B2ED"/>
+			<stop  offset="0.5414" style="stop-color:#00AEE8"/>
+			<stop  offset="0.6437" style="stop-color:#00A7E0"/>
+			<stop  offset="0.7264" style="stop-color:#009ED6"/>
+			<stop  offset="0.7972" style="stop-color:#0092CA"/>
+			<stop  offset="0.8598" style="stop-color:#0083BC"/>
+			<stop  offset="0.9165" style="stop-color:#0073AC"/>
+			<stop  offset="0.9669" style="stop-color:#00629D"/>
+			<stop  offset="1" style="stop-color:#055491"/>
+		</linearGradient>
+		<path opacity="0.5" fill="url(#SVGID_3_)" d="M173.832,52.744c7.913,0.953,13.888,8.131,13.888,16.361
+			c0,4.623-1.887,8.778-4.905,11.757c-4.542-2.635-9.793-4.175-15.408-4.175c-3.508,0-6.872,0.588-10.014,1.663l-10.419-22.08
+			C146.974,56.27,158.5,50.897,173.832,52.744z"/>
+		<linearGradient id="SVGID_4_" gradientUnits="userSpaceOnUse" x1="119.4619" y1="134.7612" x2="119.4619" y2="134.7612">
+			<stop  offset="0" style="stop-color:#FFFFFF"/>
+			<stop  offset="0.4878" style="stop-color:#FCFBFB"/>
+			<stop  offset="0.6635" style="stop-color:#F3F2F2"/>
+			<stop  offset="0.7887" style="stop-color:#E7E7E7"/>
+			<stop  offset="0.8899" style="stop-color:#D7D7D8"/>
+			<stop  offset="0.9756" style="stop-color:#C4C4C6"/>
+			<stop  offset="1" style="stop-color:#BDBEC0"/>
+		</linearGradient>
+		<path fill="url(#SVGID_4_)" d="M119.462,134.761"/>
+		<linearGradient id="SVGID_5_" gradientUnits="userSpaceOnUse" x1="33.4844" y1="148.8262" x2="58.8643" y2="148.8262">
+			<stop  offset="0" style="stop-color:#055491"/>
+			<stop  offset="0.0331" style="stop-color:#00629D"/>
+			<stop  offset="0.0835" style="stop-color:#0073AC"/>
+			<stop  offset="0.1402" style="stop-color:#0083BC"/>
+			<stop  offset="0.2028" style="stop-color:#0092CA"/>
+			<stop  offset="0.2736" style="stop-color:#009ED6"/>
+			<stop  offset="0.3563" style="stop-color:#00A7E0"/>
+			<stop  offset="0.4586" style="stop-color:#00AEE8"/>
+			<stop  offset="0.6019" style="stop-color:#00B2ED"/>
+			<stop  offset="1" style="stop-color:#00B4EF"/>
+		</linearGradient>
+		<path opacity="0.5" fill="url(#SVGID_5_)" d="M58.864,138.337H42.687c-1.073-0.143-1.621-0.994-1.701-1.663
+			c-0.102-0.73,0.304-1.358,0.667-1.663c-4.843,2.353-8.168,7.319-8.168,13.076c0,8.047,6.527,14.554,14.574,14.554h10.712
+			L58.864,138.337z"/>
+		<linearGradient id="SVGID_6_" gradientUnits="userSpaceOnUse" x1="67.459" y1="96.958" x2="97.1572" y2="96.958">
+			<stop  offset="0" style="stop-color:#00B4EF"/>
+			<stop  offset="0.3981" style="stop-color:#00B2ED"/>
+			<stop  offset="0.5414" style="stop-color:#00AEE8"/>
+			<stop  offset="0.6437" style="stop-color:#00A7E0"/>
+			<stop  offset="0.7264" style="stop-color:#009ED6"/>
+			<stop  offset="0.7972" style="stop-color:#0092CA"/>
+			<stop  offset="0.8598" style="stop-color:#0083BC"/>
+			<stop  offset="0.9165" style="stop-color:#0073AC"/>
+			<stop  offset="0.9669" style="stop-color:#00629D"/>
+			<stop  offset="1" style="stop-color:#055491"/>
+		</linearGradient>
+		<path opacity="0.5" fill="url(#SVGID_6_)" d="M90.568,107.095c0.042-0.02,0.061-0.042,0.082-0.062
+			c3.933-2.696,6.507-7.216,6.507-12.345c0-7.804-5.979-14.21-13.603-14.879c0.811,0.202,1.398,0.81,1.398,1.661
+			c0,0.61-0.304,1.257-0.831,1.602c0,0-7.298,4.115-16.663,9.407l10.748,21.629L90.568,107.095z"/>
+		<linearGradient id="SVGID_7_" gradientUnits="userSpaceOnUse" x1="339.6152" y1="59.8066" x2="364.6514" y2="59.8066">
+			<stop  offset="0" style="stop-color:#00B4EF"/>
+			<stop  offset="0.3981" style="stop-color:#00B2ED"/>
+			<stop  offset="0.5414" style="stop-color:#00AEE8"/>
+			<stop  offset="0.6437" style="stop-color:#00A7E0"/>
+			<stop  offset="0.7264" style="stop-color:#009ED6"/>
+			<stop  offset="0.7972" style="stop-color:#0092CA"/>
+			<stop  offset="0.8598" style="stop-color:#0083BC"/>
+			<stop  offset="0.9165" style="stop-color:#0073AC"/>
+			<stop  offset="0.9669" style="stop-color:#00629D"/>
+			<stop  offset="1" style="stop-color:#055491"/>
+		</linearGradient>
+		<path opacity="0.5" fill="url(#SVGID_7_)" d="M344.015,79.805c11.394,0,20.637-9.324,20.637-20.717
+			c0-8.82-5.534-16.34-13.317-19.278c2.797,1.316,4.723,4.155,4.723,7.459c0,4.542-3.689,8.089-8.231,8.089h-8.21v24.404
+			L344.015,79.805z"/>
+		<linearGradient id="SVGID_8_" gradientUnits="userSpaceOnUse" x1="148.9111" y1="142.4639" x2="161.4381" y2="154.9908">
+			<stop  offset="0" style="stop-color:#055491"/>
+			<stop  offset="0.0331" style="stop-color:#00629D"/>
+			<stop  offset="0.0835" style="stop-color:#0073AC"/>
+			<stop  offset="0.1402" style="stop-color:#0083BC"/>
+			<stop  offset="0.2028" style="stop-color:#0092CA"/>
+			<stop  offset="0.2736" style="stop-color:#009ED6"/>
+			<stop  offset="0.3563" style="stop-color:#00A7E0"/>
+			<stop  offset="0.4586" style="stop-color:#00AEE8"/>
+			<stop  offset="0.6019" style="stop-color:#00B2ED"/>
+			<stop  offset="1" style="stop-color:#00B4EF"/>
+		</linearGradient>
+		<path fill="url(#SVGID_8_)" d="M167.396,138.349c0,0-10.482,23.226-12.456,22.852c-2.823-0.307-11.465-3.367-17.417-7.349
+			c13.27-7.27,22.979-16.311,22.979-16.311s3.115,0.796,7.06,0.796"/>
+		<linearGradient id="SVGID_9_" gradientUnits="userSpaceOnUse" x1="126.7354" y1="120.7969" x2="130.359" y2="130.7527">
+			<stop  offset="0" style="stop-color:#00B4EF"/>
+			<stop  offset="0.3981" style="stop-color:#00B2ED"/>
+			<stop  offset="0.5414" style="stop-color:#00AEE8"/>
+			<stop  offset="0.6437" style="stop-color:#00A7E0"/>
+			<stop  offset="0.7264" style="stop-color:#009ED6"/>
+			<stop  offset="0.7972" style="stop-color:#0092CA"/>
+			<stop  offset="0.8598" style="stop-color:#0083BC"/>
+			<stop  offset="0.9165" style="stop-color:#0073AC"/>
+			<stop  offset="0.9669" style="stop-color:#00629D"/>
+			<stop  offset="1" style="stop-color:#055491"/>
+		</linearGradient>
+		<path fill="url(#SVGID_9_)" d="M140.718,122.887c-0.428,0.343-12.18,8.516-21.288,11.843c-0.806-1.205-3.055-5.894-4.195-9.219
+			c5.353-2.06,22.742-8.807,22.742-8.807S139.339,120.474,140.718,122.887z"/>
+		<g>
+			<path fill="#055491" d="M514.114,162.625h-25.75v22.245c0,7.487-4.721,13.474-12.209,13.474c-7.484,0-12.094-5.986-12.094-13.474
+				v-22.245h-71.534c-6.416,0-12.194-4.92-12.194-11.552c0-3.424,0.855-6.631,3.21-9.197l83.011-82.963
+				c2.783-3.213,7.395-6.659,11.891-6.659c7.486,0,9.92,5.988,9.92,13.476v72.51h25.75c6.629,0,12.193,5.562,12.193,12.191
+				C526.308,157.061,520.743,162.625,514.114,162.625z M464.062,96.262l-42.248,41.977h42.248V96.262z"/>
+		</g>
+		<linearGradient id="SVGID_10_" gradientUnits="userSpaceOnUse" x1="339.4297" y1="144.48" x2="369.3916" y2="144.48">
+			<stop  offset="0" style="stop-color:#055491"/>
+			<stop  offset="0.0181" style="stop-color:#005A96"/>
+			<stop  offset="0.0861" style="stop-color:#006DA6"/>
+			<stop  offset="0.1608" style="stop-color:#007EB7"/>
+			<stop  offset="0.2414" style="stop-color:#008EC6"/>
+			<stop  offset="0.3299" style="stop-color:#009BD4"/>
+			<stop  offset="0.4293" style="stop-color:#00A6DF"/>
+			<stop  offset="0.5461" style="stop-color:#00ADE7"/>
+			<stop  offset="0.6965" style="stop-color:#00B2ED"/>
+			<stop  offset="1" style="stop-color:#00B4EF"/>
+		</linearGradient>
+		<path opacity="0.5" fill="url(#SVGID_10_)" d="M351.228,138.328c-11.555,0-11.636-11.637-11.636-11.637v-0.365
+			c-0.101,1.115-0.162,2.252-0.162,3.386c0,17.211,13.156,31.36,29.962,32.923v-24.331L351.228,138.328z"/>
+		<linearGradient id="SVGID_11_" gradientUnits="userSpaceOnUse" x1="417.6484" y1="150.4272" x2="442.0791" y2="150.4272">
+			<stop  offset="0" style="stop-color:#282561"/>
+			<stop  offset="0.4908" style="stop-color:#0E4E8A"/>
+			<stop  offset="0.6933" style="stop-color:#015391"/>
+		</linearGradient>
+		<path fill="url(#SVGID_11_)" d="M431.921,162.621c-7.885,0-14.272-6.385-14.272-14.271c0-3.912,1.583-7.461,4.116-10.034
+			c0.04-0.041,0.062-0.062,0.081-0.081h20.151c0.021,0.02,0.041,0.04,0.082,0.081l-0.041-0.041v24.296L431.921,162.621z"/>
+		<linearGradient id="SVGID_12_" gradientUnits="userSpaceOnUse" x1="434.2959" y1="105.5176" x2="460.5434" y2="87.1389">
+			<stop  offset="0.3067" style="stop-color:#015391"/>
+			<stop  offset="0.5092" style="stop-color:#0E4E8A"/>
+			<stop  offset="1" style="stop-color:#282561"/>
+		</linearGradient>
+		<path fill="url(#SVGID_12_)" d="M448.804,111.416l15.244-15.142c-0.264-7.865-6.73-14.15-14.656-14.15
+			c-3.994,0-7.623,1.602-10.279,4.216l-10.73,10.732L448.804,111.416z"/>
+		<linearGradient id="SVGID_13_" gradientUnits="userSpaceOnUse" x1="476.1992" y1="138.2388" x2="476.1992" y2="117.9927">
+			<stop  offset="0" style="stop-color:#282561"/>
+			<stop  offset="0.1708" style="stop-color:#243772"/>
+			<stop  offset="0.3689" style="stop-color:#184884"/>
+			<stop  offset="0.4908" style="stop-color:#0E4E8A"/>
+			<stop  offset="0.6933" style="stop-color:#015391"/>
+		</linearGradient>
+		<polygon fill="url(#SVGID_13_)" points="464.062,138.239 488.364,138.239 488.364,117.993 464.034,117.993 		"/>
+		
+			<linearGradient id="SVGID_14_" gradientUnits="userSpaceOnUse" x1="775.7695" y1="475.4795" x2="775.7695" y2="455.2334" gradientTransform="matrix(-1 0 0 -1 1251.9688 638.1211)">
+			<stop  offset="0" style="stop-color:#282561"/>
+			<stop  offset="0.1708" style="stop-color:#243772"/>
+			<stop  offset="0.3689" style="stop-color:#184884"/>
+			<stop  offset="0.4908" style="stop-color:#0E4E8A"/>
+			<stop  offset="0.6933" style="stop-color:#015391"/>
+		</linearGradient>
+		<polygon fill="url(#SVGID_14_)" points="488.337,162.641 464.034,162.641 464.034,182.887 488.364,182.887 		"/>
+		<linearGradient id="SVGID_15_" gradientUnits="userSpaceOnUse" x1="327.4189" y1="55.3813" x2="327.4189" y2="46.4053">
+			<stop  offset="0" style="stop-color:#055491"/>
+			<stop  offset="0.04" style="stop-color:#005C98"/>
+			<stop  offset="0.1546" style="stop-color:#0071AA"/>
+			<stop  offset="0.2746" style="stop-color:#0084BD"/>
+			<stop  offset="0.3985" style="stop-color:#0095CD"/>
+			<stop  offset="0.5277" style="stop-color:#00A2DA"/>
+			<stop  offset="0.6645" style="stop-color:#00ABE5"/>
+			<stop  offset="0.814" style="stop-color:#00B1EC"/>
+			<stop  offset="1" style="stop-color:#00B4EF"/>
+		</linearGradient>
+		<polygon opacity="0.5" fill="url(#SVGID_15_)" points="315.282,55.381 339.584,55.381 339.584,46.405 315.254,46.405 		"/>
+		<linearGradient id="SVGID_16_" gradientUnits="userSpaceOnUse" x1="327.4824" y1="88.7666" x2="327.4824" y2="79.7905">
+			<stop  offset="0" style="stop-color:#00B4EF"/>
+			<stop  offset="0.186" style="stop-color:#00B1EC"/>
+			<stop  offset="0.3355" style="stop-color:#00ABE5"/>
+			<stop  offset="0.4723" style="stop-color:#00A2DA"/>
+			<stop  offset="0.6015" style="stop-color:#0095CD"/>
+			<stop  offset="0.7254" style="stop-color:#0084BD"/>
+			<stop  offset="0.8454" style="stop-color:#0071AA"/>
+			<stop  offset="0.96" style="stop-color:#005C98"/>
+			<stop  offset="1" style="stop-color:#055491"/>
+		</linearGradient>
+		<polygon opacity="0.5" fill="url(#SVGID_16_)" points="315.346,88.767 339.647,88.767 339.647,79.791 315.317,79.791 		"/>
+	</g>
+	<g>
+		<g>
+			<path fill="#055491" d="M29.546,202.366h-1.374c-2.501,0-3.68,1.177-3.68,3.975v3.875h4.17c1.08,0,1.964,0.884,1.964,1.964
+				s-0.884,2.011-1.964,2.011h-4.17v15.261c0,1.324-1.08,2.404-2.404,2.404c-1.325,0-2.404-1.08-2.404-2.404V214.19h-2.942
+				c-1.08,0-1.964-0.931-1.964-2.011s0.884-1.964,1.964-1.964h2.942v-3.385c0-5.151,2.356-8.439,8.098-8.439h1.765
+				c1.08,0,1.964,0.931,1.964,2.011S30.626,202.366,29.546,202.366"/>
+			<path fill="#055491" d="M42.795,232.05c-6.231,0-11.236-5.004-11.236-11.236s5.005-11.236,11.236-11.236
+				c6.23,0,11.235,5.004,11.235,11.236S49.025,232.05,42.795,232.05 M42.795,213.846c-3.925,0-6.477,3.141-6.477,6.968
+				c0,3.828,2.552,6.969,6.477,6.969s6.476-3.141,6.476-6.969C49.271,216.987,46.72,213.846,42.795,213.846"/>
+			<path fill="#055491" d="M69.684,213.846c-3.876,0-7.556,2.11-7.556,6.331v9.273c0,1.324-1.08,2.402-2.404,2.402
+				c-1.325,0-2.404-1.078-2.404-2.402v-17.273c0-1.324,1.03-2.402,2.354-2.402c1.325,0,2.454,1.078,2.454,2.402v1.032
+				c1.962-2.603,4.171-3.632,7.556-3.632c1.178,0,2.11,0.934,2.11,2.109C71.794,212.866,70.861,213.846,69.684,213.846"/>
+			<path fill="#055491" d="M92.306,222.286H77.143c0.244,3.286,2.894,5.741,6.428,5.741c2.502,0,4.661-1.031,6.377-2.699
+				c0.344-0.342,0.738-0.441,1.179-0.441c0.59,0,1.18,0.295,1.571,0.785c0.244,0.345,0.391,0.736,0.391,1.129
+				c0,0.54-0.246,1.13-0.687,1.57c-2.061,2.208-5.545,3.68-8.979,3.68c-6.23,0-11.235-5.004-11.235-11.236
+				s4.856-11.236,11.09-11.236c6.181,0,10.794,4.809,10.794,11.138C94.07,221.649,93.236,222.286,92.306,222.286 M83.276,213.602
+				c-3.289,0-5.545,2.158-6.035,5.299h12.07C88.869,215.907,86.513,213.602,83.276,213.602"/>
+			<path fill="#055491" d="M115.979,212.816l-7.949,17.762c-0.343,0.737-1.128,1.275-1.963,1.275c-0.834,0-1.57-0.538-1.914-1.275
+				l-7.997-17.762c-0.148-0.294-0.196-0.588-0.196-0.884c0-0.881,0.54-1.618,1.276-1.961c0.246-0.1,0.588-0.196,0.884-0.196
+				c0.833,0,1.618,0.49,1.961,1.276l5.986,13.444l6.035-13.444c0.343-0.786,1.129-1.276,1.963-1.276
+				c0.294,0,0.538,0.049,0.786,0.146c0.784,0.344,1.324,1.176,1.324,2.061C116.176,212.276,116.126,212.522,115.979,212.816"/>
+			<path fill="#055491" d="M137.992,222.286h-15.163c0.244,3.286,2.896,5.741,6.429,5.741c2.501,0,4.661-1.031,6.378-2.699
+				c0.344-0.342,0.736-0.441,1.177-0.441c0.59,0,1.18,0.295,1.571,0.785c0.244,0.345,0.393,0.736,0.393,1.129
+				c0,0.54-0.248,1.13-0.687,1.57c-2.062,2.208-5.547,3.68-8.981,3.68c-6.23,0-11.235-5.004-11.235-11.236
+				s4.856-11.236,11.09-11.236c6.183,0,10.794,4.809,10.794,11.138C139.757,221.649,138.924,222.286,137.992,222.286
+				 M128.963,213.602c-3.287,0-5.545,2.158-6.035,5.299h12.069C134.556,215.907,132.202,213.602,128.963,213.602"/>
+			<path fill="#055491" d="M156.343,213.846c-3.877,0-7.557,2.11-7.557,6.331v9.273c0,1.324-1.08,2.402-2.404,2.402
+				c-1.325,0-2.405-1.078-2.405-2.402v-17.273c0-1.324,1.032-2.402,2.356-2.402s2.453,1.078,2.453,2.402v1.032
+				c1.962-2.603,4.172-3.632,7.557-3.632c1.178,0,2.108,0.934,2.108,2.109C158.451,212.866,157.521,213.846,156.343,213.846"/>
+			<path fill="#055491" d="M194.518,228.566c-1.717,1.915-5.005,3.484-8.146,3.484c-6.231,0-11.236-5.004-11.236-11.236
+				s5.005-11.236,11.236-11.236c2.748,0,5.005,0.59,7.261,2.454c0.442,0.392,0.736,1.03,0.736,1.667c0,0.394-0.147,0.834-0.44,1.228
+				c-0.394,0.49-0.983,0.786-1.57,0.786c-0.441,0-0.934-0.15-1.325-0.442c-1.473-1.08-3.041-1.522-4.661-1.522
+				c-3.925,0-6.525,3.239-6.525,7.066c0,3.828,2.601,7.066,6.525,7.066c2.354,0,4.024-0.934,5.495-2.258
+				c0.394-0.343,0.834-0.49,1.277-0.49c0.54,0,1.127,0.195,1.521,0.637c0.344,0.344,0.488,0.787,0.488,1.227
+				C195.153,227.537,194.959,228.076,194.518,228.566"/>
+			<path fill="#055491" d="M209.58,232.05c-6.229,0-11.234-5.004-11.234-11.236s5.005-11.236,11.234-11.236
+				c6.232,0,11.235,5.004,11.235,11.236S215.812,232.05,209.58,232.05 M209.58,213.846c-3.925,0-6.476,3.141-6.476,6.968
+				c0,3.828,2.551,6.969,6.476,6.969c3.928,0,6.477-3.141,6.477-6.969C216.057,216.987,213.508,213.846,209.58,213.846"/>
+			<path fill="#055491" d="M242.799,231.853c-1.324,0-2.404-1.078-2.404-2.404v-10.105c0-3.092-2.306-5.496-5.545-5.496
+				c-3.236,0-5.543,2.404-5.543,5.496v10.105c0,1.326-1.08,2.404-2.404,2.404s-2.404-1.078-2.404-2.404v-9.615
+				c0-5.691,4.612-10.256,10.352-10.256c5.741,0,10.354,4.564,10.354,10.256v9.615C245.204,230.775,244.125,231.853,242.799,231.853
+				"/>
+			<path fill="#055491" d="M267.623,231.853c-1.325,0-2.405-1.078-2.405-2.404v-10.105c0-3.092-2.308-5.496-5.545-5.496
+				c-3.238,0-5.544,2.404-5.544,5.496v10.105c0,1.326-1.08,2.404-2.405,2.404c-1.324,0-2.404-1.078-2.404-2.404v-9.615
+				c0-5.691,4.613-10.256,10.354-10.256c5.741,0,10.353,4.564,10.353,10.256v9.615C270.025,230.775,268.947,231.853,267.623,231.853
+				"/>
+			<path fill="#055491" d="M293.823,222.286h-15.159c0.244,3.286,2.893,5.741,6.427,5.741c2.503,0,4.661-1.031,6.378-2.699
+				c0.344-0.342,0.737-0.441,1.178-0.441c0.59,0,1.177,0.295,1.57,0.785c0.246,0.345,0.394,0.736,0.394,1.129
+				c0,0.54-0.247,1.13-0.688,1.57c-2.061,2.208-5.545,3.68-8.979,3.68c-6.232,0-11.236-5.004-11.236-11.236
+				s4.857-11.236,11.09-11.236c6.182,0,10.794,4.809,10.794,11.138C295.591,221.649,294.757,222.286,293.823,222.286
+				 M284.797,213.602c-3.288,0-5.545,2.158-6.035,5.299h12.07C290.391,215.907,288.034,213.602,284.797,213.602"/>
+			<path fill="#055491" d="M317.954,228.566c-1.717,1.915-5.005,3.484-8.146,3.484c-6.229,0-11.234-5.004-11.234-11.236
+				s5.005-11.236,11.234-11.236c2.748,0,5.005,0.59,7.265,2.454c0.441,0.392,0.734,1.03,0.734,1.667
+				c0,0.394-0.146,0.834-0.442,1.228c-0.392,0.49-0.98,0.786-1.568,0.786c-0.443,0-0.934-0.15-1.324-0.442
+				c-1.474-1.08-3.044-1.522-4.664-1.522c-3.925,0-6.525,3.239-6.525,7.066c0,3.828,2.601,7.066,6.525,7.066
+				c2.357,0,4.024-0.934,5.497-2.258c0.392-0.343,0.832-0.49,1.275-0.49c0.54,0,1.129,0.195,1.521,0.637
+				c0.344,0.344,0.492,0.787,0.492,1.227C318.594,227.537,318.397,228.076,317.954,228.566"/>
+			<path fill="#055491" d="M334.834,214.19h-4.122v15.309c0,1.326-1.078,2.356-2.404,2.356c-1.324,0-2.404-1.03-2.404-2.356V214.19
+				h-3.581c-1.08,0-1.964-0.931-1.964-2.011s0.884-1.964,1.964-1.964h3.581v-7.065c0-1.324,1.08-2.354,2.404-2.354
+				c1.326,0,2.404,1.03,2.404,2.354v7.065h4.122c1.079,0,1.963,0.884,1.963,1.964S335.913,214.19,334.834,214.19"/>
+			<path fill="#055491" d="M357.848,222.286h-15.162c0.246,3.286,2.896,5.741,6.426,5.741c2.504,0,4.662-1.031,6.381-2.699
+				c0.344-0.342,0.735-0.441,1.176-0.441c0.59,0,1.18,0.295,1.572,0.785c0.244,0.345,0.392,0.736,0.392,1.129
+				c0,0.54-0.247,1.13-0.686,1.57c-2.062,2.208-5.545,3.68-8.981,3.68c-6.231,0-11.236-5.004-11.236-11.236
+				s4.857-11.236,11.09-11.236c6.184,0,10.794,4.809,10.794,11.138C359.612,221.649,358.778,222.286,357.848,222.286
+				 M348.818,213.602c-3.288,0-5.545,2.158-6.035,5.299h12.07C354.412,215.907,352.058,213.602,348.818,213.602"/>
+			<path fill="#055491" d="M382.48,231.853c-1.325,0-2.405-1.078-2.405-2.402v-1.13c-1.374,2.356-3.975,3.729-7.017,3.729
+				c-6.232,0-10.647-4.809-10.647-11.236s4.27-11.236,10.647-11.236c3.139,0,5.789,1.521,7.017,3.778v-12.658
+				c0-1.326,1.08-2.356,2.405-2.356c1.322,0,2.404,1.03,2.404,2.356v28.753C384.885,230.775,383.803,231.853,382.48,231.853
+				 M373.646,213.846c-3.925,0-6.429,3.141-6.429,6.968c0,3.828,2.504,6.969,6.429,6.969s6.429-2.994,6.429-6.969
+				C380.075,216.84,377.571,213.846,373.646,213.846"/>
+		</g>
+	</g>
+</g>
+</svg>
+    </a>
+    <nav class="primary-nav" aria-label="Primary">
+      <a href="#tools">Tools</a>
+      <a href="#resources">Resources</a>
+      <a href="#guides">How-to guides</a>
+      <a href="#help-centres">Help centres</a>
+      <a href="#contact">Order &amp; support</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="hero">
+    <div class="hero-inner">
+      <span class="eyebrow"><span class="dot"></span> Cloud &amp; Connectivity, relaunched</span>
+      <h1>Every tool you need, <span class="accent">wired to one place.</span></h1>
+      <p class="hero-sub">
+        Pricing, provisioning and porting for 8x8 and CallSwitch One — no more digging through
+        bookmarks or old emails to find the right link. Start here.
+      </p>
+      <div class="hero-actions">
+        <a href="#tools" class="btn btn-primary">Browse the tools</a>
+        <a href="#resources" class="btn btn-ghost">Open resources</a>
+      </div>
+
+      <!-- Signature: a "signal path" connecting the three tools, standing in for the network/connectivity theme -->
+      <svg class="signal-path" viewBox="0 0 1120 90" fill="none" xmlns="http://www.w3.org/2000/svg" role="presentation" aria-hidden="true">
+        <path id="linePath" d="M20 70 C 220 70, 260 20, 400 20 S 640 70, 760 70 S 980 20, 1100 20"
+              stroke="#C9DEEC" stroke-width="2" stroke-dasharray="1 10" stroke-linecap="round"/>
+        <circle cx="20" cy="70" r="5" fill="#055491"/>
+        <circle cx="400" cy="20" r="5" fill="#00B4EF"/>
+        <circle cx="760" cy="70" r="5" fill="#00B4EF"/>
+        <circle cx="1100" cy="20" r="5" fill="#055491"/>
+
+        <circle class="pulse" r="4" fill="#00B4EF">
+          <animateMotion dur="4.5s" repeatCount="indefinite"
+            path="M20 70 C 220 70, 260 20, 400 20 S 640 70, 760 70 S 980 20, 1100 20"/>
+        </circle>
+        <circle class="pulse pulse2" r="4" fill="#00B4EF">
+          <animateMotion dur="4.5s" repeatCount="indefinite" begin="1.5s"
+            path="M20 70 C 220 70, 260 20, 400 20 S 640 70, 760 70 S 980 20, 1100 20"/>
+        </circle>
+        <circle class="pulse pulse3" r="4" fill="#00B4EF">
+          <animateMotion dur="4.5s" repeatCount="indefinite" begin="3s"
+            path="M20 70 C 220 70, 260 20, 400 20 S 640 70, 760 70 S 980 20, 1100 20"/>
+        </circle>
+      </svg>
+    </div>
+  </section>
+
+  <section class="block" id="tools">
+    <div class="wrap">
+      <div class="block-head">
+        <span class="kicker">01 — Tools</span>
+        <h2>Three jobs, three tools, one launchpad.</h2>
+        <p>Each tool opens in a new tab and stays up to date on its own — this page just keeps them within reach.</p>
+      </div>
+
+      <div class="tools-grid">
+
+        <!-- Tool 1: Pricing calculator -->
+        <a class="tool-card" href="https://matwrenz4.github.io/C-C-Pricing-calculator/" target="_blank" rel="noopener">
+          <span class="tool-index">TOOL / 01</span>
+          <div class="tool-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M16 11h0M8 15h2M12 15h2M16 15h0"/></svg>
+          </div>
+          <h3>Cloud &amp; Connectivity pricing calculator</h3>
+          <p>Build a live quote across cloud and connectivity products, add setup fees, and export a branded PDF in minutes.</p>
+          <span class="tool-status live"><span class="status-dot"></span>Live</span>
+          <span class="tool-cta">Open the calculator
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </span>
+        </a>
+
+        <!-- Tool 2: Setup form -->
+        <a class="tool-card" href="https://matwrenz4.github.io/8x8-Callswitch-Config-Form-/" target="_blank" rel="noopener">
+          <span class="tool-index">TOOL / 02</span>
+          <div class="tool-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v4M15 3v4M4 8h16v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V8z"/><path d="M8 13h2M14 13h2M8 17h2M14 17h2"/></svg>
+          </div>
+          <h3>8x8 / CallSwitch One setup form</h3>
+          <p>Capture users, devices, queues, ring groups and auto attendants in one guided form — ready for provisioning.</p>
+          <span class="tool-status live"><span class="status-dot"></span>Live</span>
+          <span class="tool-cta">Open the setup form
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </span>
+        </a>
+
+        <!-- Tool 3: CLoA form -->
+        <a class="tool-card" href="https://matwrenz4.github.io/Interactive-CLoA/" target="_blank" rel="noopener">
+          <span class="tool-index">TOOL / 03</span>
+          <div class="tool-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+          </div>
+          <h3>Customer Letter of Authority (CLoA)</h3>
+          <p>Fill in porting authority with built-in validation for common reseller errors, then export a clean two-column PDF.</p>
+          <span class="tool-status live"><span class="status-dot"></span>Live</span>
+          <span class="tool-cta">Open the CLoA form
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </span>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="resources">
+    <div class="wrap">
+      <div class="block-head">
+        <span class="kicker">02 — Resources</span>
+        <h2>Rate cards, forms and reference files.</h2>
+        <p>Everything you'd otherwise ask for in a Teams message. Click a file to download the latest version.</p>
+      </div>
+
+      <div class="resources-shell">
+
+        <div class="file-group">
+          <h4 class="file-group-title">Rate cards</h4>
+          <div class="file-grid">
+            <a class="file-row" href="resources/CallSwitch_Rate_Card__WS___RRP__01-03-2026.xlsx" download>
+              <span class="file-ext ext-xlsx">XLSX</span>
+              <span class="file-row-text">
+                <span class="file-name">CallSwitch rate card — WS &amp; RRP</span>
+                <span class="file-meta">Effective 01 Mar 2026</span>
+              </span>
+            </a>
+            <a class="file-row" href="resources/Zest4_8x8_RateCard_01-12-2022__2_.xlsx" download>
+              <span class="file-ext ext-xlsx">XLSX</span>
+              <span class="file-row-text">
+                <span class="file-name">Zest4 8x8 rate card</span>
+                <span class="file-meta">Effective 01 Dec 2022</span>
+              </span>
+            </a>
+            <a class="file-row" href="resources/Horizon-Rate-Card-WS-Call-Rates_01-06-2022.xlsx" download>
+              <span class="file-ext ext-xlsx">XLSX</span>
+              <span class="file-row-text">
+                <span class="file-name">Horizon rate card — WS call rates</span>
+                <span class="file-meta">Effective 01 Jun 2022</span>
+              </span>
+            </a>
+          </div>
+        </div>
+
+        <div class="file-group">
+          <h4 class="file-group-title">Forms &amp; compliance</h4>
+          <div class="file-grid">
+            <a class="file-row" href="resources/Outbound_Caller_ID_Spoofing_Authorization_Form.docx" download>
+              <span class="file-ext ext-docx">DOCX</span>
+              <span class="file-row-text">
+                <span class="file-name">Outbound caller ID spoofing authorisation form</span>
+                <span class="file-meta">Customer sign-off document</span>
+              </span>
+            </a>
+            <a class="file-row" href="resources/8x8-Security.pdf" download>
+              <span class="file-ext ext-pdf">PDF</span>
+              <span class="file-row-text">
+                <span class="file-name">8x8 security &amp; compliance overview</span>
+                <span class="file-meta">Certifications and data protection summary</span>
+              </span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="guides">
+    <div class="wrap">
+      <div class="block-head">
+        <span class="kicker">03 — How-to guides</span>
+        <h2>Step-by-step walkthroughs for the Zest4 portals.</h2>
+        <p>Screenshot-led guides for the two processes resellers ask about most: placing an order and raising a port request.</p>
+      </div>
+
+      <div class="guides-grid">
+
+        <a class="guide-card" href="guides/how-to-create-and-submit-a-voip-broadband-order.pdf" download>
+          <div class="guide-card-top">
+            <span class="file-ext ext-pdf">PDF</span>
+            <span class="guide-steps">19 steps</span>
+          </div>
+          <h3>How to create and submit a VOIP/Broadband order</h3>
+          <p>Walks through the Zest4 partner portal end to end — selecting a customer, configuring licences, hardware and connectivity, and submitting the order for signature.</p>
+          <span class="tool-cta">Download the guide
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14"/></svg>
+          </span>
+        </a>
+
+        <a class="guide-card" href="guides/how-to-create-a-number-port-request-ticket.pdf" download>
+          <div class="guide-card-top">
+            <span class="file-ext ext-pdf">PDF</span>
+            <span class="guide-steps">15 steps</span>
+          </div>
+          <h3>How to create a number port request ticket</h3>
+          <p>Covers raising a porting request through the Zest4 admin portal, from finding the right ticket category to attaching a signed LOA and tracking the reference.</p>
+          <span class="tool-cta">Download the guide
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14"/></svg>
+          </span>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="help-centres">
+    <div class="wrap">
+      <div class="block-head">
+        <span class="kicker">04 — Help centres</span>
+        <h2>Platform documentation, straight from the source.</h2>
+        <p>For step-by-step how-tos and feature guides on the platforms themselves, go direct to 8x8 and CallSwitch One.</p>
+      </div>
+
+      <div class="helpcentre-grid">
+
+        <a class="helpcentre-card" href="https://support-portal.8x8.com/hc-pages/8x8/helpcenter/index.html?hl=en" target="_blank" rel="noopener">
+          <div class="helpcentre-head">
+<svg class="helpcentre-logo" role="img" aria-label="8x8" viewBox="0 0 97.65 44.92"><defs><mask id="a" x="0" y="0" width="97.65" height="44.92" maskUnits="userSpaceOnUse"><path d="M97.63 44.9H0V0h97.63z" fill="#fff"/></mask></defs><title>Asset 1</title><g mask="url(#a)"><path d="M62.76 15.88H52.23l-2.43 4.58a10.93 10.93 0 0 1-.88 1.54h-.11s-.5-.77-.88-1.49l-2.43-4.63H35l8.27 13L35 42h10.35l2.79-5.33a15.19 15.19 0 0 0 .66-1.45h.11a13.42 13.42 0 0 0 .66 1.45L52.41 42h10.36l-8.24-13 8.22-13M16.11 35.56a5.11 5.11 0 0 1-5.23-5 7.82 7.82 0 0 1 2.31-5.29c4.25 1.94 8.14 3.4 8.14 5.9 0 2.83-2 4.39-5.22 4.39zm.3-26.2c2.86 0 4.56 1.58 4.56 4a11 11 0 0 1-1.52 5.35c-3.83-1.64-7-3.1-7-6 .01-1.83 1.23-3.35 3.96-3.35zm10.7 13.13c.42-.55 4.25-5.23 4.25-9.91C31.36 4.5 24.74 0 16.65 0 6.5 0 2.07 6.2 2.07 12.52A10.56 10.56 0 0 0 6 20.85c-1.34 1-6 5-6 10.58 0 6.93 5.53 13.49 16.11 13.49 10.76 0 16.11-6.62 16.11-13.25 0-4.38-2.22-7.17-5.11-9.18zm54.41 13.07a5.11 5.11 0 0 1-5.23-5 7.82 7.82 0 0 1 2.31-5.29c4.25 1.94 8.15 3.4 8.15 5.9 0 2.86-2 4.44-5.23 4.44zm.31-26.2c2.86 0 4.56 1.58 4.56 4a11 11 0 0 1-1.52 5.35c-3.83-1.64-7-3.1-7-6 0-1.83 1.22-3.35 3.95-3.35zm10.7 13.13c.43-.55 4.25-5.23 4.25-9.91C96.78 4.5 90.15 0 82.07 0 71.92 0 67.48 6.2 67.48 12.52a10.57 10.57 0 0 0 3.95 8.33c-1.34 1-6 5-6 10.58 0 6.93 5.53 13.49 16.11 13.49 10.76 0 16.11-6.62 16.11-13.25 0-4.38-2.21-7.17-5.13-9.18z" fill="#e52920"/></g></svg>
+          </div>
+          <h3>8x8 Help Center</h3>
+          <p>Official 8x8 documentation covering Work, Contact Center and admin console features.</p>
+          <span class="tool-cta">Visit the help centre
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </span>
+        </a>
+
+        <a class="helpcentre-card" href="https://www.callswitchone.com/help-centre/" target="_blank" rel="noopener">
+          <div class="helpcentre-head">
+            <img class="helpcentre-logo helpcentre-logo--callswitch" src="data:image/png;base64,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" alt="CallSwitch One">
+          </div>
+          <h3>CallSwitch One Help Centre</h3>
+          <p>Official CallSwitch One documentation covering setup, features and troubleshooting.</p>
+          <span class="tool-cta">Visit the help centre
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </span>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="contact">
+    <div class="wrap">
+      <div class="block-head">
+        <span class="kicker">05 — Order &amp; support</span>
+        <h2>Ordering and getting help, sorted by channel.</h2>
+        <p>Portals for placing orders and raising tickets, plus the right inbox or phone option depending on what you need.</p>
+      </div>
+
+      <div class="contact-grid">
+
+        <a class="contact-card" href="https://portal.zest4partners.com/" target="_blank" rel="noopener">
+          <div class="contact-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+          </div>
+          <h3>Place a C&amp;C order</h3>
+          <p>Submit new cloud and connectivity orders through the partner portal.</p>
+          <span class="contact-value">portal.zest4partners.com</span>
+        </a>
+
+        <a class="contact-card" href="https://www.zest4customers.com/" target="_blank" rel="noopener">
+          <div class="contact-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <h3>Raise a C&amp;C ticket</h3>
+          <p>Log a support or provisioning ticket through the customer portal.</p>
+          <span class="contact-value">zest4customers.com</span>
+        </a>
+
+        <a class="contact-card" href="mailto:ccsupport@zest4.com">
+          <div class="contact-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
+          </div>
+          <h3>Email our support team</h3>
+          <p>General queries and issues on live cloud and connectivity services.</p>
+          <span class="contact-value">ccsupport@zest4.com</span>
+        </a>
+
+        <a class="contact-card" href="mailto:ccprovisioning@zest4.com">
+          <div class="contact-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
+          </div>
+          <h3>Email our provisioning team</h3>
+          <p>New setups, number porting and configuration requests.</p>
+          <span class="contact-value">ccprovisioning@zest4.com</span>
+        </a>
+
+        <div class="contact-card contact-card--phone">
+          <div class="contact-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <h3>Contact us by phone</h3>
+          <a class="contact-value contact-phone-link" href="tel:+441619563300">0161 956 3300</a>
+          <ul class="phone-options">
+            <li><span class="phone-option-num">Option 2</span> Cloud &amp; Connectivity</li>
+            <li><span class="phone-option-num">Sub-option 1</span> PSTN switch off</li>
+            <li><span class="phone-option-num">Sub-option 2</span> Provisioning &amp; porting</li>
+            <li><span class="phone-option-num">Sub-option 3</span> Technical support</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer id="site-footer">
+  <div class="footer-inner">
+    <p>Zest4 · Cloud &amp; Connectivity Hub · Internal &amp; reseller use</p>
+    <div class="footer-links">
+      <a href="mailto:ccsupport@zest4.com">ccsupport@zest4.com</a>
+      <a href="#tools">Tools</a>
+      <a href="#resources">Resources</a>
+      <a href="#guides">How-to guides</a>
+      <a href="#help-centres">Help centres</a>
+      <a href="#contact">Order &amp; support</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Register the service worker so the hub can be installed as a PWA
+  // and packaged with PWABuilder (https://www.pwabuilder.com/).
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch((err) => {
+        console.warn('Service worker registration failed:', err);
+      });
+    });
+  }
+</script>
+
+</body>
+</html>
