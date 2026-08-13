@@ -49,6 +49,7 @@
     color: var(--ink);
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
   a { color: inherit; }
@@ -59,6 +60,10 @@
     max-width: var(--max-w);
     margin: 0 auto;
     padding: 0 32px;
+  }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 0 18px; }
   }
 
   /* ---------- Skip link / focus ---------- */
@@ -103,12 +108,18 @@
     align-items: center;
     gap: 14px;
     text-decoration: none;
+    min-width: 0;
   }
 
   .brand-logo {
     height: 48px;
     width: auto;
     display: block;
+  }
+
+  @media (max-width: 600px) {
+    .topbar-inner { padding: 12px 16px; }
+    .brand-logo { height: 34px; }
   }
 
   nav.primary-nav {
@@ -128,8 +139,55 @@
 
   nav.primary-nav a:hover { border-bottom-color: var(--cyan); }
 
+  /* ---------- Mobile nav toggle ---------- */
+  .nav-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--navy-dark);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .nav-toggle:hover { border-color: var(--navy); }
+
+  .nav-toggle .icon-close { display: none; }
+  .nav-toggle[aria-expanded="true"] .icon-open { display: none; }
+  .nav-toggle[aria-expanded="true"] .icon-close { display: block; }
+
   @media (max-width: 720px) {
-    nav.primary-nav { display: none; }
+    .topbar-inner { position: relative; }
+
+    .nav-toggle { display: inline-flex; }
+
+    nav.primary-nav {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      gap: 0;
+      background: var(--paper-raised);
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 16px 30px -18px rgba(5, 84, 145, 0.4);
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.25s ease;
+    }
+
+    nav.primary-nav.is-open { max-height: 400px; }
+
+    nav.primary-nav a {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--line);
+      font-size: 16px;
+    }
   }
 
   /* ---------- Hero ---------- */
@@ -140,6 +198,10 @@
     background:
       radial-gradient(720px 420px at 82% -10%, rgba(0, 180, 239, 0.14), transparent 60%),
       var(--paper);
+  }
+
+  @media (max-width: 600px) {
+    .hero { padding: 44px 18px 40px; }
   }
 
   .hero-inner {
@@ -199,6 +261,11 @@
     flex-wrap: wrap;
   }
 
+  @media (max-width: 480px) {
+    .hero-actions { flex-direction: column; align-items: stretch; }
+    .hero-actions .btn { justify-content: center; }
+  }
+
   .btn {
     font-family: var(--font-body);
     font-weight: 600;
@@ -235,6 +302,10 @@
     display: block;
   }
 
+  @media (max-width: 600px) {
+    .signal-path { margin-top: 40px; }
+  }
+
   .signal-path .pulse {
     animation: travel 4.5s linear infinite;
   }
@@ -258,9 +329,17 @@
     padding: 72px 32px;
   }
 
+  @media (max-width: 600px) {
+    section.block { padding: 44px 18px; }
+  }
+
   .block-head {
     max-width: 640px;
     margin-bottom: 40px;
+  }
+
+  @media (max-width: 600px) {
+    .block-head { margin-bottom: 28px; }
   }
 
   .block-head .kicker {
@@ -309,6 +388,10 @@
     color: inherit;
     position: relative;
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+
+  @media (max-width: 600px) {
+    .tool-card { padding: 22px 20px 20px; }
   }
 
   .tool-card:hover {
@@ -401,6 +484,10 @@
     padding: 40px;
   }
 
+  @media (max-width: 600px) {
+    .resources-shell { padding: 22px 18px; }
+  }
+
   .file-group + .file-group {
     margin-top: 32px;
     padding-top: 32px;
@@ -420,6 +507,10 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 12px;
+  }
+
+  @media (max-width: 480px) {
+    .file-grid { grid-template-columns: 1fr; }
   }
 
   .file-row {
@@ -498,6 +589,10 @@
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
   }
 
+  @media (max-width: 600px) {
+    .guide-card { padding: 22px 20px 20px; }
+  }
+
   .guide-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 20px 40px -24px rgba(5, 84, 145, 0.35);
@@ -555,6 +650,10 @@
     text-decoration: none;
     color: inherit;
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+
+  @media (max-width: 600px) {
+    .helpcentre-card { padding: 22px 20px 20px; }
   }
 
   .helpcentre-card:hover {
@@ -620,6 +719,11 @@
     text-decoration: none;
     color: inherit;
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+
+  @media (max-width: 600px) {
+    .contact-card { padding: 20px 18px; }
+    .contact-phone-link { font-size: 16px; }
   }
 
   a.contact-card:hover {
@@ -711,6 +815,10 @@
     margin-top: 24px;
   }
 
+  @media (max-width: 600px) {
+    footer { padding: 28px 18px; }
+  }
+
   .footer-inner {
     max-width: var(--max-w);
     margin: 0 auto;
@@ -729,6 +837,7 @@
   .footer-links {
     display: flex;
     gap: 20px;
+    flex-wrap: wrap;
   }
 
   .footer-links a {
@@ -1049,7 +1158,11 @@
 </g>
 </svg>
     </a>
-    <nav class="primary-nav" aria-label="Primary">
+    <button type="button" class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="primaryNav" aria-label="Toggle menu">
+      <svg class="icon-open" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <svg class="icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <nav class="primary-nav" id="primaryNav" aria-label="Primary">
       <a href="#tools">Tools</a>
       <a href="#resources">Resources</a>
       <a href="#guides">How-to guides</a>
@@ -1369,6 +1482,35 @@
     </div>
   </div>
 </footer>
+
+<script>
+  // Mobile nav toggle
+  (function () {
+    var toggle = document.getElementById('navToggle');
+    var nav = document.getElementById('primaryNav');
+    if (!toggle || !nav) return;
+
+    function closeMenu() {
+      nav.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    toggle.addEventListener('click', function () {
+      var isOpen = nav.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    // Close the menu after a nav link is tapped
+    nav.querySelectorAll('a').forEach(function (link) {
+      link.addEventListener('click', closeMenu);
+    });
+
+    // Close the menu if the viewport grows back past the mobile breakpoint
+    window.addEventListener('resize', function () {
+      if (window.innerWidth > 720) closeMenu();
+    });
+  })();
+</script>
 
 <script>
   // Register the service worker so the hub can be installed as a PWA
