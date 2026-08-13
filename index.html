@@ -797,6 +797,30 @@
     align-items: baseline;
   }
 
+  .phone-options li a {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    color: var(--muted);
+    text-decoration: none;
+    border-radius: 6px;
+    margin: -4px -6px;
+    padding: 4px 6px;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .phone-options li a:hover,
+  .phone-options li a:focus-visible {
+    background: #E7F3FC;
+    color: var(--navy);
+  }
+
+  .phone-options li a:hover .phone-option-num,
+  .phone-options li a:focus-visible .phone-option-num {
+    background: var(--navy);
+    color: #fff;
+  }
+
   .phone-option-num {
     font-family: var(--font-mono);
     font-size: 11.5px;
@@ -1457,9 +1481,21 @@
           <a class="contact-value contact-phone-link" href="tel:+441619563300">0161 956 3300</a>
           <ul class="phone-options">
             <li><span class="phone-option-num">Option 2</span> Cloud &amp; Connectivity</li>
-            <li><span class="phone-option-num">Sub-option 1</span> PSTN switch off</li>
-            <li><span class="phone-option-num">Sub-option 2</span> Provisioning &amp; porting</li>
-            <li><span class="phone-option-num">Sub-option 3</span> Technical support</li>
+            <li>
+              <a href="tel:+441619563300,,2,,1">
+                <span class="phone-option-num">Sub-option 1</span> PSTN switch off
+              </a>
+            </li>
+            <li>
+              <a href="tel:+441619563300,,2,,2">
+                <span class="phone-option-num">Sub-option 2</span> Provisioning &amp; porting
+              </a>
+            </li>
+            <li>
+              <a href="tel:+441619563300,,2,,3">
+                <span class="phone-option-num">Sub-option 3</span> Technical support
+              </a>
+            </li>
           </ul>
         </div>
 
