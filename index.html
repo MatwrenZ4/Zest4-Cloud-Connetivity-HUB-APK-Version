@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Cloud &amp; Connectivity Hub | Zest4</title>
 
 <!-- PWA: manifest + icons -->
@@ -50,9 +50,22 @@
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
+    overscroll-behavior-y: contain;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  a { color: inherit; }
+  a { color: inherit; -webkit-tap-highlight-color: transparent; }
+
+  /* ---------- Touch active-states (hover is a no-op on Android) ---------- */
+  @media (hover: none) {
+    .tool-card:active { transform: scale(0.98); transition: transform 0.1s ease; }
+    .btn-primary:active { background: var(--navy-dark); }
+    .btn-ghost:active { border-color: var(--navy); background: rgba(5, 84, 145, 0.06); }
+    .contact-card:active,
+    .guide-card:active,
+    .helpcentre-card:active,
+    .file-row:active { background: rgba(5, 84, 145, 0.05); }
+  }
 
   img.logo-placeholder { display: block; }
 
@@ -94,6 +107,7 @@
     background: rgba(245, 248, 251, 0.92);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--line);
+    padding-top: env(safe-area-inset-top, 0px);
   }
 
   .topbar-inner {
@@ -836,11 +850,12 @@
   footer {
     border-top: 1px solid var(--line);
     padding: 40px 32px;
+    padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
     margin-top: 24px;
   }
 
   @media (max-width: 600px) {
-    footer { padding: 28px 18px; }
+    footer { padding: 28px 18px; padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
   }
 
   .footer-inner {
@@ -1247,7 +1262,7 @@
       <div class="tools-grid">
 
         <!-- Tool 1: Pricing calculator -->
-        <a class="tool-card" href="https://matwrenz4.github.io/C-C-Pricing-calculator/" target="_blank" rel="noopener">
+        <a class="tool-card" href="tools/pricing-calculator.html">
           <span class="tool-index">TOOL / 01</span>
           <div class="tool-icon" aria-hidden="true">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M16 11h0M8 15h2M12 15h2M16 15h0"/></svg>
@@ -1261,7 +1276,7 @@
         </a>
 
         <!-- Tool 2: Setup form -->
-        <a class="tool-card" href="https://matwrenz4.github.io/8x8-Callswitch-Config-Form-/" target="_blank" rel="noopener">
+        <a class="tool-card" href="tools/callswitch-setup-form.html">
           <span class="tool-index">TOOL / 02</span>
           <div class="tool-icon" aria-hidden="true">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v4M15 3v4M4 8h16v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V8z"/><path d="M8 13h2M14 13h2M8 17h2M14 17h2"/></svg>
@@ -1275,7 +1290,7 @@
         </a>
 
         <!-- Tool 3: CLoA form -->
-        <a class="tool-card" href="https://matwrenz4.github.io/Interactive-CLoA/" target="_blank" rel="noopener">
+        <a class="tool-card" href="tools/cloa-form.html">
           <span class="tool-index">TOOL / 03</span>
           <div class="tool-icon" aria-hidden="true">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
@@ -1526,24 +1541,55 @@
     var nav = document.getElementById('primaryNav');
     if (!toggle || !nav) return;
 
-    function closeMenu() {
+    var menuOpenedHistoryState = false;
+
+    function closeMenu(skipHistory) {
       nav.classList.remove('is-open');
       toggle.setAttribute('aria-expanded', 'false');
+      // If we pushed a history entry for the open menu and the caller isn't
+      // responding to a popstate (i.e. this is a normal close, not a back-press),
+      // unwind that entry so back-button state stays in sync.
+      if (menuOpenedHistoryState && !skipHistory) {
+        history.back();
+      }
+      menuOpenedHistoryState = false;
+    }
+
+    function openMenu() {
+      nav.classList.add('is-open');
+      toggle.setAttribute('aria-expanded', 'true');
+      // Push a history entry so the Android hardware/gesture back button
+      // closes the menu first, instead of leaving the page or exiting the app.
+      history.pushState({ navOpen: true }, '');
+      menuOpenedHistoryState = true;
     }
 
     toggle.addEventListener('click', function () {
-      var isOpen = nav.classList.toggle('is-open');
-      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      var isOpen = nav.classList.contains('is-open');
+      if (isOpen) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
     });
 
     // Close the menu after a nav link is tapped
     nav.querySelectorAll('a').forEach(function (link) {
-      link.addEventListener('click', closeMenu);
+      link.addEventListener('click', function () { closeMenu(); });
+    });
+
+    // Back button/gesture: close the menu instead of navigating away
+    window.addEventListener('popstate', function () {
+      if (nav.classList.contains('is-open')) {
+        closeMenu(true);
+      }
     });
 
     // Close the menu if the viewport grows back past the mobile breakpoint
     window.addEventListener('resize', function () {
-      if (window.innerWidth > 720) closeMenu();
+      if (window.innerWidth > 720 && nav.classList.contains('is-open')) {
+        closeMenu();
+      }
     });
   })();
 </script>

@@ -1,0 +1,2259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zest4 | Cloud & Connectivity Pricing Calculator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --z-blue: #1421e0;
+    --z-blue-deep: #0d167f;
+    --z-yellow: #ffd400;
+    --ink: #15182c;
+    --ink-soft: #565a72;
+    --line: #e3e4ee;
+    --bg: #f5f6fb;
+    --card: #ffffff;
+    --good: #0f9d58;
+    --radius: 10px;
+    font-size: 16px;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  .app{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 20px 80px;
+  }
+
+  /* ---------- Header ---------- */
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+  }
+  .brand-logo{
+    height: 34px;
+    width: auto;
+    display: block;
+  }
+  .brand-sub{
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    border-left: 1px solid var(--line);
+    padding-left: 12px;
+  }
+  .mode-pill{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 14px 6px 6px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+  }
+  .mode-pill strong{
+    color: var(--z-blue);
+    font-weight: 700;
+  }
+  .mode-pill .dot{
+    width:8px; height:8px; border-radius:50%;
+    background: var(--good);
+    flex: none;
+  }
+  .mode-pill button{
+    border: none;
+    background: transparent;
+    color: var(--z-blue);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+  }
+  .mode-pill button:hover{ background: #eef0ff; }
+
+  /* ---------- Gate screen ---------- */
+  .gate{
+    min-height: 70vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+  }
+  .gate-card{
+    max-width: 620px;
+  }
+  .gate-eyebrow{
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--z-blue);
+    margin-bottom: 10px;
+  }
+  .gate h1{
+    font-size: clamp(28px, 4vw, 38px);
+    line-height: 1.15;
+    margin: 0 0 14px;
+    letter-spacing: -0.5px;
+  }
+  .gate p.lead{
+    color: var(--ink-soft);
+    font-size: 16px;
+    margin: 0 0 36px;
+    line-height: 1.5;
+  }
+  .gate-options{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 600px){
+    .gate-options{ grid-template-columns: 1fr; }
+  }
+  .gate-btn{
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: 16px;
+    padding: 28px 22px;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+    font-family: inherit;
+  }
+  .gate-btn:hover{
+    border-color: var(--z-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(20,33,224,0.12);
+  }
+  .gate-btn .icon{
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    background: var(--z-blue);
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom: 16px;
+    color: white;
+    font-weight: 800;
+    font-size: 16px;
+  }
+  .gate-btn.alt .icon{ background: var(--z-blue-deep); }
+  .gate-btn h3{
+    margin: 0 0 6px;
+    font-size: 18px;
+  }
+  .gate-btn p{
+    margin: 0;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.45;
+  }
+
+  /* ---------- Main layout ---------- */
+  .layout{
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 880px){
+    .layout{ grid-template-columns: 1fr; }
+  }
+
+  .panel{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .panel h2{
+    font-size: 15px;
+    margin: 0 0 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--ink-soft);
+  }
+
+  /* ---------- Product selector ---------- */
+  .selector-row{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 520px){
+    .selector-row{ grid-template-columns: 1fr; }
+  }
+  label.field-label{
+    display:block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  select, input[type="number"], input[type="text"]{
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1.5px solid var(--line);
+    font-size: 14.5px;
+    font-family: inherit;
+    background: #fff;
+    color: var(--ink);
+  }
+  select:focus, input:focus{
+    outline: none;
+    border-color: var(--z-blue);
+  }
+  .qty-row{
+    display:flex;
+    gap: 10px;
+    align-items: end;
+  }
+  .qty-row .qty-field{ width: 110px; flex: none; }
+  .add-btn{
+    background: var(--z-blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 18px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    flex: 1;
+    transition: background .15s ease;
+  }
+  .add-btn:hover{ background: var(--z-blue-deep); }
+  .add-btn:disabled{
+    background: #c4c8e6;
+    cursor: not-allowed;
+  }
+
+  .item-preview{
+    background: #f8f9ff;
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+    min-height: 20px;
+  }
+  .item-preview strong{ color: var(--ink); }
+  .item-preview .price-tag{
+    color: var(--z-blue);
+    font-weight: 700;
+  }
+
+  .notes-line{
+    font-size: 12px;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-top: -6px;
+    margin-bottom: 14px;
+  }
+
+  /* Quick search */
+  .search-wrap{ margin-bottom: 14px; }
+
+  /* ---------- Quote list ---------- */
+  .quote-empty{
+    text-align:center;
+    padding: 36px 12px;
+    color: var(--ink-soft);
+    font-size: 13.5px;
+  }
+  .quote-item{
+    display:grid;
+    grid-template-columns: 1fr auto auto auto;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .quote-item:last-child{ border-bottom: none; }
+  .qi-name{
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .qi-name .qi-group{
+    display:block;
+    font-weight: 500;
+    color: var(--ink-soft);
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 2px;
+  }
+  .qi-qty{
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .qi-qty button{
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    color: var(--ink-soft);
+  }
+  .qi-qty button:hover{ background: #f1f2f9; }
+  .qi-qty input{
+    width: 42px;
+    text-align: center;
+    padding: 4px 2px;
+    font-size: 13px;
+  }
+  .qi-price{
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  .qi-total{
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    min-width: 70px;
+    text-align: right;
+  }
+  .qi-remove{
+    background: none;
+    border: none;
+    color: #c0392b;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 4px 6px;
+    border-radius: 6px;
+  }
+  .qi-remove:hover{ background: #fbeaea; }
+
+  .qi-setup-note{
+    font-size: 11px;
+    color: var(--ink-soft);
+    grid-column: 1 / -1;
+    margin-top: -4px;
+  }
+
+  /* ---------- Totals ---------- */
+  .totals-box{
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 2px solid var(--ink);
+  }
+  .totals-row{
+    display:flex;
+    justify-content: space-between;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+  .totals-row.grand{
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--ink);
+    margin-top: 4px;
+  }
+  .totals-row.grand .val{ color: var(--z-blue); }
+
+  .clear-btn{
+    width: 100%;
+    margin-top: 16px;
+    background: transparent;
+    border: 1.5px solid var(--line);
+    color: var(--ink-soft);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .clear-btn:hover{
+    border-color: #c0392b;
+    color: #c0392b;
+  }
+
+  .footer-note{
+    margin-top: 18px;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+
+  /* ---------- Call-routing gate (8x8 ring group check) ---------- */
+  .call-gate-container{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .call-gate-box{
+    text-align: center;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    max-width: 400px;
+  }
+  .call-gate-hidden{
+    display: none !important;
+  }
+  .call-gate-loader{
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: call-gate-spin 1s linear infinite;
+    margin: 0 auto 20px auto;
+  }
+  @keyframes call-gate-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+
+<style>
+  #zest4BackToHub {
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    padding-top: calc(10px + env(safe-area-inset-top, 0px));
+    background: #055491;
+    color: #fff;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #zest4BackToHub:active { background: #033B66; }
+</style>
+<a id="zest4BackToHub" href="../index.html" aria-label="Back to Cloud &amp; Connectivity Hub">&larr; Back to Hub</a>
+
+<!-- 1. CALL VERIFICATION GATE: shown briefly while we check the callee extension -->
+<div id="checking-status" class="call-gate-container">
+  <div class="call-gate-box">
+    <div class="call-gate-loader"></div>
+    <h2>Verifying Call Route...</h2>
+    <p>Checking incoming extension filtering rules.</p>
+  </div>
+</div>
+
+<!-- 2. PRICING CALCULATOR: only revealed if callee extension matches the target ring group -->
+<div class="app call-gate-hidden" id="app"></div>
+
+<script>
+// Zest4 Cloud & Connectivity Pricing Data
+// "rrp" = Direct/Dealer customer pricing (Tariff-Guide-Cloud-RRP-Latest)
+// "ws"  = Reseller/Wholesale customer pricing (Tariff-Guide-Cloud-WS-Latest)
+// All prices exc. VAT, GBP, per month unless billing/unit says otherwise.
+
+const PRICING_DATA = {
+  rrp: {
+    label: "Direct / Dealer (RRP)",
+    sourceNote: "Tariff Guide – Cloud RRP, updated May 2026",
+    categories: [
+      {
+        id: "8x8-xseries",
+        group: "8x8",
+        name: "X Series Licences",
+        billing: "per user / per month",
+        items: [
+          { name: "Lobby", price: 4.00, unit: "user/mo" },
+          { name: "X1", price: 10.00, unit: "user/mo" },
+          { name: "X2", price: 20.00, unit: "user/mo" },
+          { name: "X3", price: 25.00, unit: "user/mo" },
+          { name: "X4", price: 37.00, unit: "user/mo" },
+          { name: "X6", price: 100.00, unit: "user/mo" },
+          { name: "X7", price: 115.00, unit: "user/mo" },
+          { name: "X8", price: 145.00, unit: "user/mo" },
+        ],
+        notes: "24 month term. Set up fee £15.00 per user. Revenue share 10–25%.",
+      },
+      {
+        id: "8x8-numbers",
+        group: "8x8",
+        name: "Additional Items & Numbers",
+        billing: "varies",
+        items: [
+          { name: "UK Virtual Number / DDI (rental)", price: 1.00, unit: "mo" },
+          { name: "UK Toll Free Virtual Number (rental)", price: 4.00, unit: "mo" },
+          { name: "International Virtual Number (rental)", price: 9.00, unit: "mo", setup: 10.00 },
+          { name: "International Toll Free Virtual Number (rental)", price: 8.00, unit: "mo" },
+          { name: "International Virtual Fax Number (rental)", price: 9.00, unit: "mo", setup: 10.00 },
+        ],
+      },
+      {
+        id: "8x8-porting",
+        group: "8x8",
+        name: "Porting Charges",
+        billing: "one-off",
+        items: [
+          { name: "Successful Port", price: 0, unit: "one-off", note: "FOC" },
+          { name: "Date Change", price: 30.00, unit: "one-off" },
+          { name: "Order Rejected", price: 15.00, unit: "one-off" },
+        ],
+      },
+      {
+        id: "8x8-teams",
+        group: "8x8",
+        name: "Voice for Microsoft Teams",
+        billing: "one-off / per seat",
+        items: [
+          { name: "Implementation Plus (≤250 seats)", price: 240.00, unit: "one-off" },
+          { name: "Managed Implementation Services (251+ seats)", price: 1200.00, unit: "one-off" },
+          { name: "Microsoft Teams Bolt-On", price: 0, unit: "mo", note: "FOC" },
+        ],
+      },
+      {
+        id: "8x8-call-recording",
+        group: "8x8",
+        name: "X Series Call Recording Storage",
+        billing: "per licence / per month",
+        items: [
+          { name: "Cold Storage (1 year)", price: 1.95, unit: "licence/mo" },
+          { name: "Cold Storage (2 years)", price: 2.45, unit: "licence/mo" },
+          { name: "Cold Storage (3 years)", price: 2.95, unit: "licence/mo" },
+          { name: "Cold Storage (4 years)", price: 3.45, unit: "licence/mo" },
+          { name: "Cold Storage (5 years)", price: 3.90, unit: "licence/mo" },
+          { name: "Cold Storage (6 years)", price: 4.30, unit: "licence/mo" },
+          { name: "Cold Storage (7 years)", price: 4.60, unit: "licence/mo" },
+          { name: "Cold Storage (8 years)", price: 4.90, unit: "licence/mo" },
+          { name: "Cold Storage (9 years)", price: 5.15, unit: "licence/mo" },
+          { name: "Cold Storage (10 years)", price: 5.30, unit: "licence/mo" },
+          { name: "Hot Storage (130 Days)", price: 1.20, unit: "licence/mo" },
+        ],
+      },
+      {
+        id: "8x8-screen-recording",
+        group: "8x8",
+        name: "X Series Screen Recording Storage",
+        billing: "per licence / per month",
+        items: [
+          { name: "Cold Storage (1 year)", price: 9.50, unit: "licence/mo" },
+          { name: "Cold Storage (2 years)", price: 17.50, unit: "licence/mo" },
+          { name: "Cold Storage (3 years)", price: 21.50, unit: "licence/mo" },
+          { name: "Cold Storage (4 years)", price: 25.50, unit: "licence/mo" },
+          { name: "Cold Storage (5 years)", price: 29.50, unit: "licence/mo" },
+          { name: "Cold Storage (6 years)", price: 33.50, unit: "licence/mo" },
+          { name: "Cold Storage (7 years)", price: 37.50, unit: "licence/mo" },
+          { name: "Cold Storage (8 years)", price: 41.50, unit: "licence/mo" },
+          { name: "Cold Storage (9 years)", price: 45.50, unit: "licence/mo" },
+          { name: "Cold Storage (10 years)", price: 49.50, unit: "licence/mo" },
+          { name: "Hot Storage (30 days)", price: 6.50, unit: "licence/mo" },
+          { name: "Hot Storage (130 days)", price: 18.50, unit: "licence/mo" },
+          { name: "Screen Recording Archive", price: 0.75, unit: "licence/mo" },
+          { name: "Screen Recording Retention (10 days)", price: 7.50, unit: "licence/mo" },
+          { name: "Screen Recording Retention (40 days)", price: 12.00, unit: "licence/mo" },
+        ],
+      },
+      {
+        id: "csw-licences",
+        group: "CallSwitch One",
+        name: "Main Licences",
+        billing: "per user / per month",
+        items: [
+          { name: "With Hardware (Yealink T42U) – 36 Months", price: 15.75, unit: "user/mo", setup: 15.00 },
+          { name: "With Hardware (Yealink T42U) – 48 Months", price: 12.75, unit: "user/mo", setup: 15.00 },
+          { name: "With Hardware (Yealink T42U) – 60 Months", price: 11.50, unit: "user/mo", setup: 15.00 },
+          { name: "Licence Only – 12 Months", price: 12.95, unit: "user/mo", setup: 15.00 },
+        ],
+      },
+      {
+        id: "csw-services",
+        group: "CallSwitch One",
+        name: "Additional Services",
+        billing: "per user / per month",
+        items: [
+          { name: "Analytics Suite", price: 3.25, unit: "user/mo" },
+          { name: "Call Recording (12 months storage)", price: 2.50, unit: "user/mo" },
+          { name: "Call Recording (36 months storage)", price: 3.25, unit: "user/mo" },
+          { name: "Call Recording (60 months storage)", price: 4.25, unit: "user/mo" },
+          { name: "Virtual Mobile Number Bolt-On (12mo term)", price: 5.00, unit: "user/mo" },
+        ],
+      },
+      {
+        id: "csw-porting",
+        group: "CallSwitch One",
+        name: "Number Porting & Allocation",
+        billing: "varies",
+        items: [
+          { name: "Standard Geographic Single/Non-Geo/Mobile Line", price: 10.00, unit: "number" },
+          { name: "Standard Geographic Multi-line", price: 10.00, unit: "number", note: "up to max £50" },
+          { name: "Date Change", price: 10.00, unit: "number" },
+          { name: "Cancellation", price: 10.00, unit: "number" },
+          { name: "Resubmissions", price: 10.00, unit: "order" },
+          { name: "Rejection", price: 10.00, unit: "order" },
+          { name: "Out of Hours - Mon to Fri", price: 250.00, unit: "order" },
+          { name: "Out of Hours - Weekends", price: 500.00, unit: "order" },
+          { name: "Porting Out", price: 5.00, unit: "number" },
+          { name: "New Number Allocation (01/02/03)", price: 0, unit: "connection", note: "FOC" },
+          { name: "New Number Subscription (per DDI)", price: 0.50, unit: "number/mo" },
+          { name: "New Mobile Number Allocation", price: 0.50, unit: "number" },
+          { name: "New Mobile Number Subscription", price: 1.00, unit: "number/mo" },
+        ],
+      },
+      {
+        id: "horizon-licences",
+        group: "Horizon",
+        name: "Licences",
+        billing: "per user / per month",
+        items: [
+          { name: "Premium Licence – 36 Months", price: 12.95, unit: "user/mo" },
+          { name: "Premium Licence – 60 Months", price: 11.95, unit: "user/mo" },
+        ],
+      },
+      {
+        id: "horizon-porting",
+        group: "Horizon",
+        name: "Porting Charges",
+        billing: "varies",
+        items: [
+          { name: "Single Line Port Order", price: 12.00, unit: "CLI" },
+          { name: "Multi Line Port Order (Aux)", price: 22.00, unit: "billing number" },
+          { name: "Multi Line Port Order w/ DDI Block (up to 10)", price: 56.00, unit: "billing number" },
+          { name: "Multi Line Port Order w/ DDI Block (11+)", price: 110.00, unit: "billing number" },
+          { name: "OOH Porting (Evenings Mon-Fri)", price: 135.00, unit: "order/day" },
+          { name: "OOH Porting (Saturday)", price: 270.00, unit: "order/day" },
+          { name: "DMA Transfer w/ Block of 1000 DDIs", price: 550.00, unit: "billing number" },
+          { name: "Geographic Porting Out", price: 15.00, unit: "number" },
+          { name: "Error 01: Order Rejection", price: 15.00, unit: "order" },
+          { name: "Error 02: Date Changed/Emergency Restore", price: 30.00, unit: "order" },
+          { name: "Error 03: Cancellation by Partner", price: 15.00, unit: "order" },
+          { name: "Error 04: Order Timed Out", price: 15.00, unit: "order" },
+          { name: "Out of Hours Provisioning Support", price: 520.00, unit: "day" },
+          { name: "Manual Pre-Port Test Call", price: 30.00, unit: "request" },
+        ],
+      },
+      {
+        id: "horizon-boltons",
+        group: "Horizon",
+        name: "Bolt-Ons (per user/month)",
+        billing: "per user / per month",
+        items: [
+          { name: "Call Centre Agent", price: 5.00, unit: "user/mo" },
+          { name: "Call Centre Supervisor Client", price: 25.00, unit: "user/mo" },
+          { name: "Call Queue User", price: 2.00, unit: "user/mo" },
+          { name: "Receptionist Console", price: 25.00, unit: "user/mo" },
+          { name: "Horizon Integrator", price: 1.50, unit: "user/mo" },
+          { name: "Horizon Integrator CRM", price: 4.00, unit: "user/mo" },
+          { name: "Softphone", price: 2.50, unit: "user/mo" },
+          { name: "Webex Basic", price: 5.50, unit: "user/mo" },
+          { name: "Webex Standard", price: 9.00, unit: "user/mo" },
+          { name: "Webex Premium", price: 21.50, unit: "user/mo" },
+          { name: "Horizon Collaborate", price: 6.00, unit: "user/mo" },
+        ],
+      },
+      {
+        id: "horizon-mobile-boltons",
+        group: "Horizon",
+        name: "Mobile Bolt-Ons (shared minutes)",
+        billing: "per bundle / per month",
+        items: [
+          { name: "Mobile Bolt-On 1000 (1000 shared mins)", price: 10.00, unit: "bundle/mo" },
+          { name: "Mobile Bolt-On 3000 (3000 shared mins)", price: 30.00, unit: "bundle/mo" },
+          { name: "Mobile Bolt-On 5000 (5000 shared mins)", price: 50.00, unit: "bundle/mo" },
+          { name: "Mobile Bolt-On 10,000 (10,000 shared mins)", price: 100.00, unit: "bundle/mo" },
+        ],
+      },
+      {
+        id: "horizon-call-recording",
+        group: "Horizon",
+        name: "Call Recording (data storage)",
+        billing: "per month",
+        items: [
+          { name: "Call Recording 900MB", price: 12.50, unit: "mo" },
+          { name: "Call Recording 1,800MB", price: 25.00, unit: "mo" },
+          { name: "Call Recording 3,600MB", price: 43.50, unit: "mo" },
+          { name: "Call Recording 9,000MB", price: 62.50, unit: "mo" },
+          { name: "Call Recording 18,000MB", price: 100.00, unit: "mo" },
+          { name: "Call Recording 45,000MB", price: 150.00, unit: "mo" },
+          { name: "Call Recording 90,000MB", price: 225.00, unit: "mo" },
+          { name: "Call Recording 180,000MB", price: 375.00, unit: "mo" },
+          { name: "Call Recording 360,000MB", price: 625.00, unit: "mo" },
+        ],
+      },
+      {
+        id: "horizon-peruser-recording",
+        group: "Horizon",
+        name: "Per User Call Recording",
+        billing: "per user / per month",
+        items: [
+          { name: "Business Call Recording – 3 Months", price: 2.00, unit: "user/mo" },
+          { name: "Business Call Recording – 6 Months", price: 2.25, unit: "user/mo" },
+          { name: "Business Call Recording – 12 Months", price: 2.50, unit: "user/mo" },
+          { name: "Business Call Recording – 36 Months", price: 5.00, unit: "user/mo" },
+          { name: "Compliant Call Recording – 84 Months", price: 12.50, unit: "user/mo" },
+        ],
+      },
+      {
+        id: "akixi",
+        group: "Akixi",
+        name: "Set Up (one-off)",
+        billing: "one-off",
+        items: [
+          { name: "Akixi Lite Set Up", price: 110.00, unit: "one-off" },
+          { name: "Akixi 1000 Set Up", price: 182.50, unit: "one-off" },
+          { name: "Akixi 2000 Set Up", price: 472.50, unit: "one-off" },
+          { name: "Akixi 3000 Set Up", price: 600.00, unit: "one-off" },
+          { name: "Akixi Training", price: 355.00, unit: "one-off" },
+        ],
+      },
+      {
+        id: "akixi-rental",
+        group: "Akixi",
+        name: "Rental (per month)",
+        billing: "per month",
+        items: [
+          { name: "Akixi Lite - Supervisor", price: 5.00, unit: "mo" },
+          { name: "Akixi Lite - Extensions", price: 0.70, unit: "mo" },
+          { name: "Akixi 1000 - Supervisor", price: 6.75, unit: "mo" },
+          { name: "Akixi 1000 - Extensions", price: 2.10, unit: "mo" },
+          { name: "Akixi 2000 - Supervisor", price: 25.75, unit: "mo" },
+          { name: "Akixi 2000 - Extensions", price: 2.10, unit: "mo" },
+          { name: "Akixi 3000 - Supervisor", price: 30.00, unit: "mo" },
+          { name: "Akixi 3000 - Extensions", price: 2.10, unit: "mo" },
+        ],
+      },
+      {
+        id: "connectivity",
+        group: "Connectivity",
+        name: "SIP, FTTP & SoGEA",
+        billing: "per month",
+        items: [
+          { name: "SIP Connection Fee (Per Site)", price: 70.00, unit: "one-off" },
+          { name: "FTTP 80/20", price: 36.00, unit: "mo", setup: 85.00 },
+          { name: "FTTP 160/30", price: 39.50, unit: "mo", setup: 85.00 },
+          { name: "FTTP 330/50", price: 46.00, unit: "mo", setup: 85.00 },
+          { name: "FTTP 550/75", price: 53.00, unit: "mo", setup: 85.00 },
+          { name: "FTTP 1000/115", price: 59.00, unit: "mo", setup: 85.00 },
+          { name: "SoGEA 80/20", price: 34.00, unit: "mo", setup: 40.00 },
+        ],
+      },
+      {
+        id: "engineering",
+        group: "Engineering",
+        name: "Site Survey, Install & Training",
+        billing: "one-off / hourly",
+        items: [
+          { name: "Site Survey (1-50 Extensions)", price: 200.00, unit: "one-off" },
+          { name: "Install (1-50 Ext, Half Day)", price: 250.00, unit: "one-off" },
+          { name: "Install (1-50 Ext, Full Day)", price: 350.00, unit: "one-off" },
+          { name: "On-site Training (2 Sessions)", price: 320.00, unit: "one-off" },
+          { name: "On-site Training (4 Sessions)", price: 432.00, unit: "one-off" },
+          { name: "Webinar Training (2 Sessions)", price: 270.00, unit: "one-off" },
+          { name: "Webinar Training (4 Sessions)", price: 350.00, unit: "one-off" },
+          { name: "On-site Admin Training (1 Session)", price: 320.00, unit: "one-off" },
+          { name: "Webinar Admin Training (1 Session)", price: 270.00, unit: "one-off" },
+          { name: "Out of Scope Remote Support", price: 200.00, unit: "hour" },
+        ],
+      },
+      {
+        id: "hw-8x8",
+        group: "Hardware",
+        name: "8x8 Hardware",
+        billing: "one-off per unit",
+        items: [
+          { name: "Poly Edge E100 IP Phone PoE", price: 97.95, unit: "unit" },
+          { name: "Poly Edge E100 IP Phone PoE (Amortised 36M)", price: 3.00, unit: "unit/mo" },
+          { name: "Poly Edge E220 IP Phone PoE", price: 103.92, unit: "unit" },
+          { name: "Poly Edge E220 IP Phone PoE (Amortised 36M)", price: 3.25, unit: "unit/mo" },
+          { name: "Poly Edge E300 IP Phone PoE", price: 137.17, unit: "unit" },
+          { name: "Poly Edge E300 IP Phone PoE (Amortised 36M)", price: 4.00, unit: "unit/mo" },
+          { name: "Poly Edge E320 IP Phone PoE", price: 149.84, unit: "unit" },
+          { name: "Poly Edge E320 IP Phone PoE (Amortised 36M)", price: 4.25, unit: "unit/mo" },
+          { name: "Poly Edge E350 IP Phone PoE", price: 161.50, unit: "unit" },
+          { name: "Poly Edge E350 IP Phone PoE (Amortised 36M)", price: 4.75, unit: "unit/mo" },
+          { name: "Poly Edge E400", price: 166.39, unit: "unit" },
+          { name: "Poly Edge E450", price: 211.28, unit: "unit" },
+          { name: "Poly Edge E500 IP Phone PoE", price: 193.72, unit: "unit" },
+          { name: "Poly Edge E500 IP Phone PoE (Amortised 36M)", price: 5.50, unit: "unit/mo" },
+          { name: "Poly Edge E550 IP Phone PoE", price: 209.03, unit: "unit" },
+          { name: "Poly Edge E550 IP Phone PoE (Amortised 36M)", price: 6.00, unit: "unit/mo" },
+          { name: "Poly Edge Expansion Module E400+", price: 194.45, unit: "unit" },
+          { name: "Poly Edge PSU", price: 13.97, unit: "unit" },
+          { name: "Poly PSU CCX 500/600/700, Edge E500 – 48V UK", price: 31.97, unit: "unit" },
+          { name: "Poly CCX 700", price: 385.11, unit: "unit" },
+          { name: "Poly IP 6000 Speakerphone PoE", price: 502.59, unit: "unit" },
+          { name: "Poly IP7000 Power Injector", price: 64.78, unit: "unit" },
+          { name: "Poly CCX 350 PSU 5V/3A UK", price: 14.16, unit: "unit" },
+          { name: "Polycom Rove 30 DECT IP Phone Handset", price: 118.87, unit: "unit" },
+          { name: "Polycom Rove B2 DECT Base Station", price: 209.82, unit: "unit" },
+          { name: "Polycom VVX X50 Power Supply", price: 20.74, unit: "unit" },
+          { name: "RealPresence Trio 8800 (No Power Kit)", price: 465.57, unit: "unit" },
+          { name: "Power Kit for Trio 8500 UK", price: 84.02, unit: "unit" },
+          { name: "Power Kit for Trio 8800 / Trio Visual+", price: 84.02, unit: "unit" },
+          { name: "Yealink SIP-T53", price: 100.37, unit: "unit" },
+          { name: "Yealink SIP-T53 IP Phone PoE (Amortised 36M)", price: 3.00, unit: "unit/mo" },
+          { name: "Yealink SIP T53W", price: 124.86, unit: "unit" },
+          { name: "Yealink SIP-T53W IP Phone PoE (Amortised 36M)", price: 3.75, unit: "unit/mo" },
+          { name: "Yealink SIP-T54W", price: 151.93, unit: "unit" },
+          { name: "Yealink SIP-T54W IP Phone PoE (Amortised 36M)", price: 4.50, unit: "unit/mo" },
+          { name: "Yealink SIP-T57W", price: 205.49, unit: "unit" },
+          { name: "Yealink SIP-T57W IP Phone PoE (Amortised 36M)", price: 6.00, unit: "unit/mo" },
+          { name: "Yealink SIP-T58W", price: 262.77, unit: "unit" },
+          { name: "Yealink SIP-T58W IP Phone PoE (Amortised 36M)", price: 7.50, unit: "unit/mo" },
+          { name: "Yealink SIP-T58W Pro Media IP Phone", price: 228.16, unit: "unit" },
+          { name: "Yealink T33G IP Phone", price: 74.76, unit: "unit" },
+          { name: "Yealink T42U", price: 88.77, unit: "unit" },
+          { name: "Yealink T43U", price: 95.22, unit: "unit" },
+          { name: "Yealink T48U", price: 188.09, unit: "unit" },
+          { name: "Yealink W56H DECT Handset Only", price: 79.75, unit: "unit" },
+          { name: "Yealink W56H DECT Handset (Amortised 36M)", price: 3.50, unit: "unit/mo" },
+          { name: "Yealink W59R Rugged DECT Handset", price: 127.44, unit: "unit" },
+          { name: "Yealink W70B DECT Base Station Only", price: 68.15, unit: "unit" },
+          { name: "Yealink W76P (W70B + W56H)", price: 118.42, unit: "unit" },
+          { name: "Yealink W79P (W70B + W59R)", price: 173.84, unit: "unit" },
+          { name: "Yealink W79P (W70B + W59R) Amortised 36M", price: 5.00, unit: "unit/mo" },
+          { name: "Yealink 10W Power Supply", price: 7.85, unit: "unit" },
+          { name: "Yealink Power Supply T41/T42", price: 7.85, unit: "unit" },
+          { name: "Yealink Power Supply T46/T48/T54W/T57W", price: 11.76, unit: "unit" },
+          { name: "Audio Codes MP112 2 Port ATA", price: 147.99, unit: "unit" },
+          { name: "Audio Codes MP114 4 Port ATA", price: 270.99, unit: "unit" },
+          { name: "Audio Codes MP118 8 Port ATA", price: 430.99, unit: "unit" },
+          { name: "Audio Codes MP124 24 Port FXS ATA", price: 1099.99, unit: "unit" },
+          { name: "Grandstream HT814 ATA", price: 87.83, unit: "unit" },
+          { name: "Obihai OBi 300 1 Port SIP ATA", price: 67.00, unit: "unit" },
+        ],
+        notes: "Source: 8x8 Hardware Pricelist. All prices exc. VAT, per unit.",
+      },
+      {
+        id: "hw-csw",
+        group: "Hardware",
+        name: "CallSwitch One Hardware",
+        billing: "one-off per unit",
+        items: [
+          { name: "Yealink T42U", price: 70.00, unit: "unit" },
+          { name: "Yealink T42U (Hardware Bundle)", price: 0.00, unit: "unit", note: "FOC when bundled with licence" },
+          { name: "Yealink T43U", price: 80.00, unit: "unit" },
+          { name: "Yealink T43U (Hardware Bundle)", price: 20.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Yealink T46U", price: 125.00, unit: "unit" },
+          { name: "Yealink T46U (Hardware Bundle)", price: 70.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Yealink T48U", price: 155.00, unit: "unit" },
+          { name: "Yealink T48U (Hardware Bundle)", price: 100.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Yealink T57W", price: 180.00, unit: "unit" },
+          { name: "Yealink T57W (Hardware Bundle)", price: 125.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Yealink W56H", price: 70.00, unit: "unit" },
+          { name: "Yealink W56H (Hardware Bundle)", price: 5.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Yealink W59R", price: 95.00, unit: "unit" },
+          { name: "Yealink W59R (Hardware Bundle)", price: 40.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Yealink W76P", price: 135.00, unit: "unit" },
+          { name: "Yealink W76P (Hardware Bundle)", price: 30.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Yealink W77P", price: 120.00, unit: "unit" },
+          { name: "Yealink W77P (Hardware Bundle)", price: 65.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Yealink W70B DECT Base Station Only", price: 68.15, unit: "unit" },
+          { name: "Yealink Expansion Module EXP40", price: 60.00, unit: "unit" },
+          { name: "Yealink Power Supply (T42U / T43U / T53)", price: 8.00, unit: "unit" },
+          { name: "Yealink Power Supply (T46U / T48U / T54W)", price: 10.67, unit: "unit" },
+          { name: "Grandstream GXV3370", price: 230.00, unit: "unit" },
+          { name: "Grandstream GXV3370 (Hardware Bundle)", price: 175.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Grandstream GXV3380", price: 350.00, unit: "unit" },
+          { name: "Grandstream GXV3380 (Hardware Bundle)", price: 295.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Grandstream WP820", price: 160.00, unit: "unit" },
+          { name: "Grandstream WP820 (Hardware Bundle)", price: 95.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Grandstream ATA 801", price: 45.00, unit: "unit" },
+        ],
+        notes: "Source: CS1 Hardware Pricelist. 'Hardware Bundle' prices apply when ordered alongside a CallSwitch One licence. All prices exc. VAT, per unit.",
+      },
+    ],
+  },
+
+  ws: {
+    label: "Reseller (Wholesale)",
+    sourceNote: "Tariff Guide – Cloud Wholesale, updated June 2026",
+    categories: [
+      {
+        id: "8x8-engage",
+        group: "8x8",
+        name: "Engage",
+        billing: "per seat / per month",
+        items: [
+          { name: "8x8 Engage – 24 Months", price: 27.50, unit: "seat/mo", setup: 30.00 },
+          { name: "8x8 Engage – 36 Months", price: 27.00, unit: "seat/mo", setup: 30.00 },
+          { name: "8x8 Engage – 60 Months", price: 26.00, unit: "seat/mo", setup: 30.00 },
+        ],
+        notes: "£30 setup fee per seat applies unless partner is trained to self-provision.",
+      },
+      {
+        id: "8x8-xseries",
+        group: "8x8",
+        name: "X Series Licences",
+        billing: "per user / per month",
+        items: [
+          { name: "Lobby – 24 Month Term", price: 3.50, unit: "user/mo" },
+          { name: "X1 – 24 Month Term", price: 7.50, unit: "user/mo" },
+          { name: "X1 – 36 Month Term", price: 7.00, unit: "user/mo" },
+          { name: "X1 – 60 Month Term", price: 6.50, unit: "user/mo" },
+          { name: "X2 – 24 Month Term", price: 13.50, unit: "user/mo" },
+          { name: "X2 – 36 Month Term", price: 13.00, unit: "user/mo" },
+          { name: "X2 – 60 Month Term", price: 12.50, unit: "user/mo" },
+          { name: "X3 – 24 Month Term", price: 17.50, unit: "user/mo" },
+          { name: "X3 – 36 Month Term", price: 17.00, unit: "user/mo" },
+          { name: "X3 – 60 Month Term", price: 16.50, unit: "user/mo" },
+          { name: "X4 – 24 Month Term", price: 25.00, unit: "user/mo" },
+          { name: "X4 – 36 Month Term", price: 24.50, unit: "user/mo" },
+          { name: "X4 – 60 Month Term", price: 24.00, unit: "user/mo" },
+          { name: "X6 – 24 Month Term", price: 67.50, unit: "user/mo" },
+          { name: "X6 – 36 Month Term", price: 65.50, unit: "user/mo" },
+          { name: "X6 – 60 Month Term", price: 63.50, unit: "user/mo" },
+          { name: "X7 – 24 Month Term", price: 77.50, unit: "user/mo" },
+          { name: "X7 – 36 Month Term", price: 75.50, unit: "user/mo" },
+          { name: "X7 – 60 Month Term", price: 73.50, unit: "user/mo" },
+          { name: "X8 – 24 Month Term", price: 97.50, unit: "user/mo" },
+          { name: "X8 – 36 Month Term", price: 94.50, unit: "user/mo" },
+          { name: "X8 – 60 Month Term", price: 91.50, unit: "user/mo" },
+        ],
+        notes: "Set up fee £15.00 per user (all terms).",
+      },
+      {
+        id: "8x8-numbers",
+        group: "8x8",
+        name: "Additional Items & Numbers",
+        billing: "varies",
+        items: [
+          { name: "UK Virtual Number / DDI (rental)", price: 1.00, unit: "mo" },
+          { name: "UK Toll Free Virtual Number (rental)", price: 3.00, unit: "mo" },
+          { name: "International Virtual Number (rental)", price: 6.00, unit: "mo", setup: 8.00 },
+          { name: "International Toll Free Virtual Number (rental)", price: 6.00, unit: "mo" },
+          { name: "International Virtual Fax Number (rental)", price: 6.00, unit: "mo", setup: 8.00 },
+        ],
+      },
+      {
+        id: "8x8-porting",
+        group: "8x8",
+        name: "Porting Charges",
+        billing: "one-off",
+        items: [
+          { name: "Successful Port", price: 0, unit: "one-off", note: "FOC" },
+          { name: "Date Change", price: 30.00, unit: "one-off" },
+          { name: "Order Rejected", price: 15.00, unit: "one-off" },
+        ],
+      },
+      {
+        id: "8x8-teams",
+        group: "8x8",
+        name: "Voice for Microsoft Teams",
+        billing: "one-off / per seat / per month",
+        items: [
+          { name: "Implementation Plus (≤250 seats)", price: 240.00, unit: "one-off" },
+          { name: "Managed Implementation Services (251+ seats)", price: 1200.00, unit: "one-off" },
+          { name: "Microsoft Teams Bolt-On", price: 0, unit: "mo", note: "FOC" },
+          { name: "Operator Connect – Metered Licence", price: 2.95, unit: "user/mo" },
+          { name: "Operator Connect – Nationwide Licence", price: 4.65, unit: "user/mo" },
+        ],
+      },
+      {
+        id: "8x8-call-recording",
+        group: "8x8",
+        name: "X Series Call Recording Storage",
+        billing: "per licence / per month",
+        items: [
+          { name: "Cold Storage (1 year)", price: 1.72, unit: "licence/mo" },
+          { name: "Cold Storage (2 years)", price: 2.16, unit: "licence/mo" },
+          { name: "Cold Storage (3 years)", price: 2.60, unit: "licence/mo" },
+          { name: "Cold Storage (4 years)", price: 3.04, unit: "licence/mo" },
+          { name: "Cold Storage (5 years)", price: 3.43, unit: "licence/mo" },
+          { name: "Cold Storage (6 years)", price: 3.78, unit: "licence/mo" },
+          { name: "Cold Storage (7 years)", price: 4.05, unit: "licence/mo" },
+          { name: "Cold Storage (8 years)", price: 4.31, unit: "licence/mo" },
+          { name: "Cold Storage (9 years)", price: 4.53, unit: "licence/mo" },
+          { name: "Cold Storage (10 years)", price: 4.66, unit: "licence/mo" },
+          { name: "Hot Storage (130 Days)", price: 1.06, unit: "licence/mo" },
+        ],
+      },
+      {
+        id: "8x8-screen-recording",
+        group: "8x8",
+        name: "X Series Screen Recording Storage",
+        billing: "per licence / per month",
+        items: [
+          { name: "Cold Storage (1 year)", price: 8.36, unit: "licence/mo" },
+          { name: "Cold Storage (2 years)", price: 15.40, unit: "licence/mo" },
+          { name: "Cold Storage (3 years)", price: 18.92, unit: "licence/mo" },
+          { name: "Cold Storage (4 years)", price: 22.44, unit: "licence/mo" },
+          { name: "Cold Storage (5 years)", price: 25.96, unit: "licence/mo" },
+          { name: "Cold Storage (6 years)", price: 29.48, unit: "licence/mo" },
+          { name: "Cold Storage (7 years)", price: 33.00, unit: "licence/mo" },
+          { name: "Cold Storage (8 years)", price: 36.52, unit: "licence/mo" },
+          { name: "Cold Storage (9 years)", price: 40.04, unit: "licence/mo" },
+          { name: "Cold Storage (10 years)", price: 43.56, unit: "licence/mo" },
+          { name: "Hot Storage (30 days)", price: 5.72, unit: "licence/mo" },
+          { name: "Hot Storage (130 days)", price: 16.28, unit: "licence/mo" },
+          { name: "Screen Recording Archive", price: 0.59, unit: "licence/mo" },
+          { name: "Screen Recording Retention (10 days)", price: 5.85, unit: "licence/mo" },
+          { name: "Screen Recording Retention (40 days)", price: 9.36, unit: "licence/mo" },
+        ],
+      },
+      {
+        id: "8x8-conversation-iq",
+        group: "8x8",
+        name: "Conversation IQ",
+        billing: "per licence / per month",
+        items: [
+          { name: "Contact Centre Speech Analytics", price: 22.50, unit: "licence/mo" },
+          { name: "UC Transcriptions", price: 1.65, unit: "licence/mo" },
+          { name: "UC AI Summarisation", price: 0.55, unit: "licence/mo" },
+          { name: "UC AI Action Items", price: 0.55, unit: "licence/mo" },
+          { name: "UC Sentiment Analysis", price: 2.80, unit: "licence/mo" },
+          { name: "UC Topics Insights", price: 2.80, unit: "licence/mo" },
+        ],
+      },
+      {
+        id: "csw-licences",
+        group: "CallSwitch One",
+        name: "Main Licences",
+        billing: "per user / per month",
+        items: [
+          { name: "With Hardware (Yealink T42U) – 36 Months", price: 8.95, unit: "user/mo", setup: 15.00 },
+          { name: "With Hardware (Yealink T42U) – 48 Months", price: 7.95, unit: "user/mo", setup: 15.00 },
+          { name: "With Hardware (Yealink T42U) – 60 Months", price: 7.50, unit: "user/mo", setup: 15.00 },
+          { name: "Licence Only – 3 Months", price: 8.00, unit: "user/mo", setup: 15.00 },
+          { name: "Licence Only – 36 Months", price: 6.60, unit: "user/mo", setup: 15.00 },
+          { name: "Licence Only – 48 Months", price: 6.30, unit: "user/mo", setup: 15.00 },
+          { name: "Licence Only – 60 Months", price: 6.10, unit: "user/mo", setup: 15.00 },
+        ],
+      },
+      {
+        id: "csw-services",
+        group: "CallSwitch One",
+        name: "Additional Services",
+        billing: "per user / per month",
+        items: [
+          { name: "Analytics Suite", price: 2.75, unit: "user/mo" },
+          { name: "Call Recording (12 months storage)", price: 2.00, unit: "user/mo" },
+          { name: "Call Recording (36 months storage)", price: 2.75, unit: "user/mo" },
+          { name: "Call Recording (60 months storage)", price: 3.50, unit: "user/mo" },
+          { name: "Virtual Mobile Number Bolt-On (12mo term)", price: 4.50, unit: "user/mo" },
+        ],
+      },
+      {
+        id: "csw-porting",
+        group: "CallSwitch One",
+        name: "Number Porting & Allocation",
+        billing: "varies",
+        items: [
+          { name: "Standard Geographic Single/Non-Geo/Mobile Line", price: 10.00, unit: "number" },
+          { name: "Standard Geographic Multi-line", price: 10.00, unit: "number", note: "up to max £50" },
+          { name: "Date Change", price: 10.00, unit: "number" },
+          { name: "Cancellation", price: 10.00, unit: "number" },
+          { name: "Resubmissions", price: 10.00, unit: "order" },
+          { name: "Rejection", price: 10.00, unit: "order" },
+          { name: "Out of Hours - Mon to Fri", price: 250.00, unit: "order" },
+          { name: "Out of Hours - Weekends", price: 500.00, unit: "order" },
+          { name: "Porting Out", price: 5.00, unit: "number" },
+          { name: "New Number Allocation (01/02/03)", price: 0, unit: "connection", note: "FOC" },
+          { name: "New Number Subscription (per DDI)", price: 0.50, unit: "number/mo" },
+          { name: "New Mobile Number Allocation", price: 0.50, unit: "number" },
+          { name: "New Mobile Number Subscription", price: 1.00, unit: "number/mo" },
+        ],
+      },
+      {
+        id: "horizon-licences",
+        group: "Horizon",
+        name: "Licences",
+        billing: "per user / per month",
+        items: [
+          { name: "Premium Licence – 36 Months", price: 7.95, unit: "user/mo" },
+          { name: "Premium Licence – 60 Months", price: 6.95, unit: "user/mo" },
+        ],
+      },
+      {
+        id: "horizon-contact",
+        group: "Horizon",
+        name: "Horizon Contact",
+        billing: "per user / per month",
+        items: [
+          { name: "Agent Voice & Email – 90 Days", price: 22.00, unit: "user/mo" },
+          { name: "Agent Voice & Email – 36 Months", price: 18.00, unit: "user/mo" },
+          { name: "Agent Voice & Email – 60 Months", price: 15.00, unit: "user/mo" },
+          { name: "Agent Web Chat – 90 Days", price: 8.00, unit: "user/mo" },
+          { name: "Agent Web Chat – 36 Months", price: 8.00, unit: "user/mo" },
+          { name: "Agent Web Chat – 60 Months", price: 8.00, unit: "user/mo" },
+          { name: "Supervisor – 90 Days", price: 35.00, unit: "user/mo" },
+          { name: "Supervisor – 36 Months", price: 29.00, unit: "user/mo" },
+          { name: "Supervisor – 60 Months", price: 24.00, unit: "user/mo" },
+        ],
+      },
+      {
+        id: "horizon-porting",
+        group: "Horizon",
+        name: "Porting Charges",
+        billing: "varies",
+        items: [
+          { name: "Single Line Port Order", price: 12.00, unit: "CLI" },
+          { name: "Multi Line Port Order (Aux)", price: 22.00, unit: "billing number" },
+          { name: "Multi Line Port Order w/ DDI Block (up to 10)", price: 56.00, unit: "billing number" },
+          { name: "Multi Line Port Order w/ DDI Block (11+)", price: 110.00, unit: "billing number" },
+          { name: "OOH Porting (Evenings Mon-Fri)", price: 135.00, unit: "order/day" },
+          { name: "OOH Porting (Saturday)", price: 270.00, unit: "order/day" },
+          { name: "DMA Transfer w/ Block of 1000 DDIs", price: 550.00, unit: "billing number" },
+          { name: "Geographic Porting Out", price: 15.00, unit: "number" },
+          { name: "Error 01: Order Rejection", price: 15.00, unit: "order" },
+          { name: "Error 02: Date Changed/Emergency Restore", price: 30.00, unit: "order" },
+          { name: "Error 03: Cancellation by Partner", price: 15.00, unit: "order" },
+          { name: "Error 04: Order Timed Out", price: 15.00, unit: "order" },
+          { name: "Out of Hours Provisioning Support", price: 520.00, unit: "day" },
+          { name: "Manual Pre-Port Test Call", price: 30.00, unit: "request" },
+        ],
+      },
+      {
+        id: "horizon-boltons",
+        group: "Horizon",
+        name: "Bolt-Ons (per user/month)",
+        billing: "per user / per month",
+        items: [
+          { name: "Call Centre Agent", price: 4.40, unit: "user/mo" },
+          { name: "Call Centre Supervisor Client", price: 22.00, unit: "user/mo" },
+          { name: "Call Queue User", price: 1.76, unit: "user/mo" },
+          { name: "Receptionist Console", price: 22.00, unit: "user/mo" },
+          { name: "Horizon Integrator", price: 1.25, unit: "user/mo" },
+          { name: "Horizon Integrator CRM", price: 3.50, unit: "user/mo" },
+          { name: "Softphone", price: 2.00, unit: "user/mo" },
+          { name: "Webex Basic", price: 4.50, unit: "user/mo" },
+          { name: "Webex Standard", price: 7.50, unit: "user/mo" },
+          { name: "Webex Premium", price: 17.50, unit: "user/mo" },
+          { name: "Horizon Collaborate", price: 4.50, unit: "user/mo" },
+        ],
+      },
+      {
+        id: "horizon-mobile-boltons",
+        group: "Horizon",
+        name: "Mobile Bolt-Ons (shared minutes)",
+        billing: "per bundle / per month",
+        items: [
+          { name: "Mobile Bolt-On 1000 (1000 shared mins)", price: 8.00, unit: "bundle/mo" },
+          { name: "Mobile Bolt-On 3000 (3000 shared mins)", price: 24.00, unit: "bundle/mo" },
+          { name: "Mobile Bolt-On 5000 (5000 shared mins)", price: 40.00, unit: "bundle/mo" },
+          { name: "Mobile Bolt-On 10,000 (10,000 shared mins)", price: 80.00, unit: "bundle/mo" },
+        ],
+      },
+      {
+        id: "horizon-call-recording",
+        group: "Horizon",
+        name: "Call Recording (data storage)",
+        billing: "per month",
+        items: [
+          { name: "Call Recording 900MB", price: 11.00, unit: "mo" },
+          { name: "Call Recording 1,800MB", price: 22.00, unit: "mo" },
+          { name: "Call Recording 3,600MB", price: 38.28, unit: "mo" },
+          { name: "Call Recording 9,000MB", price: 55.00, unit: "mo" },
+          { name: "Call Recording 18,000MB", price: 88.00, unit: "mo" },
+          { name: "Call Recording 45,000MB", price: 132.00, unit: "mo" },
+          { name: "Call Recording 90,000MB", price: 198.00, unit: "mo" },
+          { name: "Call Recording 180,000MB", price: 330.00, unit: "mo" },
+          { name: "Call Recording 360,000MB", price: 550.00, unit: "mo" },
+        ],
+      },
+      {
+        id: "horizon-peruser-recording",
+        group: "Horizon",
+        name: "Per User Call Recording",
+        billing: "per user / per month",
+        items: [
+          { name: "Business Call Recording – 3 Months", price: 1.50, unit: "user/mo" },
+          { name: "Business Call Recording – 6 Months", price: 1.75, unit: "user/mo" },
+          { name: "Business Call Recording – 12 Months", price: 2.00, unit: "user/mo" },
+          { name: "Business Call Recording – 36 Months", price: 4.00, unit: "user/mo" },
+          { name: "Compliant Call Recording – 84 Months", price: 10.00, unit: "user/mo" },
+        ],
+      },
+      {
+        id: "akixi",
+        group: "Akixi",
+        name: "Set Up (one-off)",
+        billing: "one-off",
+        items: [
+          { name: "Akixi Lite Set Up", price: 99.00, unit: "one-off" },
+          { name: "Akixi 1000 Set Up", price: 165.00, unit: "one-off" },
+          { name: "Akixi 2000 Set Up", price: 425.00, unit: "one-off" },
+          { name: "Akixi 3000 Set Up", price: 550.00, unit: "one-off" },
+          { name: "Akixi Training", price: 355.00, unit: "one-off" },
+        ],
+      },
+      {
+        id: "akixi-rental",
+        group: "Akixi",
+        name: "Rental (per month)",
+        billing: "per month",
+        items: [
+          { name: "Akixi Lite - Supervisor", price: 4.95, unit: "mo" },
+          { name: "Akixi Lite - Extensions", price: 0.72, unit: "mo" },
+          { name: "Akixi 1000 - Supervisor", price: 6.88, unit: "mo" },
+          { name: "Akixi 1000 - Extensions", price: 2.15, unit: "mo" },
+          { name: "Akixi 2000 - Supervisor", price: 26.35, unit: "mo" },
+          { name: "Akixi 2000 - Extensions", price: 2.15, unit: "mo" },
+          { name: "Akixi 3000 - Supervisor", price: 29.70, unit: "mo" },
+          { name: "Akixi 3000 - Extensions", price: 2.15, unit: "mo" },
+        ],
+      },
+      {
+        id: "connectivity",
+        group: "Connectivity",
+        name: "SoGEA, FTTP & SIP",
+        billing: "per month",
+        items: [
+          { name: "SoGEA 80:20 – 1 Month", price: 24.00, unit: "mo", setup: 40.00 },
+          { name: "SoGEA 80:20 – 36 Months", price: 23.00, unit: "mo", setup: 40.00 },
+          { name: "FTTP 80:20 – 12 Months", price: 27.50, unit: "mo", setup: 85.00 },
+          { name: "FTTP 160:30 – 12 Months", price: 29.00, unit: "mo", setup: 85.00 },
+          { name: "FTTP 330:50 – 12 Months", price: 32.00, unit: "mo", setup: 85.00 },
+          { name: "FTTP 550:75 – 12 Months", price: 37.50, unit: "mo", setup: 85.00 },
+          { name: "FTTP 1G:115 – 12 Months", price: 40.50, unit: "mo", setup: 85.00 },
+          { name: "FTTP 80:20 – 36 Months", price: 27.00, unit: "mo", setup: 0 },
+          { name: "FTTP 160:30 – 36 Months", price: 28.50, unit: "mo", setup: 0 },
+          { name: "FTTP 330:50 – 36 Months", price: 31.50, unit: "mo", setup: 0 },
+          { name: "FTTP 550:75 – 36 Months", price: 37.00, unit: "mo", setup: 0 },
+          { name: "FTTP 1G:115 – 36 Months", price: 40.00, unit: "mo", setup: 0 },
+        ],
+      },
+      {
+        id: "engineering",
+        group: "Engineering",
+        name: "Site Survey, Install & Training",
+        billing: "one-off / hourly",
+        items: [
+          { name: "Site Survey (1-50 Extensions)", price: 200.00, unit: "one-off" },
+          { name: "Install (1-50 Ext, Half Day)", price: 250.00, unit: "one-off" },
+          { name: "Install (1-50 Ext, Full Day)", price: 350.00, unit: "one-off" },
+          { name: "On-site Training (2 Sessions)", price: 320.00, unit: "one-off" },
+          { name: "On-site Training (4 Sessions)", price: 432.00, unit: "one-off" },
+          { name: "Webinar Training (2 Sessions)", price: 270.00, unit: "one-off" },
+          { name: "Webinar Training (4 Sessions)", price: 350.00, unit: "one-off" },
+          { name: "On-site Admin Training (1 Session)", price: 320.00, unit: "one-off" },
+          { name: "Webinar Admin Training (1 Session)", price: 270.00, unit: "one-off" },
+          { name: "Out of Scope Remote Support", price: 200.00, unit: "hour" },
+        ],
+      },
+      {
+        id: "hw-8x8",
+        group: "Hardware",
+        name: "8x8 Hardware",
+        billing: "one-off per unit",
+        items: [
+          { name: "Poly Edge E100 IP Phone PoE", price: 97.95, unit: "unit" },
+          { name: "Poly Edge E100 IP Phone PoE (Amortised 36M)", price: 3.00, unit: "unit/mo" },
+          { name: "Poly Edge E220 IP Phone PoE", price: 103.92, unit: "unit" },
+          { name: "Poly Edge E220 IP Phone PoE (Amortised 36M)", price: 3.25, unit: "unit/mo" },
+          { name: "Poly Edge E300 IP Phone PoE", price: 137.17, unit: "unit" },
+          { name: "Poly Edge E300 IP Phone PoE (Amortised 36M)", price: 4.00, unit: "unit/mo" },
+          { name: "Poly Edge E320 IP Phone PoE", price: 149.84, unit: "unit" },
+          { name: "Poly Edge E320 IP Phone PoE (Amortised 36M)", price: 4.25, unit: "unit/mo" },
+          { name: "Poly Edge E350 IP Phone PoE", price: 161.50, unit: "unit" },
+          { name: "Poly Edge E350 IP Phone PoE (Amortised 36M)", price: 4.75, unit: "unit/mo" },
+          { name: "Poly Edge E400", price: 166.39, unit: "unit" },
+          { name: "Poly Edge E450", price: 211.28, unit: "unit" },
+          { name: "Poly Edge E500 IP Phone PoE", price: 193.72, unit: "unit" },
+          { name: "Poly Edge E500 IP Phone PoE (Amortised 36M)", price: 5.50, unit: "unit/mo" },
+          { name: "Poly Edge E550 IP Phone PoE", price: 209.03, unit: "unit" },
+          { name: "Poly Edge E550 IP Phone PoE (Amortised 36M)", price: 6.00, unit: "unit/mo" },
+          { name: "Poly Edge Expansion Module E400+", price: 194.45, unit: "unit" },
+          { name: "Poly Edge PSU", price: 13.97, unit: "unit" },
+          { name: "Poly PSU CCX 500/600/700, Edge E500 – 48V UK", price: 31.97, unit: "unit" },
+          { name: "Poly CCX 700", price: 385.11, unit: "unit" },
+          { name: "Poly IP 6000 Speakerphone PoE", price: 502.59, unit: "unit" },
+          { name: "Poly IP7000 Power Injector", price: 64.78, unit: "unit" },
+          { name: "Poly CCX 350 PSU 5V/3A UK", price: 14.16, unit: "unit" },
+          { name: "Polycom Rove 30 DECT IP Phone Handset", price: 118.87, unit: "unit" },
+          { name: "Polycom Rove B2 DECT Base Station", price: 209.82, unit: "unit" },
+          { name: "Polycom VVX X50 Power Supply", price: 20.74, unit: "unit" },
+          { name: "RealPresence Trio 8800 (No Power Kit)", price: 465.57, unit: "unit" },
+          { name: "Power Kit for Trio 8500 UK", price: 84.02, unit: "unit" },
+          { name: "Power Kit for Trio 8800 / Trio Visual+", price: 84.02, unit: "unit" },
+          { name: "Yealink SIP-T53", price: 100.37, unit: "unit" },
+          { name: "Yealink SIP-T53 IP Phone PoE (Amortised 36M)", price: 3.00, unit: "unit/mo" },
+          { name: "Yealink SIP T53W", price: 124.86, unit: "unit" },
+          { name: "Yealink SIP-T53W IP Phone PoE (Amortised 36M)", price: 3.75, unit: "unit/mo" },
+          { name: "Yealink SIP-T54W", price: 151.93, unit: "unit" },
+          { name: "Yealink SIP-T54W IP Phone PoE (Amortised 36M)", price: 4.50, unit: "unit/mo" },
+          { name: "Yealink SIP-T57W", price: 205.49, unit: "unit" },
+          { name: "Yealink SIP-T57W IP Phone PoE (Amortised 36M)", price: 6.00, unit: "unit/mo" },
+          { name: "Yealink SIP-T58W", price: 262.77, unit: "unit" },
+          { name: "Yealink SIP-T58W IP Phone PoE (Amortised 36M)", price: 7.50, unit: "unit/mo" },
+          { name: "Yealink SIP-T58W Pro Media IP Phone", price: 228.16, unit: "unit" },
+          { name: "Yealink T33G IP Phone", price: 74.76, unit: "unit" },
+          { name: "Yealink T42U", price: 88.77, unit: "unit" },
+          { name: "Yealink T43U", price: 95.22, unit: "unit" },
+          { name: "Yealink T48U", price: 188.09, unit: "unit" },
+          { name: "Yealink W56H DECT Handset Only", price: 79.75, unit: "unit" },
+          { name: "Yealink W56H DECT Handset (Amortised 36M)", price: 3.50, unit: "unit/mo" },
+          { name: "Yealink W59R Rugged DECT Handset", price: 127.44, unit: "unit" },
+          { name: "Yealink W70B DECT Base Station Only", price: 68.15, unit: "unit" },
+          { name: "Yealink W76P (W70B + W56H)", price: 118.42, unit: "unit" },
+          { name: "Yealink W79P (W70B + W59R)", price: 173.84, unit: "unit" },
+          { name: "Yealink W79P (W70B + W59R) Amortised 36M", price: 5.00, unit: "unit/mo" },
+          { name: "Yealink 10W Power Supply", price: 7.85, unit: "unit" },
+          { name: "Yealink Power Supply T41/T42", price: 7.85, unit: "unit" },
+          { name: "Yealink Power Supply T46/T48/T54W/T57W", price: 11.76, unit: "unit" },
+          { name: "Audio Codes MP112 2 Port ATA", price: 147.99, unit: "unit" },
+          { name: "Audio Codes MP114 4 Port ATA", price: 270.99, unit: "unit" },
+          { name: "Audio Codes MP118 8 Port ATA", price: 430.99, unit: "unit" },
+          { name: "Audio Codes MP124 24 Port FXS ATA", price: 1099.99, unit: "unit" },
+          { name: "Grandstream HT814 ATA", price: 87.83, unit: "unit" },
+          { name: "Obihai OBi 300 1 Port SIP ATA", price: 67.00, unit: "unit" },
+        ],
+        notes: "Source: 8x8 Hardware Pricelist. All prices exc. VAT, per unit.",
+      },
+      {
+        id: "hw-csw",
+        group: "Hardware",
+        name: "CallSwitch One Hardware",
+        billing: "one-off per unit",
+        items: [
+          { name: "Yealink T42U", price: 70.00, unit: "unit" },
+          { name: "Yealink T42U (Hardware Bundle)", price: 0.00, unit: "unit", note: "FOC when bundled with licence" },
+          { name: "Yealink T43U", price: 80.00, unit: "unit" },
+          { name: "Yealink T43U (Hardware Bundle)", price: 20.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Yealink T46U", price: 125.00, unit: "unit" },
+          { name: "Yealink T46U (Hardware Bundle)", price: 70.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Yealink T48U", price: 155.00, unit: "unit" },
+          { name: "Yealink T48U (Hardware Bundle)", price: 100.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Yealink T57W", price: 180.00, unit: "unit" },
+          { name: "Yealink T57W (Hardware Bundle)", price: 125.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Yealink W56H", price: 70.00, unit: "unit" },
+          { name: "Yealink W56H (Hardware Bundle)", price: 5.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Yealink W59R", price: 95.00, unit: "unit" },
+          { name: "Yealink W59R (Hardware Bundle)", price: 40.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Yealink W76P", price: 135.00, unit: "unit" },
+          { name: "Yealink W76P (Hardware Bundle)", price: 30.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Yealink W77P", price: 120.00, unit: "unit" },
+          { name: "Yealink W77P (Hardware Bundle)", price: 65.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Yealink W70B DECT Base Station Only", price: 68.15, unit: "unit" },
+          { name: "Yealink Expansion Module EXP40", price: 60.00, unit: "unit" },
+          { name: "Yealink Power Supply (T42U / T43U / T53)", price: 8.00, unit: "unit" },
+          { name: "Yealink Power Supply (T46U / T48U / T54W)", price: 10.67, unit: "unit" },
+          { name: "Grandstream GXV3370", price: 230.00, unit: "unit" },
+          { name: "Grandstream GXV3370 (Hardware Bundle)", price: 175.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Grandstream GXV3380", price: 350.00, unit: "unit" },
+          { name: "Grandstream GXV3380 (Hardware Bundle)", price: 295.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Grandstream WP820", price: 160.00, unit: "unit" },
+          { name: "Grandstream WP820 (Hardware Bundle)", price: 95.00, unit: "unit", note: "Discounted with licence bundle" },
+          { name: "Grandstream ATA 801", price: 45.00, unit: "unit" },
+        ],
+        notes: "Source: CS1 Hardware Pricelist. 'Hardware Bundle' prices apply when ordered alongside a CallSwitch One licence. All prices exc. VAT, per unit.",
+      },
+      {
+        id: "pci",
+        group: "PCI Compliance",
+        name: "PCI Guard",
+        billing: "per month",
+        items: [
+          { name: "DTMF Capture Per Channel – 36M", price: 10.00, unit: "channel/mo" },
+          { name: "DTMF Capture Per Channel – 12M", price: 12.00, unit: "channel/mo" },
+          { name: "DTMF Capture Per User – 36M", price: 6.50, unit: "user/mo" },
+          { name: "DTMF Capture Per User – 12M", price: 7.50, unit: "user/mo" },
+          { name: "Digital Payment Link Per User – 36M", price: 2.50, unit: "user/mo" },
+          { name: "Digital Payment Link Per User – 12M", price: 4.00, unit: "user/mo" },
+        ],
+      },
+    ],
+  },
+};
+
+</script>
+<script>
+(function(){
+
+  // ---------- State ----------
+  let mode = null; // 'rrp' | 'ws'
+  let quoteItems = []; // { key, group, name, price, unit, qty, setup }
+
+  const root = document.getElementById('app');
+
+  function fmtGBP(n){
+    return '£' + n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function render(){
+    if(!mode){
+      renderGate();
+    } else {
+      renderCalculator();
+    }
+  }
+
+  // ---------- Gate screen ----------
+  function renderGate(){
+    root.innerHTML = `
+      <div class="topbar">
+        <div class="brand">
+          <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNi4wLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB3aWR0aD0iNTQxLjA4NHB4IiBoZWlnaHQ9IjI0Ny4wOTNweCIgdmlld0JveD0iMCAwIDU0MS4wODQgMjQ3LjA5MyIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgNTQxLjA4NCAyNDcuMDkzIg0KCSB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxnPg0KCTxnPg0KCQk8cGF0aCBmaWxsPSIjMDBCNEVGIiBkPSJNMzUxLjI1NCwxMzguMzM3Yy0xMS41NTUsMC0xMS42MzctMTEuNjM3LTExLjYzNy0xMS42Mzd2LTQ2Ljk1bDguMTA5LDAuMDINCgkJCWMxNy44OCwwLDMyLjM1NC0xNC40OTMsMzIuMzU0LTMyLjM3NGMwLTE3Ljg1OS0xNC41OTctMzIuMzU0LTMyLjM1NC0zMi4zNTRjMCwwLTMyLjQxNiwwLjc3LTMyLjQxNiwzMi4zNTQNCgkJCWMwLDEuNjIyLDAsNy45ODgsMCw3Ljk4OHMtNDguNjMyLDAtNzQuMDEzLDBzLTI1LjQyMiwyNi40MTMtMjUuNDIyLDI2LjQxM2MwLDguNzM4LDQuMjU5LDE2LjQ0MSwxMC44MDYsMjEuMjI3bDU2LjAxMywzMS45NjcNCgkJCWMwLjM2NCwwLjMwNSwwLjc5LDAuOTMzLDAuNjg4LDEuNjgzYy0wLjA4MSwwLjY2OS0wLjYyNywxLjUwMS0xLjcwMiwxLjY0MWwtMTE0LjI3MywwLjA0MmMwLDAtNC40MTktMC4wNjItNi45MTItMC44MTINCgkJCWw0Mi45NzYtNDIuOTc0YzMuNTg5LTMuNjksNS43OTktOC43MzksNS43OTktMTQuMzEzYzAtNi4yMDItMi43NzctMTEuNzc3LTcuMTM3LTE1LjU0OGMtOS40NjgtNy43MDMtMjEuNTY5LTEyLjM0Ni0zNC43MjYtMTIuMzQ2DQoJCQljLTMwLjQ2OSwwLTU1LjE2MSwyNC42OTEtNTUuMTYxLDU1LjE0YzAsOS45MTMsMi42MzcsMTkuMjE2LDcuMjE5LDI3LjI2NGMtOS43NTIsMi45MzktMTguOTE0LDMuNDY4LTIyLjcwNSwzLjU2OUg0Mi42OTINCgkJCWMtMS4wNzUtMC4xNDMtMS42MjItMC45OTQtMS43MDEtMS42NjNjLTAuMTA0LTAuNzUsMC4zMjMtMS4zNzgsMC42ODgtMS42ODNsNTYuMDEyLTMxLjk2Nw0KCQkJYzYuNTQ5LTQuNzg2LDEwLjgwNi0xMi40ODksMTAuODA2LTIxLjIyN2MwLDAtMC4wNDItMjYuNDEzLTI1LjQyMi0yNi40MTNIMjYuOTM5Yy02LjcwOSwwLTEyLjE2Miw1LjQ3Mi0xMi4xNjIsMTIuMjAzDQoJCQljMCw2LjcxMSw1LjQ1MywxMi4xNjMsMTIuMTYyLDEyLjE2M2g1Ni4yMTdjMS4wMTQsMC4wODIsMS44MDMsMC43MywxLjgwMywxLjcyNGMwLDAuNjA4LTAuMzAzLDEuMjU1LTAuODMyLDEuNg0KCQkJYzAsMC01NC44MzUsMzAuOTU1LTU3LjE2NSwzMi4zMTNjLTIuMzMyLDEuMzM5LTEyLjE4NSw3LjUwMS0xMi4xODUsMjEuNzkzYzAsMjMuNDM0LDI0LjA0MywyNS40NiwyNC4wNDMsMjUuNDZoNTYuNjYxDQoJCQljNS4yNSwwLDIzLjkyMS0wLjU4Niw0Mi4wNDQtOC43OThjOC41OTUsNS41NzUsMTguODU0LDguNzk4LDI5Ljg1OSw4Ljc5OGgxMTguMTY3YzAsMCwyNC4wNDMtMi4wMjYsMjQuMDQzLTI1LjQ2DQoJCQljMC0xNC4yOTItOS44NTMtMjAuNDU0LTEyLjE4My0yMS43OTNjLTIuMzUzLTEuMzU4LTU3LjE2OS0zMi4zMTMtNTcuMTY5LTMyLjMxM2MtMC41MjctMC4zNDUtMC44My0wLjk5Mi0wLjgzLTEuNg0KCQkJYzAtMC45OTQsMC43OS0xLjY0MywxLjgwMy0xLjcyNGg3NC4wOTV2NDYuMjZjLTAuMDYsMi43MzYsMC4xNjIsMTYuMTk3LDkuODM0LDI2LjI3MmM0LjUyLDQuNzI0LDEyLjgzMiwxMC4zNTcsMjYuNjc3LDEwLjM1Nw0KCQkJaDI2LjY3OGMwLjI4NSwwLDAuNTY3LDAsMC44NTMtMC4wMzljMC4xNDIsMC4wMiwwLjI4MywwLjAyLDAuNDI1LDAuMDJoMjIuNzcxYzYuNzEsMCwxMi4xNDMtNS40MzIsMTIuMTQzLTEyLjE0Mw0KCQkJYzAtNi43MDktNS40MzMtMTIuMTY0LTEyLjE0My0xMi4xNjRoLTIyLjc3MUwzNTEuMjU0LDEzOC4zMzd6IE0zMzkuNjE3LDQ3LjE3M2MwLjA2Mi00LjUsMy43MS04LjEyOSw4LjIwOS04LjEyOQ0KCQkJYzQuNTYyLDAsOC4yNTIsMy42OSw4LjI1Miw4LjI1MWMwLDQuNTQyLTMuNjg5LDguMDg5LTguMjUyLDguMDg5aC04LjIwOVY0Ny4xNzN6IE0xMzYuNTcxLDEwNy41MDQNCgkJCWMwLTE3LjAwOSwxMy44MDctMzAuODEzLDMwLjgzNS0zMC44MTNjNS42MTUsMCwxMC44NjYsMS41NDEsMTUuNDA4LDQuMTc1bC00Mi4wNjUsNDIuMDQ0DQoJCQlDMTM4LjExMywxMTguMzg5LDEzNi41NzEsMTEzLjEzOCwxMzYuNTcxLDEwNy41MDR6Ii8+DQoJCTxsaW5lYXJHcmFkaWVudCBpZD0iU1ZHSURfMV8iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iMjMyLjU4MyIgeTE9IjY5LjQ3NDYiIHgyPSIyNjUuMDgyIiB5Mj0iNjkuNDc0NiI+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwIiBzdHlsZT0ic3RvcC1jb2xvcjojMDU1NDkxIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjAzMzEiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDYyOUQiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMDgzNSIgc3R5bGU9InN0b3AtY29sb3I6IzAwNzNBQyIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4xNDAyIiBzdHlsZT0ic3RvcC1jb2xvcjojMDA4M0JDIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjIwMjgiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDkyQ0EiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMjczNiIgc3R5bGU9InN0b3AtY29sb3I6IzAwOUVENiIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4zNTYzIiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBN0UwIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjQ1ODYiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEFFRTgiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNjAxOSIgc3R5bGU9InN0b3AtY29sb3I6IzAwQjJFRCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMSIgc3R5bGU9InN0b3AtY29sb3I6IzAwQjRFRiIvPg0KCQk8L2xpbmVhckdyYWRpZW50Pg0KCQk8cGF0aCBvcGFjaXR5PSIwLjUiIGZpbGw9InVybCgjU1ZHSURfMV8pIiBkPSJNMjU4LjcxNCw3OS43NjNoLTE3LjQ5NWMtMS4wMTQsMC4wNjItMS44MDUsMC43MS0xLjgwNSwxLjcwMw0KCQkJYzAsMC42MDksMC4zMDQsMS4yNTYsMC44MzEsMS42MDFjMCwwLDAuMzA0LDAuMTgyLDAuODkyLDAuNTA3Yy01LjA0Ny0yLjM1My04LjU1NC03LjQ3OS04LjU1NC0xMy40MjENCgkJCWMwLTcuOTI0LDYuMjQ0LTE0LjQxMiwxNC4wOS0xNC43NzhoMTguNDA5djI0LjM3OEwyNTguNzE0LDc5Ljc2M3oiLz4NCgkJPGxpbmVhckdyYWRpZW50IGlkPSJTVkdJRF8yXyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSIyNjcuNDI4NyIgeTE9IjEyMS45NzE3IiB4Mj0iMjk2LjY4MjYiIHkyPSIxMjEuOTcxNyI+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwIiBzdHlsZT0ic3RvcC1jb2xvcjojMDBCNEVGIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjM5ODEiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEIyRUQiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNTQxNCIgc3R5bGU9InN0b3AtY29sb3I6IzAwQUVFOCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC42NDM3IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBN0UwIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjcyNjQiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDlFRDYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNzk3MiIgc3R5bGU9InN0b3AtY29sb3I6IzAwOTJDQSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC44NTk4IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA4M0JDIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjkxNjUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDczQUMiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuOTY2OSIgc3R5bGU9InN0b3AtY29sb3I6IzAwNjI5RCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMSIgc3R5bGU9InN0b3AtY29sb3I6IzA1NTQ5MSIvPg0KCQk8L2xpbmVhckdyYWRpZW50Pg0KCQk8cGF0aCBvcGFjaXR5PSIwLjUiIGZpbGw9InVybCgjU1ZHSURfMl8pIiBkPSJNMjkwLjE3NSwxMTEuMjU5YzMuOTMyLDIuNjU1LDYuNTA4LDcuMTU2LDYuNTA4LDEyLjI0NA0KCQkJYzAsOC4xNS02LjYwOSwxNC43NTktMTQuNzYsMTQuNzU5Yy0wLjA2MSwwLTAuMTQzLDAtMC4yMDItMC4wMjFjMS4wNTQtMC4xNDIsMS41OC0wLjk1MywxLjY2MS0xLjYwMg0KCQkJYzAuMTAzLTAuNzctMC4zMjMtMS4zOTgtMC42ODgtMS43MDRsLTE1LjI2Ni04LjcxNmwxMi45MDgtMjAuNTRMMjkwLjE3NSwxMTEuMjU5eiIvPg0KCQk8bGluZWFyR3JhZGllbnQgaWQ9IlNWR0lEXzNfIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjE0Ni45NzM2IiB5MT0iNjYuNjA5NCIgeDI9IjE4Ny43MTk3IiB5Mj0iNjYuNjA5NCI+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwIiBzdHlsZT0ic3RvcC1jb2xvcjojMDBCNEVGIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjM5ODEiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEIyRUQiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNTQxNCIgc3R5bGU9InN0b3AtY29sb3I6IzAwQUVFOCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC42NDM3IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBN0UwIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjcyNjQiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDlFRDYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNzk3MiIgc3R5bGU9InN0b3AtY29sb3I6IzAwOTJDQSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC44NTk4IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA4M0JDIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjkxNjUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDczQUMiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuOTY2OSIgc3R5bGU9InN0b3AtY29sb3I6IzAwNjI5RCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMSIgc3R5bGU9InN0b3AtY29sb3I6IzA1NTQ5MSIvPg0KCQk8L2xpbmVhckdyYWRpZW50Pg0KCQk8cGF0aCBvcGFjaXR5PSIwLjUiIGZpbGw9InVybCgjU1ZHSURfM18pIiBkPSJNMTczLjgzMiw1Mi43NDRjNy45MTMsMC45NTMsMTMuODg4LDguMTMxLDEzLjg4OCwxNi4zNjENCgkJCWMwLDQuNjIzLTEuODg3LDguNzc4LTQuOTA1LDExLjc1N2MtNC41NDItMi42MzUtOS43OTMtNC4xNzUtMTUuNDA4LTQuMTc1Yy0zLjUwOCwwLTYuODcyLDAuNTg4LTEwLjAxNCwxLjY2M2wtMTAuNDE5LTIyLjA4DQoJCQlDMTQ2Ljk3NCw1Ni4yNywxNTguNSw1MC44OTcsMTczLjgzMiw1Mi43NDR6Ii8+DQoJCTxsaW5lYXJHcmFkaWVudCBpZD0iU1ZHSURfNF8iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iMTE5LjQ2MTkiIHkxPSIxMzQuNzYxMiIgeDI9IjExOS40NjE5IiB5Mj0iMTM0Ljc2MTIiPg0KCQkJPHN0b3AgIG9mZnNldD0iMCIgc3R5bGU9InN0b3AtY29sb3I6I0ZGRkZGRiIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC40ODc4IiBzdHlsZT0ic3RvcC1jb2xvcjojRkNGQkZCIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjY2MzUiIHN0eWxlPSJzdG9wLWNvbG9yOiNGM0YyRjIiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNzg4NyIgc3R5bGU9InN0b3AtY29sb3I6I0U3RTdFNyIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC44ODk5IiBzdHlsZT0ic3RvcC1jb2xvcjojRDdEN0Q4Ii8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjk3NTYiIHN0eWxlPSJzdG9wLWNvbG9yOiNDNEM0QzYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjEiIHN0eWxlPSJzdG9wLWNvbG9yOiNCREJFQzAiLz4NCgkJPC9saW5lYXJHcmFkaWVudD4NCgkJPHBhdGggZmlsbD0idXJsKCNTVkdJRF80XykiIGQ9Ik0xMTkuNDYyLDEzNC43NjEiLz4NCgkJPGxpbmVhckdyYWRpZW50IGlkPSJTVkdJRF81XyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSIzMy40ODQ0IiB5MT0iMTQ4LjgyNjIiIHgyPSI1OC44NjQzIiB5Mj0iMTQ4LjgyNjIiPg0KCQkJPHN0b3AgIG9mZnNldD0iMCIgc3R5bGU9InN0b3AtY29sb3I6IzA1NTQ5MSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4wMzMxIiBzdHlsZT0ic3RvcC1jb2xvcjojMDA2MjlEIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjA4MzUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDczQUMiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMTQwMiIgc3R5bGU9InN0b3AtY29sb3I6IzAwODNCQyIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4yMDI4IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA5MkNBIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjI3MzYiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDlFRDYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMzU2MyIgc3R5bGU9InN0b3AtY29sb3I6IzAwQTdFMCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC40NTg2IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBRUU4Ii8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjYwMTkiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEIyRUQiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjEiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEI0RUYiLz4NCgkJPC9saW5lYXJHcmFkaWVudD4NCgkJPHBhdGggb3BhY2l0eT0iMC41IiBmaWxsPSJ1cmwoI1NWR0lEXzVfKSIgZD0iTTU4Ljg2NCwxMzguMzM3SDQyLjY4N2MtMS4wNzMtMC4xNDMtMS42MjEtMC45OTQtMS43MDEtMS42NjMNCgkJCWMtMC4xMDItMC43MywwLjMwNC0xLjM1OCwwLjY2Ny0xLjY2M2MtNC44NDMsMi4zNTMtOC4xNjgsNy4zMTktOC4xNjgsMTMuMDc2YzAsOC4wNDcsNi41MjcsMTQuNTU0LDE0LjU3NCwxNC41NTRoMTAuNzEyDQoJCQlMNTguODY0LDEzOC4zMzd6Ii8+DQoJCTxsaW5lYXJHcmFkaWVudCBpZD0iU1ZHSURfNl8iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iNjcuNDU5IiB5MT0iOTYuOTU4IiB4Mj0iOTcuMTU3MiIgeTI9Ijk2Ljk1OCI+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwIiBzdHlsZT0ic3RvcC1jb2xvcjojMDBCNEVGIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjM5ODEiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEIyRUQiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNTQxNCIgc3R5bGU9InN0b3AtY29sb3I6IzAwQUVFOCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC42NDM3IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBN0UwIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjcyNjQiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDlFRDYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNzk3MiIgc3R5bGU9InN0b3AtY29sb3I6IzAwOTJDQSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC44NTk4IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA4M0JDIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjkxNjUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDczQUMiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuOTY2OSIgc3R5bGU9InN0b3AtY29sb3I6IzAwNjI5RCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMSIgc3R5bGU9InN0b3AtY29sb3I6IzA1NTQ5MSIvPg0KCQk8L2xpbmVhckdyYWRpZW50Pg0KCQk8cGF0aCBvcGFjaXR5PSIwLjUiIGZpbGw9InVybCgjU1ZHSURfNl8pIiBkPSJNOTAuNTY4LDEwNy4wOTVjMC4wNDItMC4wMiwwLjA2MS0wLjA0MiwwLjA4Mi0wLjA2Mg0KCQkJYzMuOTMzLTIuNjk2LDYuNTA3LTcuMjE2LDYuNTA3LTEyLjM0NWMwLTcuODA0LTUuOTc5LTE0LjIxLTEzLjYwMy0xNC44NzljMC44MTEsMC4yMDIsMS4zOTgsMC44MSwxLjM5OCwxLjY2MQ0KCQkJYzAsMC42MS0wLjMwNCwxLjI1Ny0wLjgzMSwxLjYwMmMwLDAtNy4yOTgsNC4xMTUtMTYuNjYzLDkuNDA3bDEwLjc0OCwyMS42MjlMOTAuNTY4LDEwNy4wOTV6Ii8+DQoJCTxsaW5lYXJHcmFkaWVudCBpZD0iU1ZHSURfN18iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iMzM5LjYxNTIiIHkxPSI1OS44MDY2IiB4Mj0iMzY0LjY1MTQiIHkyPSI1OS44MDY2Ij4NCgkJCTxzdG9wICBvZmZzZXQ9IjAiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEI0RUYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMzk4MSIgc3R5bGU9InN0b3AtY29sb3I6IzAwQjJFRCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC41NDE0IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBRUU4Ii8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjY0MzciIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEE3RTAiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNzI2NCIgc3R5bGU9InN0b3AtY29sb3I6IzAwOUVENiIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC43OTcyIiBzdHlsZT0ic3RvcC1jb2xvcjojMDA5MkNBIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjg1OTgiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDgzQkMiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuOTE2NSIgc3R5bGU9InN0b3AtY29sb3I6IzAwNzNBQyIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC45NjY5IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA2MjlEIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIxIiBzdHlsZT0ic3RvcC1jb2xvcjojMDU1NDkxIi8+DQoJCTwvbGluZWFyR3JhZGllbnQ+DQoJCTxwYXRoIG9wYWNpdHk9IjAuNSIgZmlsbD0idXJsKCNTVkdJRF83XykiIGQ9Ik0zNDQuMDE1LDc5LjgwNWMxMS4zOTQsMCwyMC42MzctOS4zMjQsMjAuNjM3LTIwLjcxNw0KCQkJYzAtOC44Mi01LjUzNC0xNi4zNC0xMy4zMTctMTkuMjc4YzIuNzk3LDEuMzE2LDQuNzIzLDQuMTU1LDQuNzIzLDcuNDU5YzAsNC41NDItMy42ODksOC4wODktOC4yMzEsOC4wODloLTguMjF2MjQuNDA0DQoJCQlMMzQ0LjAxNSw3OS44MDV6Ii8+DQoJCTxsaW5lYXJHcmFkaWVudCBpZD0iU1ZHSURfOF8iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iMTQ4LjkxMTEiIHkxPSIxNDIuNDYzOSIgeDI9IjE2MS40MzgxIiB5Mj0iMTU0Ljk5MDgiPg0KCQkJPHN0b3AgIG9mZnNldD0iMCIgc3R5bGU9InN0b3AtY29sb3I6IzA1NTQ5MSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4wMzMxIiBzdHlsZT0ic3RvcC1jb2xvcjojMDA2MjlEIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjA4MzUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDczQUMiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMTQwMiIgc3R5bGU9InN0b3AtY29sb3I6IzAwODNCQyIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4yMDI4IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA5MkNBIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjI3MzYiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDlFRDYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMzU2MyIgc3R5bGU9InN0b3AtY29sb3I6IzAwQTdFMCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC40NTg2IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBRUU4Ii8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjYwMTkiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEIyRUQiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjEiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEI0RUYiLz4NCgkJPC9saW5lYXJHcmFkaWVudD4NCgkJPHBhdGggZmlsbD0idXJsKCNTVkdJRF84XykiIGQ9Ik0xNjcuMzk2LDEzOC4zNDljMCwwLTEwLjQ4MiwyMy4yMjYtMTIuNDU2LDIyLjg1MmMtMi44MjMtMC4zMDctMTEuNDY1LTMuMzY3LTE3LjQxNy03LjM0OQ0KCQkJYzEzLjI3LTcuMjcsMjIuOTc5LTE2LjMxMSwyMi45NzktMTYuMzExczMuMTE1LDAuNzk2LDcuMDYsMC43OTYiLz4NCgkJPGxpbmVhckdyYWRpZW50IGlkPSJTVkdJRF85XyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSIxMjYuNzM1NCIgeTE9IjEyMC43OTY5IiB4Mj0iMTMwLjM1OSIgeTI9IjEzMC43NTI3Ij4NCgkJCTxzdG9wICBvZmZzZXQ9IjAiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEI0RUYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMzk4MSIgc3R5bGU9InN0b3AtY29sb3I6IzAwQjJFRCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC41NDE0IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBRUU4Ii8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjY0MzciIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEE3RTAiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNzI2NCIgc3R5bGU9InN0b3AtY29sb3I6IzAwOUVENiIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC43OTcyIiBzdHlsZT0ic3RvcC1jb2xvcjojMDA5MkNBIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjg1OTgiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDgzQkMiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuOTE2NSIgc3R5bGU9InN0b3AtY29sb3I6IzAwNzNBQyIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC45NjY5IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA2MjlEIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIxIiBzdHlsZT0ic3RvcC1jb2xvcjojMDU1NDkxIi8+DQoJCTwvbGluZWFyR3JhZGllbnQ+DQoJCTxwYXRoIGZpbGw9InVybCgjU1ZHSURfOV8pIiBkPSJNMTQwLjcxOCwxMjIuODg3Yy0wLjQyOCwwLjM0My0xMi4xOCw4LjUxNi0yMS4yODgsMTEuODQzYy0wLjgwNi0xLjIwNS0zLjA1NS01Ljg5NC00LjE5NS05LjIxOQ0KCQkJYzUuMzUzLTIuMDYsMjIuNzQyLTguODA3LDIyLjc0Mi04LjgwN1MxMzkuMzM5LDEyMC40NzQsMTQwLjcxOCwxMjIuODg3eiIvPg0KCQk8Zz4NCgkJCTxwYXRoIGZpbGw9IiMwNTU0OTEiIGQ9Ik01MTQuMTE0LDE2Mi42MjVoLTI1Ljc1djIyLjI0NWMwLDcuNDg3LTQuNzIxLDEzLjQ3NC0xMi4yMDksMTMuNDc0Yy03LjQ4NCwwLTEyLjA5NC01Ljk4Ni0xMi4wOTQtMTMuNDc0DQoJCQkJdi0yMi4yNDVoLTcxLjUzNGMtNi40MTYsMC0xMi4xOTQtNC45Mi0xMi4xOTQtMTEuNTUyYzAtMy40MjQsMC44NTUtNi42MzEsMy4yMS05LjE5N2w4My4wMTEtODIuOTYzDQoJCQkJYzIuNzgzLTMuMjEzLDcuMzk1LTYuNjU5LDExLjg5MS02LjY1OWM3LjQ4NiwwLDkuOTIsNS45ODgsOS45MiwxMy40NzZ2NzIuNTFoMjUuNzVjNi42MjksMCwxMi4xOTMsNS41NjIsMTIuMTkzLDEyLjE5MQ0KCQkJCUM1MjYuMzA4LDE1Ny4wNjEsNTIwLjc0MywxNjIuNjI1LDUxNC4xMTQsMTYyLjYyNXogTTQ2NC4wNjIsOTYuMjYybC00Mi4yNDgsNDEuOTc3aDQyLjI0OFY5Ni4yNjJ6Ii8+DQoJCTwvZz4NCgkJPGxpbmVhckdyYWRpZW50IGlkPSJTVkdJRF8xMF8iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iMzM5LjQyOTciIHkxPSIxNDQuNDgiIHgyPSIzNjkuMzkxNiIgeTI9IjE0NC40OCI+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwIiBzdHlsZT0ic3RvcC1jb2xvcjojMDU1NDkxIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjAxODEiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDVBOTYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMDg2MSIgc3R5bGU9InN0b3AtY29sb3I6IzAwNkRBNiIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4xNjA4IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA3RUI3Ii8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjI0MTQiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDhFQzYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMzI5OSIgc3R5bGU9InN0b3AtY29sb3I6IzAwOUJENCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC40MjkzIiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBNkRGIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjU0NjEiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEFERTciLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNjk2NSIgc3R5bGU9InN0b3AtY29sb3I6IzAwQjJFRCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMSIgc3R5bGU9InN0b3AtY29sb3I6IzAwQjRFRiIvPg0KCQk8L2xpbmVhckdyYWRpZW50Pg0KCQk8cGF0aCBvcGFjaXR5PSIwLjUiIGZpbGw9InVybCgjU1ZHSURfMTBfKSIgZD0iTTM1MS4yMjgsMTM4LjMyOGMtMTEuNTU1LDAtMTEuNjM2LTExLjYzNy0xMS42MzYtMTEuNjM3di0wLjM2NQ0KCQkJYy0wLjEwMSwxLjExNS0wLjE2MiwyLjI1Mi0wLjE2MiwzLjM4NmMwLDE3LjIxMSwxMy4xNTYsMzEuMzYsMjkuOTYyLDMyLjkyM3YtMjQuMzMxTDM1MS4yMjgsMTM4LjMyOHoiLz4NCgkJPGxpbmVhckdyYWRpZW50IGlkPSJTVkdJRF8xMV8iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iNDE3LjY0ODQiIHkxPSIxNTAuNDI3MiIgeDI9IjQ0Mi4wNzkxIiB5Mj0iMTUwLjQyNzIiPg0KCQkJPHN0b3AgIG9mZnNldD0iMCIgc3R5bGU9InN0b3AtY29sb3I6IzI4MjU2MSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC40OTA4IiBzdHlsZT0ic3RvcC1jb2xvcjojMEU0RThBIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjY5MzMiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMTUzOTEiLz4NCgkJPC9saW5lYXJHcmFkaWVudD4NCgkJPHBhdGggZmlsbD0idXJsKCNTVkdJRF8xMV8pIiBkPSJNNDMxLjkyMSwxNjIuNjIxYy03Ljg4NSwwLTE0LjI3Mi02LjM4NS0xNC4yNzItMTQuMjcxYzAtMy45MTIsMS41ODMtNy40NjEsNC4xMTYtMTAuMDM0DQoJCQljMC4wNC0wLjA0MSwwLjA2Mi0wLjA2MiwwLjA4MS0wLjA4MWgyMC4xNTFjMC4wMjEsMC4wMiwwLjA0MSwwLjA0LDAuMDgyLDAuMDgxbC0wLjA0MS0wLjA0MXYyNC4yOTZMNDMxLjkyMSwxNjIuNjIxeiIvPg0KCQk8bGluZWFyR3JhZGllbnQgaWQ9IlNWR0lEXzEyXyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSI0MzQuMjk1OSIgeTE9IjEwNS41MTc2IiB4Mj0iNDYwLjU0MzQiIHkyPSI4Ny4xMzg5Ij4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMzA2NyIgc3R5bGU9InN0b3AtY29sb3I6IzAxNTM5MSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC41MDkyIiBzdHlsZT0ic3RvcC1jb2xvcjojMEU0RThBIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIxIiBzdHlsZT0ic3RvcC1jb2xvcjojMjgyNTYxIi8+DQoJCTwvbGluZWFyR3JhZGllbnQ+DQoJCTxwYXRoIGZpbGw9InVybCgjU1ZHSURfMTJfKSIgZD0iTTQ0OC44MDQsMTExLjQxNmwxNS4yNDQtMTUuMTQyYy0wLjI2NC03Ljg2NS02LjczLTE0LjE1LTE0LjY1Ni0xNC4xNQ0KCQkJYy0zLjk5NCwwLTcuNjIzLDEuNjAyLTEwLjI3OSw0LjIxNmwtMTAuNzMsMTAuNzMyTDQ0OC44MDQsMTExLjQxNnoiLz4NCgkJPGxpbmVhckdyYWRpZW50IGlkPSJTVkdJRF8xM18iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iNDc2LjE5OTIiIHkxPSIxMzguMjM4OCIgeDI9IjQ3Ni4xOTkyIiB5Mj0iMTE3Ljk5MjciPg0KCQkJPHN0b3AgIG9mZnNldD0iMCIgc3R5bGU9InN0b3AtY29sb3I6IzI4MjU2MSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4xNzA4IiBzdHlsZT0ic3RvcC1jb2xvcjojMjQzNzcyIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjM2ODkiIHN0eWxlPSJzdG9wLWNvbG9yOiMxODQ4ODQiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNDkwOCIgc3R5bGU9InN0b3AtY29sb3I6IzBFNEU4QSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC42OTMzIiBzdHlsZT0ic3RvcC1jb2xvcjojMDE1MzkxIi8+DQoJCTwvbGluZWFyR3JhZGllbnQ+DQoJCTxwb2x5Z29uIGZpbGw9InVybCgjU1ZHSURfMTNfKSIgcG9pbnRzPSI0NjQuMDYyLDEzOC4yMzkgNDg4LjM2NCwxMzguMjM5IDQ4OC4zNjQsMTE3Ljk5MyA0NjQuMDM0LDExNy45OTMgCQkiLz4NCgkJDQoJCQk8bGluZWFyR3JhZGllbnQgaWQ9IlNWR0lEXzE0XyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSI3NzUuNzY5NSIgeTE9IjQ3NS40Nzk1IiB4Mj0iNzc1Ljc2OTUiIHkyPSI0NTUuMjMzNCIgZ3JhZGllbnRUcmFuc2Zvcm09Im1hdHJpeCgtMSAwIDAgLTEgMTI1MS45Njg4IDYzOC4xMjExKSI+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwIiBzdHlsZT0ic3RvcC1jb2xvcjojMjgyNTYxIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjE3MDgiIHN0eWxlPSJzdG9wLWNvbG9yOiMyNDM3NzIiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMzY4OSIgc3R5bGU9InN0b3AtY29sb3I6IzE4NDg4NCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC40OTA4IiBzdHlsZT0ic3RvcC1jb2xvcjojMEU0RThBIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjY5MzMiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMTUzOTEiLz4NCgkJPC9saW5lYXJHcmFkaWVudD4NCgkJPHBvbHlnb24gZmlsbD0idXJsKCNTVkdJRF8xNF8pIiBwb2ludHM9IjQ4OC4zMzcsMTYyLjY0MSA0NjQuMDM0LDE2Mi42NDEgNDY0LjAzNCwxODIuODg3IDQ4OC4zNjQsMTgyLjg4NyAJCSIvPg0KCQk8bGluZWFyR3JhZGllbnQgaWQ9IlNWR0lEXzE1XyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSIzMjcuNDE4OSIgeTE9IjU1LjM4MTMiIHgyPSIzMjcuNDE4OSIgeTI9IjQ2LjQwNTMiPg0KCQkJPHN0b3AgIG9mZnNldD0iMCIgc3R5bGU9InN0b3AtY29sb3I6IzA1NTQ5MSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4wNCIgc3R5bGU9InN0b3AtY29sb3I6IzAwNUM5OCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4xNTQ2IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA3MUFBIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjI3NDYiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDg0QkQiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMzk4NSIgc3R5bGU9InN0b3AtY29sb3I6IzAwOTVDRCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC41Mjc3IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBMkRBIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjY2NDUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEFCRTUiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuODE0IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBCMUVDIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIxIiBzdHlsZT0ic3RvcC1jb2xvcjojMDBCNEVGIi8+DQoJCTwvbGluZWFyR3JhZGllbnQ+DQoJCTxwb2x5Z29uIG9wYWNpdHk9IjAuNSIgZmlsbD0idXJsKCNTVkdJRF8xNV8pIiBwb2ludHM9IjMxNS4yODIsNTUuMzgxIDMzOS41ODQsNTUuMzgxIDMzOS41ODQsNDYuNDA1IDMxNS4yNTQsNDYuNDA1IAkJIi8+DQoJCTxsaW5lYXJHcmFkaWVudCBpZD0iU1ZHSURfMTZfIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjMyNy40ODI0IiB5MT0iODguNzY2NiIgeDI9IjMyNy40ODI0IiB5Mj0iNzkuNzkwNSI+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwIiBzdHlsZT0ic3RvcC1jb2xvcjojMDBCNEVGIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjE4NiIgc3R5bGU9InN0b3AtY29sb3I6IzAwQjFFQyIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4zMzU1IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBQkU1Ii8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjQ3MjMiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEEyREEiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNjAxNSIgc3R5bGU9InN0b3AtY29sb3I6IzAwOTVDRCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC43MjU0IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA4NEJEIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjg0NTQiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDcxQUEiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuOTYiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDVDOTgiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjEiIHN0eWxlPSJzdG9wLWNvbG9yOiMwNTU0OTEiLz4NCgkJPC9saW5lYXJHcmFkaWVudD4NCgkJPHBvbHlnb24gb3BhY2l0eT0iMC41IiBmaWxsPSJ1cmwoI1NWR0lEXzE2XykiIHBvaW50cz0iMzE1LjM0Niw4OC43NjcgMzM5LjY0Nyw4OC43NjcgMzM5LjY0Nyw3OS43OTEgMzE1LjMxNyw3OS43OTEgCQkiLz4NCgk8L2c+DQoJPGc+DQoJCTxnPg0KCQkJPHBhdGggZmlsbD0iIzA1NTQ5MSIgZD0iTTI5LjU0NiwyMDIuMzY2aC0xLjM3NGMtMi41MDEsMC0zLjY4LDEuMTc3LTMuNjgsMy45NzV2My44NzVoNC4xN2MxLjA4LDAsMS45NjQsMC44ODQsMS45NjQsMS45NjQNCgkJCQlzLTAuODg0LDIuMDExLTEuOTY0LDIuMDExaC00LjE3djE1LjI2MWMwLDEuMzI0LTEuMDgsMi40MDQtMi40MDQsMi40MDRjLTEuMzI1LDAtMi40MDQtMS4wOC0yLjQwNC0yLjQwNFYyMTQuMTloLTIuOTQyDQoJCQkJYy0xLjA4LDAtMS45NjQtMC45MzEtMS45NjQtMi4wMTFzMC44ODQtMS45NjQsMS45NjQtMS45NjRoMi45NDJ2LTMuMzg1YzAtNS4xNTEsMi4zNTYtOC40MzksOC4wOTgtOC40MzloMS43NjUNCgkJCQljMS4wOCwwLDEuOTY0LDAuOTMxLDEuOTY0LDIuMDExUzMwLjYyNiwyMDIuMzY2LDI5LjU0NiwyMDIuMzY2Ii8+DQoJCQk8cGF0aCBmaWxsPSIjMDU1NDkxIiBkPSJNNDIuNzk1LDIzMi4wNWMtNi4yMzEsMC0xMS4yMzYtNS4wMDQtMTEuMjM2LTExLjIzNnM1LjAwNS0xMS4yMzYsMTEuMjM2LTExLjIzNg0KCQkJCWM2LjIzLDAsMTEuMjM1LDUuMDA0LDExLjIzNSwxMS4yMzZTNDkuMDI1LDIzMi4wNSw0Mi43OTUsMjMyLjA1IE00Mi43OTUsMjEzLjg0NmMtMy45MjUsMC02LjQ3NywzLjE0MS02LjQ3Nyw2Ljk2OA0KCQkJCWMwLDMuODI4LDIuNTUyLDYuOTY5LDYuNDc3LDYuOTY5czYuNDc2LTMuMTQxLDYuNDc2LTYuOTY5QzQ5LjI3MSwyMTYuOTg3LDQ2LjcyLDIxMy44NDYsNDIuNzk1LDIxMy44NDYiLz4NCgkJCTxwYXRoIGZpbGw9IiMwNTU0OTEiIGQ9Ik02OS42ODQsMjEzLjg0NmMtMy44NzYsMC03LjU1NiwyLjExLTcuNTU2LDYuMzMxdjkuMjczYzAsMS4zMjQtMS4wOCwyLjQwMi0yLjQwNCwyLjQwMg0KCQkJCWMtMS4zMjUsMC0yLjQwNC0xLjA3OC0yLjQwNC0yLjQwMnYtMTcuMjczYzAtMS4zMjQsMS4wMy0yLjQwMiwyLjM1NC0yLjQwMmMxLjMyNSwwLDIuNDU0LDEuMDc4LDIuNDU0LDIuNDAydjEuMDMyDQoJCQkJYzEuOTYyLTIuNjAzLDQuMTcxLTMuNjMyLDcuNTU2LTMuNjMyYzEuMTc4LDAsMi4xMSwwLjkzNCwyLjExLDIuMTA5QzcxLjc5NCwyMTIuODY2LDcwLjg2MSwyMTMuODQ2LDY5LjY4NCwyMTMuODQ2Ii8+DQoJCQk8cGF0aCBmaWxsPSIjMDU1NDkxIiBkPSJNOTIuMzA2LDIyMi4yODZINzcuMTQzYzAuMjQ0LDMuMjg2LDIuODk0LDUuNzQxLDYuNDI4LDUuNzQxYzIuNTAyLDAsNC42NjEtMS4wMzEsNi4zNzctMi42OTkNCgkJCQljMC4zNDQtMC4zNDIsMC43MzgtMC40NDEsMS4xNzktMC40NDFjMC41OSwwLDEuMTgsMC4yOTUsMS41NzEsMC43ODVjMC4yNDQsMC4zNDUsMC4zOTEsMC43MzYsMC4zOTEsMS4xMjkNCgkJCQljMCwwLjU0LTAuMjQ2LDEuMTMtMC42ODcsMS41N2MtMi4wNjEsMi4yMDgtNS41NDUsMy42OC04Ljk3OSwzLjY4Yy02LjIzLDAtMTEuMjM1LTUuMDA0LTExLjIzNS0xMS4yMzYNCgkJCQlzNC44NTYtMTEuMjM2LDExLjA5LTExLjIzNmM2LjE4MSwwLDEwLjc5NCw0LjgwOSwxMC43OTQsMTEuMTM4Qzk0LjA3LDIyMS42NDksOTMuMjM2LDIyMi4yODYsOTIuMzA2LDIyMi4yODYgTTgzLjI3NiwyMTMuNjAyDQoJCQkJYy0zLjI4OSwwLTUuNTQ1LDIuMTU4LTYuMDM1LDUuMjk5aDEyLjA3Qzg4Ljg2OSwyMTUuOTA3LDg2LjUxMywyMTMuNjAyLDgzLjI3NiwyMTMuNjAyIi8+DQoJCQk8cGF0aCBmaWxsPSIjMDU1NDkxIiBkPSJNMTE1Ljk3OSwyMTIuODE2bC03Ljk0OSwxNy43NjJjLTAuMzQzLDAuNzM3LTEuMTI4LDEuMjc1LTEuOTYzLDEuMjc1Yy0wLjgzNCwwLTEuNTctMC41MzgtMS45MTQtMS4yNzUNCgkJCQlsLTcuOTk3LTE3Ljc2MmMtMC4xNDgtMC4yOTQtMC4xOTYtMC41ODgtMC4xOTYtMC44ODRjMC0wLjg4MSwwLjU0LTEuNjE4LDEuMjc2LTEuOTYxYzAuMjQ2LTAuMSwwLjU4OC0wLjE5NiwwLjg4NC0wLjE5Ng0KCQkJCWMwLjgzMywwLDEuNjE4LDAuNDksMS45NjEsMS4yNzZsNS45ODYsMTMuNDQ0bDYuMDM1LTEzLjQ0NGMwLjM0My0wLjc4NiwxLjEyOS0xLjI3NiwxLjk2My0xLjI3Ng0KCQkJCWMwLjI5NCwwLDAuNTM4LDAuMDQ5LDAuNzg2LDAuMTQ2YzAuNzg0LDAuMzQ0LDEuMzI0LDEuMTc2LDEuMzI0LDIuMDYxQzExNi4xNzYsMjEyLjI3NiwxMTYuMTI2LDIxMi41MjIsMTE1Ljk3OSwyMTIuODE2Ii8+DQoJCQk8cGF0aCBmaWxsPSIjMDU1NDkxIiBkPSJNMTM3Ljk5MiwyMjIuMjg2aC0xNS4xNjNjMC4yNDQsMy4yODYsMi44OTYsNS43NDEsNi40MjksNS43NDFjMi41MDEsMCw0LjY2MS0xLjAzMSw2LjM3OC0yLjY5OQ0KCQkJCWMwLjM0NC0wLjM0MiwwLjczNi0wLjQ0MSwxLjE3Ny0wLjQ0MWMwLjU5LDAsMS4xOCwwLjI5NSwxLjU3MSwwLjc4NWMwLjI0NCwwLjM0NSwwLjM5MywwLjczNiwwLjM5MywxLjEyOQ0KCQkJCWMwLDAuNTQtMC4yNDgsMS4xMy0wLjY4NywxLjU3Yy0yLjA2MiwyLjIwOC01LjU0NywzLjY4LTguOTgxLDMuNjhjLTYuMjMsMC0xMS4yMzUtNS4wMDQtMTEuMjM1LTExLjIzNg0KCQkJCXM0Ljg1Ni0xMS4yMzYsMTEuMDktMTEuMjM2YzYuMTgzLDAsMTAuNzk0LDQuODA5LDEwLjc5NCwxMS4xMzhDMTM5Ljc1NywyMjEuNjQ5LDEzOC45MjQsMjIyLjI4NiwxMzcuOTkyLDIyMi4yODYNCgkJCQkgTTEyOC45NjMsMjEzLjYwMmMtMy4yODcsMC01LjU0NSwyLjE1OC02LjAzNSw1LjI5OWgxMi4wNjlDMTM0LjU1NiwyMTUuOTA3LDEzMi4yMDIsMjEzLjYwMiwxMjguOTYzLDIxMy42MDIiLz4NCgkJCTxwYXRoIGZpbGw9IiMwNTU0OTEiIGQ9Ik0xNTYuMzQzLDIxMy44NDZjLTMuODc3LDAtNy41NTcsMi4xMS03LjU1Nyw2LjMzMXY5LjI3M2MwLDEuMzI0LTEuMDgsMi40MDItMi40MDQsMi40MDINCgkJCQljLTEuMzI1LDAtMi40MDUtMS4wNzgtMi40MDUtMi40MDJ2LTE3LjI3M2MwLTEuMzI0LDEuMDMyLTIuNDAyLDIuMzU2LTIuNDAyczIuNDUzLDEuMDc4LDIuNDUzLDIuNDAydjEuMDMyDQoJCQkJYzEuOTYyLTIuNjAzLDQuMTcyLTMuNjMyLDcuNTU3LTMuNjMyYzEuMTc4LDAsMi4xMDgsMC45MzQsMi4xMDgsMi4xMDlDMTU4LjQ1MSwyMTIuODY2LDE1Ny41MjEsMjEzLjg0NiwxNTYuMzQzLDIxMy44NDYiLz4NCgkJCTxwYXRoIGZpbGw9IiMwNTU0OTEiIGQ9Ik0xOTQuNTE4LDIyOC41NjZjLTEuNzE3LDEuOTE1LTUuMDA1LDMuNDg0LTguMTQ2LDMuNDg0Yy02LjIzMSwwLTExLjIzNi01LjAwNC0xMS4yMzYtMTEuMjM2DQoJCQkJczUuMDA1LTExLjIzNiwxMS4yMzYtMTEuMjM2YzIuNzQ4LDAsNS4wMDUsMC41OSw3LjI2MSwyLjQ1NGMwLjQ0MiwwLjM5MiwwLjczNiwxLjAzLDAuNzM2LDEuNjY3YzAsMC4zOTQtMC4xNDcsMC44MzQtMC40NCwxLjIyOA0KCQkJCWMtMC4zOTQsMC40OS0wLjk4MywwLjc4Ni0xLjU3LDAuNzg2Yy0wLjQ0MSwwLTAuOTM0LTAuMTUtMS4zMjUtMC40NDJjLTEuNDczLTEuMDgtMy4wNDEtMS41MjItNC42NjEtMS41MjINCgkJCQljLTMuOTI1LDAtNi41MjUsMy4yMzktNi41MjUsNy4wNjZjMCwzLjgyOCwyLjYwMSw3LjA2Niw2LjUyNSw3LjA2NmMyLjM1NCwwLDQuMDI0LTAuOTM0LDUuNDk1LTIuMjU4DQoJCQkJYzAuMzk0LTAuMzQzLDAuODM0LTAuNDksMS4yNzctMC40OWMwLjU0LDAsMS4xMjcsMC4xOTUsMS41MjEsMC42MzdjMC4zNDQsMC4zNDQsMC40ODgsMC43ODcsMC40ODgsMS4yMjcNCgkJCQlDMTk1LjE1MywyMjcuNTM3LDE5NC45NTksMjI4LjA3NiwxOTQuNTE4LDIyOC41NjYiLz4NCgkJCTxwYXRoIGZpbGw9IiMwNTU0OTEiIGQ9Ik0yMDkuNTgsMjMyLjA1Yy02LjIyOSwwLTExLjIzNC01LjAwNC0xMS4yMzQtMTEuMjM2czUuMDA1LTExLjIzNiwxMS4yMzQtMTEuMjM2DQoJCQkJYzYuMjMyLDAsMTEuMjM1LDUuMDA0LDExLjIzNSwxMS4yMzZTMjE1LjgxMiwyMzIuMDUsMjA5LjU4LDIzMi4wNSBNMjA5LjU4LDIxMy44NDZjLTMuOTI1LDAtNi40NzYsMy4xNDEtNi40NzYsNi45NjgNCgkJCQljMCwzLjgyOCwyLjU1MSw2Ljk2OSw2LjQ3Niw2Ljk2OWMzLjkyOCwwLDYuNDc3LTMuMTQxLDYuNDc3LTYuOTY5QzIxNi4wNTcsMjE2Ljk4NywyMTMuNTA4LDIxMy44NDYsMjA5LjU4LDIxMy44NDYiLz4NCgkJCTxwYXRoIGZpbGw9IiMwNTU0OTEiIGQ9Ik0yNDIuNzk5LDIzMS44NTNjLTEuMzI0LDAtMi40MDQtMS4wNzgtMi40MDQtMi40MDR2LTEwLjEwNWMwLTMuMDkyLTIuMzA2LTUuNDk2LTUuNTQ1LTUuNDk2DQoJCQkJYy0zLjIzNiwwLTUuNTQzLDIuNDA0LTUuNTQzLDUuNDk2djEwLjEwNWMwLDEuMzI2LTEuMDgsMi40MDQtMi40MDQsMi40MDRzLTIuNDA0LTEuMDc4LTIuNDA0LTIuNDA0di05LjYxNQ0KCQkJCWMwLTUuNjkxLDQuNjEyLTEwLjI1NiwxMC4zNTItMTAuMjU2YzUuNzQxLDAsMTAuMzU0LDQuNTY0LDEwLjM1NCwxMC4yNTZ2OS42MTVDMjQ1LjIwNCwyMzAuNzc1LDI0NC4xMjUsMjMxLjg1MywyNDIuNzk5LDIzMS44NTMNCgkJCQkiLz4NCgkJCTxwYXRoIGZpbGw9IiMwNTU0OTEiIGQ9Ik0yNjcuNjIzLDIzMS44NTNjLTEuMzI1LDAtMi40MDUtMS4wNzgtMi40MDUtMi40MDR2LTEwLjEwNWMwLTMuMDkyLTIuMzA4LTUuNDk2LTUuNTQ1LTUuNDk2DQoJCQkJYy0zLjIzOCwwLTUuNTQ0LDIuNDA0LTUuNTQ0LDUuNDk2djEwLjEwNWMwLDEuMzI2LTEuMDgsMi40MDQtMi40MDUsMi40MDRjLTEuMzI0LDAtMi40MDQtMS4wNzgtMi40MDQtMi40MDR2LTkuNjE1DQoJCQkJYzAtNS42OTEsNC42MTMtMTAuMjU2LDEwLjM1NC0xMC4yNTZjNS43NDEsMCwxMC4zNTMsNC41NjQsMTAuMzUzLDEwLjI1NnY5LjYxNUMyNzAuMDI1LDIzMC43NzUsMjY4Ljk0NywyMzEuODUzLDI2Ny42MjMsMjMxLjg1Mw0KCQkJCSIvPg0KCQkJPHBhdGggZmlsbD0iIzA1NTQ5MSIgZD0iTTI5My44MjMsMjIyLjI4NmgtMTUuMTU5YzAuMjQ0LDMuMjg2LDIuODkzLDUuNzQxLDYuNDI3LDUuNzQxYzIuNTAzLDAsNC42NjEtMS4wMzEsNi4zNzgtMi42OTkNCgkJCQljMC4zNDQtMC4zNDIsMC43MzctMC40NDEsMS4xNzgtMC40NDFjMC41OSwwLDEuMTc3LDAuMjk1LDEuNTcsMC43ODVjMC4yNDYsMC4zNDUsMC4zOTQsMC43MzYsMC4zOTQsMS4xMjkNCgkJCQljMCwwLjU0LTAuMjQ3LDEuMTMtMC42ODgsMS41N2MtMi4wNjEsMi4yMDgtNS41NDUsMy42OC04Ljk3OSwzLjY4Yy02LjIzMiwwLTExLjIzNi01LjAwNC0xMS4yMzYtMTEuMjM2DQoJCQkJczQuODU3LTExLjIzNiwxMS4wOS0xMS4yMzZjNi4xODIsMCwxMC43OTQsNC44MDksMTAuNzk0LDExLjEzOEMyOTUuNTkxLDIyMS42NDksMjk0Ljc1NywyMjIuMjg2LDI5My44MjMsMjIyLjI4Ng0KCQkJCSBNMjg0Ljc5NywyMTMuNjAyYy0zLjI4OCwwLTUuNTQ1LDIuMTU4LTYuMDM1LDUuMjk5aDEyLjA3QzI5MC4zOTEsMjE1LjkwNywyODguMDM0LDIxMy42MDIsMjg0Ljc5NywyMTMuNjAyIi8+DQoJCQk8cGF0aCBmaWxsPSIjMDU1NDkxIiBkPSJNMzE3Ljk1NCwyMjguNTY2Yy0xLjcxNywxLjkxNS01LjAwNSwzLjQ4NC04LjE0NiwzLjQ4NGMtNi4yMjksMC0xMS4yMzQtNS4wMDQtMTEuMjM0LTExLjIzNg0KCQkJCXM1LjAwNS0xMS4yMzYsMTEuMjM0LTExLjIzNmMyLjc0OCwwLDUuMDA1LDAuNTksNy4yNjUsMi40NTRjMC40NDEsMC4zOTIsMC43MzQsMS4wMywwLjczNCwxLjY2Nw0KCQkJCWMwLDAuMzk0LTAuMTQ2LDAuODM0LTAuNDQyLDEuMjI4Yy0wLjM5MiwwLjQ5LTAuOTgsMC43ODYtMS41NjgsMC43ODZjLTAuNDQzLDAtMC45MzQtMC4xNS0xLjMyNC0wLjQ0Mg0KCQkJCWMtMS40NzQtMS4wOC0zLjA0NC0xLjUyMi00LjY2NC0xLjUyMmMtMy45MjUsMC02LjUyNSwzLjIzOS02LjUyNSw3LjA2NmMwLDMuODI4LDIuNjAxLDcuMDY2LDYuNTI1LDcuMDY2DQoJCQkJYzIuMzU3LDAsNC4wMjQtMC45MzQsNS40OTctMi4yNThjMC4zOTItMC4zNDMsMC44MzItMC40OSwxLjI3NS0wLjQ5YzAuNTQsMCwxLjEyOSwwLjE5NSwxLjUyMSwwLjYzNw0KCQkJCWMwLjM0NCwwLjM0NCwwLjQ5MiwwLjc4NywwLjQ5MiwxLjIyN0MzMTguNTk0LDIyNy41MzcsMzE4LjM5NywyMjguMDc2LDMxNy45NTQsMjI4LjU2NiIvPg0KCQkJPHBhdGggZmlsbD0iIzA1NTQ5MSIgZD0iTTMzNC44MzQsMjE0LjE5aC00LjEyMnYxNS4zMDljMCwxLjMyNi0xLjA3OCwyLjM1Ni0yLjQwNCwyLjM1NmMtMS4zMjQsMC0yLjQwNC0xLjAzLTIuNDA0LTIuMzU2VjIxNC4xOQ0KCQkJCWgtMy41ODFjLTEuMDgsMC0xLjk2NC0wLjkzMS0xLjk2NC0yLjAxMXMwLjg4NC0xLjk2NCwxLjk2NC0xLjk2NGgzLjU4MXYtNy4wNjVjMC0xLjMyNCwxLjA4LTIuMzU0LDIuNDA0LTIuMzU0DQoJCQkJYzEuMzI2LDAsMi40MDQsMS4wMywyLjQwNCwyLjM1NHY3LjA2NWg0LjEyMmMxLjA3OSwwLDEuOTYzLDAuODg0LDEuOTYzLDEuOTY0UzMzNS45MTMsMjE0LjE5LDMzNC44MzQsMjE0LjE5Ii8+DQoJCQk8cGF0aCBmaWxsPSIjMDU1NDkxIiBkPSJNMzU3Ljg0OCwyMjIuMjg2aC0xNS4xNjJjMC4yNDYsMy4yODYsMi44OTYsNS43NDEsNi40MjYsNS43NDFjMi41MDQsMCw0LjY2Mi0xLjAzMSw2LjM4MS0yLjY5OQ0KCQkJCWMwLjM0NC0wLjM0MiwwLjczNS0wLjQ0MSwxLjE3Ni0wLjQ0MWMwLjU5LDAsMS4xOCwwLjI5NSwxLjU3MiwwLjc4NWMwLjI0NCwwLjM0NSwwLjM5MiwwLjczNiwwLjM5MiwxLjEyOQ0KCQkJCWMwLDAuNTQtMC4yNDcsMS4xMy0wLjY4NiwxLjU3Yy0yLjA2MiwyLjIwOC01LjU0NSwzLjY4LTguOTgxLDMuNjhjLTYuMjMxLDAtMTEuMjM2LTUuMDA0LTExLjIzNi0xMS4yMzYNCgkJCQlzNC44NTctMTEuMjM2LDExLjA5LTExLjIzNmM2LjE4NCwwLDEwLjc5NCw0LjgwOSwxMC43OTQsMTEuMTM4QzM1OS42MTIsMjIxLjY0OSwzNTguNzc4LDIyMi4yODYsMzU3Ljg0OCwyMjIuMjg2DQoJCQkJIE0zNDguODE4LDIxMy42MDJjLTMuMjg4LDAtNS41NDUsMi4xNTgtNi4wMzUsNS4yOTloMTIuMDdDMzU0LjQxMiwyMTUuOTA3LDM1Mi4wNTgsMjEzLjYwMiwzNDguODE4LDIxMy42MDIiLz4NCgkJCTxwYXRoIGZpbGw9IiMwNTU0OTEiIGQ9Ik0zODIuNDgsMjMxLjg1M2MtMS4zMjUsMC0yLjQwNS0xLjA3OC0yLjQwNS0yLjQwMnYtMS4xM2MtMS4zNzQsMi4zNTYtMy45NzUsMy43MjktNy4wMTcsMy43MjkNCgkJCQljLTYuMjMyLDAtMTAuNjQ3LTQuODA5LTEwLjY0Ny0xMS4yMzZzNC4yNy0xMS4yMzYsMTAuNjQ3LTExLjIzNmMzLjEzOSwwLDUuNzg5LDEuNTIxLDcuMDE3LDMuNzc4di0xMi42NTgNCgkJCQljMC0xLjMyNiwxLjA4LTIuMzU2LDIuNDA1LTIuMzU2YzEuMzIyLDAsMi40MDQsMS4wMywyLjQwNCwyLjM1NnYyOC43NTNDMzg0Ljg4NSwyMzAuNzc1LDM4My44MDMsMjMxLjg1MywzODIuNDgsMjMxLjg1Mw0KCQkJCSBNMzczLjY0NiwyMTMuODQ2Yy0zLjkyNSwwLTYuNDI5LDMuMTQxLTYuNDI5LDYuOTY4YzAsMy44MjgsMi41MDQsNi45NjksNi40MjksNi45NjlzNi40MjktMi45OTQsNi40MjktNi45NjkNCgkJCQlDMzgwLjA3NSwyMTYuODQsMzc3LjU3MSwyMTMuODQ2LDM3My42NDYsMjEzLjg0NiIvPg0KCQk8L2c+DQoJPC9nPg0KPC9nPg0KPC9zdmc+DQo=" alt="Zest4" class="brand-logo">
+          <span class="brand-sub">Cloud &amp; Connectivity Pricing Calculator</span>
+        </div>
+      </div>
+
+      <div class="gate">
+        <div class="gate-card">
+          <div class="gate-eyebrow">Step 1 of 2</div>
+          <h1>Who are you pricing this for?</h1>
+          <p class="lead">Choose a pricing book to load. You can switch between them at any time &mdash; your quote will be cleared when you do, since the two price books aren't comparable.</p>
+          <div class="gate-options">
+            <button class="gate-btn" id="btn-rrp">
+              <div class="icon">RRP</div>
+              <h3>Direct / Dealer</h3>
+              <p>Recommended Retail Pricing for end customers and dealer-billed accounts. Source: Cloud RRP Tariff Guide.</p>
+            </button>
+            <button class="gate-btn alt" id="btn-ws">
+              <div class="icon">WS</div>
+              <h3>Reseller</h3>
+              <p>Wholesale cost pricing for reseller / channel partner accounts. Source: Cloud Wholesale Tariff Guide.</p>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.getElementById('btn-rrp').addEventListener('click', () => setMode('rrp'));
+    document.getElementById('btn-ws').addEventListener('click', () => setMode('ws'));
+  }
+
+  function setMode(m){
+    mode = m;
+    quoteItems = [];
+    render();
+  }
+
+  function switchMode(){
+    if(quoteItems.length > 0){
+      const ok = confirm('Switching pricing book will clear your current quote. Continue?');
+      if(!ok) return;
+    }
+    mode = null;
+    quoteItems = [];
+    render();
+  }
+
+  // ---------- Calculator screen ----------
+  function renderCalculator(){
+    const data = PRICING_DATA[mode];
+
+    root.innerHTML = `
+      <div class="topbar">
+        <div class="brand">
+          <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNi4wLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB3aWR0aD0iNTQxLjA4NHB4IiBoZWlnaHQ9IjI0Ny4wOTNweCIgdmlld0JveD0iMCAwIDU0MS4wODQgMjQ3LjA5MyIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgNTQxLjA4NCAyNDcuMDkzIg0KCSB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxnPg0KCTxnPg0KCQk8cGF0aCBmaWxsPSIjMDBCNEVGIiBkPSJNMzUxLjI1NCwxMzguMzM3Yy0xMS41NTUsMC0xMS42MzctMTEuNjM3LTExLjYzNy0xMS42Mzd2LTQ2Ljk1bDguMTA5LDAuMDINCgkJCWMxNy44OCwwLDMyLjM1NC0xNC40OTMsMzIuMzU0LTMyLjM3NGMwLTE3Ljg1OS0xNC41OTctMzIuMzU0LTMyLjM1NC0zMi4zNTRjMCwwLTMyLjQxNiwwLjc3LTMyLjQxNiwzMi4zNTQNCgkJCWMwLDEuNjIyLDAsNy45ODgsMCw3Ljk4OHMtNDguNjMyLDAtNzQuMDEzLDBzLTI1LjQyMiwyNi40MTMtMjUuNDIyLDI2LjQxM2MwLDguNzM4LDQuMjU5LDE2LjQ0MSwxMC44MDYsMjEuMjI3bDU2LjAxMywzMS45NjcNCgkJCWMwLjM2NCwwLjMwNSwwLjc5LDAuOTMzLDAuNjg4LDEuNjgzYy0wLjA4MSwwLjY2OS0wLjYyNywxLjUwMS0xLjcwMiwxLjY0MWwtMTE0LjI3MywwLjA0MmMwLDAtNC40MTktMC4wNjItNi45MTItMC44MTINCgkJCWw0Mi45NzYtNDIuOTc0YzMuNTg5LTMuNjksNS43OTktOC43MzksNS43OTktMTQuMzEzYzAtNi4yMDItMi43NzctMTEuNzc3LTcuMTM3LTE1LjU0OGMtOS40NjgtNy43MDMtMjEuNTY5LTEyLjM0Ni0zNC43MjYtMTIuMzQ2DQoJCQljLTMwLjQ2OSwwLTU1LjE2MSwyNC42OTEtNTUuMTYxLDU1LjE0YzAsOS45MTMsMi42MzcsMTkuMjE2LDcuMjE5LDI3LjI2NGMtOS43NTIsMi45MzktMTguOTE0LDMuNDY4LTIyLjcwNSwzLjU2OUg0Mi42OTINCgkJCWMtMS4wNzUtMC4xNDMtMS42MjItMC45OTQtMS43MDEtMS42NjNjLTAuMTA0LTAuNzUsMC4zMjMtMS4zNzgsMC42ODgtMS42ODNsNTYuMDEyLTMxLjk2Nw0KCQkJYzYuNTQ5LTQuNzg2LDEwLjgwNi0xMi40ODksMTAuODA2LTIxLjIyN2MwLDAtMC4wNDItMjYuNDEzLTI1LjQyMi0yNi40MTNIMjYuOTM5Yy02LjcwOSwwLTEyLjE2Miw1LjQ3Mi0xMi4xNjIsMTIuMjAzDQoJCQljMCw2LjcxMSw1LjQ1MywxMi4xNjMsMTIuMTYyLDEyLjE2M2g1Ni4yMTdjMS4wMTQsMC4wODIsMS44MDMsMC43MywxLjgwMywxLjcyNGMwLDAuNjA4LTAuMzAzLDEuMjU1LTAuODMyLDEuNg0KCQkJYzAsMC01NC44MzUsMzAuOTU1LTU3LjE2NSwzMi4zMTNjLTIuMzMyLDEuMzM5LTEyLjE4NSw3LjUwMS0xMi4xODUsMjEuNzkzYzAsMjMuNDM0LDI0LjA0MywyNS40NiwyNC4wNDMsMjUuNDZoNTYuNjYxDQoJCQljNS4yNSwwLDIzLjkyMS0wLjU4Niw0Mi4wNDQtOC43OThjOC41OTUsNS41NzUsMTguODU0LDguNzk4LDI5Ljg1OSw4Ljc5OGgxMTguMTY3YzAsMCwyNC4wNDMtMi4wMjYsMjQuMDQzLTI1LjQ2DQoJCQljMC0xNC4yOTItOS44NTMtMjAuNDU0LTEyLjE4My0yMS43OTNjLTIuMzUzLTEuMzU4LTU3LjE2OS0zMi4zMTMtNTcuMTY5LTMyLjMxM2MtMC41MjctMC4zNDUtMC44My0wLjk5Mi0wLjgzLTEuNg0KCQkJYzAtMC45OTQsMC43OS0xLjY0MywxLjgwMy0xLjcyNGg3NC4wOTV2NDYuMjZjLTAuMDYsMi43MzYsMC4xNjIsMTYuMTk3LDkuODM0LDI2LjI3MmM0LjUyLDQuNzI0LDEyLjgzMiwxMC4zNTcsMjYuNjc3LDEwLjM1Nw0KCQkJaDI2LjY3OGMwLjI4NSwwLDAuNTY3LDAsMC44NTMtMC4wMzljMC4xNDIsMC4wMiwwLjI4MywwLjAyLDAuNDI1LDAuMDJoMjIuNzcxYzYuNzEsMCwxMi4xNDMtNS40MzIsMTIuMTQzLTEyLjE0Mw0KCQkJYzAtNi43MDktNS40MzMtMTIuMTY0LTEyLjE0My0xMi4xNjRoLTIyLjc3MUwzNTEuMjU0LDEzOC4zMzd6IE0zMzkuNjE3LDQ3LjE3M2MwLjA2Mi00LjUsMy43MS04LjEyOSw4LjIwOS04LjEyOQ0KCQkJYzQuNTYyLDAsOC4yNTIsMy42OSw4LjI1Miw4LjI1MWMwLDQuNTQyLTMuNjg5LDguMDg5LTguMjUyLDguMDg5aC04LjIwOVY0Ny4xNzN6IE0xMzYuNTcxLDEwNy41MDQNCgkJCWMwLTE3LjAwOSwxMy44MDctMzAuODEzLDMwLjgzNS0zMC44MTNjNS42MTUsMCwxMC44NjYsMS41NDEsMTUuNDA4LDQuMTc1bC00Mi4wNjUsNDIuMDQ0DQoJCQlDMTM4LjExMywxMTguMzg5LDEzNi41NzEsMTEzLjEzOCwxMzYuNTcxLDEwNy41MDR6Ii8+DQoJCTxsaW5lYXJHcmFkaWVudCBpZD0iU1ZHSURfMV8iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iMjMyLjU4MyIgeTE9IjY5LjQ3NDYiIHgyPSIyNjUuMDgyIiB5Mj0iNjkuNDc0NiI+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwIiBzdHlsZT0ic3RvcC1jb2xvcjojMDU1NDkxIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjAzMzEiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDYyOUQiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMDgzNSIgc3R5bGU9InN0b3AtY29sb3I6IzAwNzNBQyIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4xNDAyIiBzdHlsZT0ic3RvcC1jb2xvcjojMDA4M0JDIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjIwMjgiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDkyQ0EiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMjczNiIgc3R5bGU9InN0b3AtY29sb3I6IzAwOUVENiIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4zNTYzIiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBN0UwIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjQ1ODYiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEFFRTgiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNjAxOSIgc3R5bGU9InN0b3AtY29sb3I6IzAwQjJFRCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMSIgc3R5bGU9InN0b3AtY29sb3I6IzAwQjRFRiIvPg0KCQk8L2xpbmVhckdyYWRpZW50Pg0KCQk8cGF0aCBvcGFjaXR5PSIwLjUiIGZpbGw9InVybCgjU1ZHSURfMV8pIiBkPSJNMjU4LjcxNCw3OS43NjNoLTE3LjQ5NWMtMS4wMTQsMC4wNjItMS44MDUsMC43MS0xLjgwNSwxLjcwMw0KCQkJYzAsMC42MDksMC4zMDQsMS4yNTYsMC44MzEsMS42MDFjMCwwLDAuMzA0LDAuMTgyLDAuODkyLDAuNTA3Yy01LjA0Ny0yLjM1My04LjU1NC03LjQ3OS04LjU1NC0xMy40MjENCgkJCWMwLTcuOTI0LDYuMjQ0LTE0LjQxMiwxNC4wOS0xNC43NzhoMTguNDA5djI0LjM3OEwyNTguNzE0LDc5Ljc2M3oiLz4NCgkJPGxpbmVhckdyYWRpZW50IGlkPSJTVkdJRF8yXyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSIyNjcuNDI4NyIgeTE9IjEyMS45NzE3IiB4Mj0iMjk2LjY4MjYiIHkyPSIxMjEuOTcxNyI+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwIiBzdHlsZT0ic3RvcC1jb2xvcjojMDBCNEVGIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjM5ODEiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEIyRUQiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNTQxNCIgc3R5bGU9InN0b3AtY29sb3I6IzAwQUVFOCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC42NDM3IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBN0UwIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjcyNjQiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDlFRDYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNzk3MiIgc3R5bGU9InN0b3AtY29sb3I6IzAwOTJDQSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC44NTk4IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA4M0JDIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjkxNjUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDczQUMiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuOTY2OSIgc3R5bGU9InN0b3AtY29sb3I6IzAwNjI5RCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMSIgc3R5bGU9InN0b3AtY29sb3I6IzA1NTQ5MSIvPg0KCQk8L2xpbmVhckdyYWRpZW50Pg0KCQk8cGF0aCBvcGFjaXR5PSIwLjUiIGZpbGw9InVybCgjU1ZHSURfMl8pIiBkPSJNMjkwLjE3NSwxMTEuMjU5YzMuOTMyLDIuNjU1LDYuNTA4LDcuMTU2LDYuNTA4LDEyLjI0NA0KCQkJYzAsOC4xNS02LjYwOSwxNC43NTktMTQuNzYsMTQuNzU5Yy0wLjA2MSwwLTAuMTQzLDAtMC4yMDItMC4wMjFjMS4wNTQtMC4xNDIsMS41OC0wLjk1MywxLjY2MS0xLjYwMg0KCQkJYzAuMTAzLTAuNzctMC4zMjMtMS4zOTgtMC42ODgtMS43MDRsLTE1LjI2Ni04LjcxNmwxMi45MDgtMjAuNTRMMjkwLjE3NSwxMTEuMjU5eiIvPg0KCQk8bGluZWFyR3JhZGllbnQgaWQ9IlNWR0lEXzNfIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjE0Ni45NzM2IiB5MT0iNjYuNjA5NCIgeDI9IjE4Ny43MTk3IiB5Mj0iNjYuNjA5NCI+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwIiBzdHlsZT0ic3RvcC1jb2xvcjojMDBCNEVGIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjM5ODEiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEIyRUQiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNTQxNCIgc3R5bGU9InN0b3AtY29sb3I6IzAwQUVFOCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC42NDM3IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBN0UwIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjcyNjQiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDlFRDYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNzk3MiIgc3R5bGU9InN0b3AtY29sb3I6IzAwOTJDQSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC44NTk4IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA4M0JDIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjkxNjUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDczQUMiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuOTY2OSIgc3R5bGU9InN0b3AtY29sb3I6IzAwNjI5RCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMSIgc3R5bGU9InN0b3AtY29sb3I6IzA1NTQ5MSIvPg0KCQk8L2xpbmVhckdyYWRpZW50Pg0KCQk8cGF0aCBvcGFjaXR5PSIwLjUiIGZpbGw9InVybCgjU1ZHSURfM18pIiBkPSJNMTczLjgzMiw1Mi43NDRjNy45MTMsMC45NTMsMTMuODg4LDguMTMxLDEzLjg4OCwxNi4zNjENCgkJCWMwLDQuNjIzLTEuODg3LDguNzc4LTQuOTA1LDExLjc1N2MtNC41NDItMi42MzUtOS43OTMtNC4xNzUtMTUuNDA4LTQuMTc1Yy0zLjUwOCwwLTYuODcyLDAuNTg4LTEwLjAxNCwxLjY2M2wtMTAuNDE5LTIyLjA4DQoJCQlDMTQ2Ljk3NCw1Ni4yNywxNTguNSw1MC44OTcsMTczLjgzMiw1Mi43NDR6Ii8+DQoJCTxsaW5lYXJHcmFkaWVudCBpZD0iU1ZHSURfNF8iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iMTE5LjQ2MTkiIHkxPSIxMzQuNzYxMiIgeDI9IjExOS40NjE5IiB5Mj0iMTM0Ljc2MTIiPg0KCQkJPHN0b3AgIG9mZnNldD0iMCIgc3R5bGU9InN0b3AtY29sb3I6I0ZGRkZGRiIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC40ODc4IiBzdHlsZT0ic3RvcC1jb2xvcjojRkNGQkZCIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjY2MzUiIHN0eWxlPSJzdG9wLWNvbG9yOiNGM0YyRjIiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNzg4NyIgc3R5bGU9InN0b3AtY29sb3I6I0U3RTdFNyIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC44ODk5IiBzdHlsZT0ic3RvcC1jb2xvcjojRDdEN0Q4Ii8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjk3NTYiIHN0eWxlPSJzdG9wLWNvbG9yOiNDNEM0QzYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjEiIHN0eWxlPSJzdG9wLWNvbG9yOiNCREJFQzAiLz4NCgkJPC9saW5lYXJHcmFkaWVudD4NCgkJPHBhdGggZmlsbD0idXJsKCNTVkdJRF80XykiIGQ9Ik0xMTkuNDYyLDEzNC43NjEiLz4NCgkJPGxpbmVhckdyYWRpZW50IGlkPSJTVkdJRF81XyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSIzMy40ODQ0IiB5MT0iMTQ4LjgyNjIiIHgyPSI1OC44NjQzIiB5Mj0iMTQ4LjgyNjIiPg0KCQkJPHN0b3AgIG9mZnNldD0iMCIgc3R5bGU9InN0b3AtY29sb3I6IzA1NTQ5MSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4wMzMxIiBzdHlsZT0ic3RvcC1jb2xvcjojMDA2MjlEIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjA4MzUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDczQUMiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMTQwMiIgc3R5bGU9InN0b3AtY29sb3I6IzAwODNCQyIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4yMDI4IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA5MkNBIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjI3MzYiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDlFRDYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMzU2MyIgc3R5bGU9InN0b3AtY29sb3I6IzAwQTdFMCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC40NTg2IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBRUU4Ii8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjYwMTkiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEIyRUQiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjEiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEI0RUYiLz4NCgkJPC9saW5lYXJHcmFkaWVudD4NCgkJPHBhdGggb3BhY2l0eT0iMC41IiBmaWxsPSJ1cmwoI1NWR0lEXzVfKSIgZD0iTTU4Ljg2NCwxMzguMzM3SDQyLjY4N2MtMS4wNzMtMC4xNDMtMS42MjEtMC45OTQtMS43MDEtMS42NjMNCgkJCWMtMC4xMDItMC43MywwLjMwNC0xLjM1OCwwLjY2Ny0xLjY2M2MtNC44NDMsMi4zNTMtOC4xNjgsNy4zMTktOC4xNjgsMTMuMDc2YzAsOC4wNDcsNi41MjcsMTQuNTU0LDE0LjU3NCwxNC41NTRoMTAuNzEyDQoJCQlMNTguODY0LDEzOC4zMzd6Ii8+DQoJCTxsaW5lYXJHcmFkaWVudCBpZD0iU1ZHSURfNl8iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iNjcuNDU5IiB5MT0iOTYuOTU4IiB4Mj0iOTcuMTU3MiIgeTI9Ijk2Ljk1OCI+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwIiBzdHlsZT0ic3RvcC1jb2xvcjojMDBCNEVGIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjM5ODEiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEIyRUQiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNTQxNCIgc3R5bGU9InN0b3AtY29sb3I6IzAwQUVFOCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC42NDM3IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBN0UwIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjcyNjQiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDlFRDYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNzk3MiIgc3R5bGU9InN0b3AtY29sb3I6IzAwOTJDQSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC44NTk4IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA4M0JDIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjkxNjUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDczQUMiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuOTY2OSIgc3R5bGU9InN0b3AtY29sb3I6IzAwNjI5RCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMSIgc3R5bGU9InN0b3AtY29sb3I6IzA1NTQ5MSIvPg0KCQk8L2xpbmVhckdyYWRpZW50Pg0KCQk8cGF0aCBvcGFjaXR5PSIwLjUiIGZpbGw9InVybCgjU1ZHSURfNl8pIiBkPSJNOTAuNTY4LDEwNy4wOTVjMC4wNDItMC4wMiwwLjA2MS0wLjA0MiwwLjA4Mi0wLjA2Mg0KCQkJYzMuOTMzLTIuNjk2LDYuNTA3LTcuMjE2LDYuNTA3LTEyLjM0NWMwLTcuODA0LTUuOTc5LTE0LjIxLTEzLjYwMy0xNC44NzljMC44MTEsMC4yMDIsMS4zOTgsMC44MSwxLjM5OCwxLjY2MQ0KCQkJYzAsMC42MS0wLjMwNCwxLjI1Ny0wLjgzMSwxLjYwMmMwLDAtNy4yOTgsNC4xMTUtMTYuNjYzLDkuNDA3bDEwLjc0OCwyMS42MjlMOTAuNTY4LDEwNy4wOTV6Ii8+DQoJCTxsaW5lYXJHcmFkaWVudCBpZD0iU1ZHSURfN18iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iMzM5LjYxNTIiIHkxPSI1OS44MDY2IiB4Mj0iMzY0LjY1MTQiIHkyPSI1OS44MDY2Ij4NCgkJCTxzdG9wICBvZmZzZXQ9IjAiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEI0RUYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMzk4MSIgc3R5bGU9InN0b3AtY29sb3I6IzAwQjJFRCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC41NDE0IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBRUU4Ii8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjY0MzciIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEE3RTAiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNzI2NCIgc3R5bGU9InN0b3AtY29sb3I6IzAwOUVENiIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC43OTcyIiBzdHlsZT0ic3RvcC1jb2xvcjojMDA5MkNBIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjg1OTgiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDgzQkMiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuOTE2NSIgc3R5bGU9InN0b3AtY29sb3I6IzAwNzNBQyIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC45NjY5IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA2MjlEIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIxIiBzdHlsZT0ic3RvcC1jb2xvcjojMDU1NDkxIi8+DQoJCTwvbGluZWFyR3JhZGllbnQ+DQoJCTxwYXRoIG9wYWNpdHk9IjAuNSIgZmlsbD0idXJsKCNTVkdJRF83XykiIGQ9Ik0zNDQuMDE1LDc5LjgwNWMxMS4zOTQsMCwyMC42MzctOS4zMjQsMjAuNjM3LTIwLjcxNw0KCQkJYzAtOC44Mi01LjUzNC0xNi4zNC0xMy4zMTctMTkuMjc4YzIuNzk3LDEuMzE2LDQuNzIzLDQuMTU1LDQuNzIzLDcuNDU5YzAsNC41NDItMy42ODksOC4wODktOC4yMzEsOC4wODloLTguMjF2MjQuNDA0DQoJCQlMMzQ0LjAxNSw3OS44MDV6Ii8+DQoJCTxsaW5lYXJHcmFkaWVudCBpZD0iU1ZHSURfOF8iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iMTQ4LjkxMTEiIHkxPSIxNDIuNDYzOSIgeDI9IjE2MS40MzgxIiB5Mj0iMTU0Ljk5MDgiPg0KCQkJPHN0b3AgIG9mZnNldD0iMCIgc3R5bGU9InN0b3AtY29sb3I6IzA1NTQ5MSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4wMzMxIiBzdHlsZT0ic3RvcC1jb2xvcjojMDA2MjlEIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjA4MzUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDczQUMiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMTQwMiIgc3R5bGU9InN0b3AtY29sb3I6IzAwODNCQyIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4yMDI4IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA5MkNBIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjI3MzYiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDlFRDYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMzU2MyIgc3R5bGU9InN0b3AtY29sb3I6IzAwQTdFMCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC40NTg2IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBRUU4Ii8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjYwMTkiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEIyRUQiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjEiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEI0RUYiLz4NCgkJPC9saW5lYXJHcmFkaWVudD4NCgkJPHBhdGggZmlsbD0idXJsKCNTVkdJRF84XykiIGQ9Ik0xNjcuMzk2LDEzOC4zNDljMCwwLTEwLjQ4MiwyMy4yMjYtMTIuNDU2LDIyLjg1MmMtMi44MjMtMC4zMDctMTEuNDY1LTMuMzY3LTE3LjQxNy03LjM0OQ0KCQkJYzEzLjI3LTcuMjcsMjIuOTc5LTE2LjMxMSwyMi45NzktMTYuMzExczMuMTE1LDAuNzk2LDcuMDYsMC43OTYiLz4NCgkJPGxpbmVhckdyYWRpZW50IGlkPSJTVkdJRF85XyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSIxMjYuNzM1NCIgeTE9IjEyMC43OTY5IiB4Mj0iMTMwLjM1OSIgeTI9IjEzMC43NTI3Ij4NCgkJCTxzdG9wICBvZmZzZXQ9IjAiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEI0RUYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMzk4MSIgc3R5bGU9InN0b3AtY29sb3I6IzAwQjJFRCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC41NDE0IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBRUU4Ii8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjY0MzciIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEE3RTAiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNzI2NCIgc3R5bGU9InN0b3AtY29sb3I6IzAwOUVENiIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC43OTcyIiBzdHlsZT0ic3RvcC1jb2xvcjojMDA5MkNBIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjg1OTgiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDgzQkMiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuOTE2NSIgc3R5bGU9InN0b3AtY29sb3I6IzAwNzNBQyIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC45NjY5IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA2MjlEIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIxIiBzdHlsZT0ic3RvcC1jb2xvcjojMDU1NDkxIi8+DQoJCTwvbGluZWFyR3JhZGllbnQ+DQoJCTxwYXRoIGZpbGw9InVybCgjU1ZHSURfOV8pIiBkPSJNMTQwLjcxOCwxMjIuODg3Yy0wLjQyOCwwLjM0My0xMi4xOCw4LjUxNi0yMS4yODgsMTEuODQzYy0wLjgwNi0xLjIwNS0zLjA1NS01Ljg5NC00LjE5NS05LjIxOQ0KCQkJYzUuMzUzLTIuMDYsMjIuNzQyLTguODA3LDIyLjc0Mi04LjgwN1MxMzkuMzM5LDEyMC40NzQsMTQwLjcxOCwxMjIuODg3eiIvPg0KCQk8Zz4NCgkJCTxwYXRoIGZpbGw9IiMwNTU0OTEiIGQ9Ik01MTQuMTE0LDE2Mi42MjVoLTI1Ljc1djIyLjI0NWMwLDcuNDg3LTQuNzIxLDEzLjQ3NC0xMi4yMDksMTMuNDc0Yy03LjQ4NCwwLTEyLjA5NC01Ljk4Ni0xMi4wOTQtMTMuNDc0DQoJCQkJdi0yMi4yNDVoLTcxLjUzNGMtNi40MTYsMC0xMi4xOTQtNC45Mi0xMi4xOTQtMTEuNTUyYzAtMy40MjQsMC44NTUtNi42MzEsMy4yMS05LjE5N2w4My4wMTEtODIuOTYzDQoJCQkJYzIuNzgzLTMuMjEzLDcuMzk1LTYuNjU5LDExLjg5MS02LjY1OWM3LjQ4NiwwLDkuOTIsNS45ODgsOS45MiwxMy40NzZ2NzIuNTFoMjUuNzVjNi42MjksMCwxMi4xOTMsNS41NjIsMTIuMTkzLDEyLjE5MQ0KCQkJCUM1MjYuMzA4LDE1Ny4wNjEsNTIwLjc0MywxNjIuNjI1LDUxNC4xMTQsMTYyLjYyNXogTTQ2NC4wNjIsOTYuMjYybC00Mi4yNDgsNDEuOTc3aDQyLjI0OFY5Ni4yNjJ6Ii8+DQoJCTwvZz4NCgkJPGxpbmVhckdyYWRpZW50IGlkPSJTVkdJRF8xMF8iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iMzM5LjQyOTciIHkxPSIxNDQuNDgiIHgyPSIzNjkuMzkxNiIgeTI9IjE0NC40OCI+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwIiBzdHlsZT0ic3RvcC1jb2xvcjojMDU1NDkxIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjAxODEiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDVBOTYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMDg2MSIgc3R5bGU9InN0b3AtY29sb3I6IzAwNkRBNiIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4xNjA4IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA3RUI3Ii8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjI0MTQiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDhFQzYiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMzI5OSIgc3R5bGU9InN0b3AtY29sb3I6IzAwOUJENCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC40MjkzIiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBNkRGIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjU0NjEiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEFERTciLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNjk2NSIgc3R5bGU9InN0b3AtY29sb3I6IzAwQjJFRCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMSIgc3R5bGU9InN0b3AtY29sb3I6IzAwQjRFRiIvPg0KCQk8L2xpbmVhckdyYWRpZW50Pg0KCQk8cGF0aCBvcGFjaXR5PSIwLjUiIGZpbGw9InVybCgjU1ZHSURfMTBfKSIgZD0iTTM1MS4yMjgsMTM4LjMyOGMtMTEuNTU1LDAtMTEuNjM2LTExLjYzNy0xMS42MzYtMTEuNjM3di0wLjM2NQ0KCQkJYy0wLjEwMSwxLjExNS0wLjE2MiwyLjI1Mi0wLjE2MiwzLjM4NmMwLDE3LjIxMSwxMy4xNTYsMzEuMzYsMjkuOTYyLDMyLjkyM3YtMjQuMzMxTDM1MS4yMjgsMTM4LjMyOHoiLz4NCgkJPGxpbmVhckdyYWRpZW50IGlkPSJTVkdJRF8xMV8iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iNDE3LjY0ODQiIHkxPSIxNTAuNDI3MiIgeDI9IjQ0Mi4wNzkxIiB5Mj0iMTUwLjQyNzIiPg0KCQkJPHN0b3AgIG9mZnNldD0iMCIgc3R5bGU9InN0b3AtY29sb3I6IzI4MjU2MSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC40OTA4IiBzdHlsZT0ic3RvcC1jb2xvcjojMEU0RThBIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjY5MzMiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMTUzOTEiLz4NCgkJPC9saW5lYXJHcmFkaWVudD4NCgkJPHBhdGggZmlsbD0idXJsKCNTVkdJRF8xMV8pIiBkPSJNNDMxLjkyMSwxNjIuNjIxYy03Ljg4NSwwLTE0LjI3Mi02LjM4NS0xNC4yNzItMTQuMjcxYzAtMy45MTIsMS41ODMtNy40NjEsNC4xMTYtMTAuMDM0DQoJCQljMC4wNC0wLjA0MSwwLjA2Mi0wLjA2MiwwLjA4MS0wLjA4MWgyMC4xNTFjMC4wMjEsMC4wMiwwLjA0MSwwLjA0LDAuMDgyLDAuMDgxbC0wLjA0MS0wLjA0MXYyNC4yOTZMNDMxLjkyMSwxNjIuNjIxeiIvPg0KCQk8bGluZWFyR3JhZGllbnQgaWQ9IlNWR0lEXzEyXyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSI0MzQuMjk1OSIgeTE9IjEwNS41MTc2IiB4Mj0iNDYwLjU0MzQiIHkyPSI4Ny4xMzg5Ij4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMzA2NyIgc3R5bGU9InN0b3AtY29sb3I6IzAxNTM5MSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC41MDkyIiBzdHlsZT0ic3RvcC1jb2xvcjojMEU0RThBIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIxIiBzdHlsZT0ic3RvcC1jb2xvcjojMjgyNTYxIi8+DQoJCTwvbGluZWFyR3JhZGllbnQ+DQoJCTxwYXRoIGZpbGw9InVybCgjU1ZHSURfMTJfKSIgZD0iTTQ0OC44MDQsMTExLjQxNmwxNS4yNDQtMTUuMTQyYy0wLjI2NC03Ljg2NS02LjczLTE0LjE1LTE0LjY1Ni0xNC4xNQ0KCQkJYy0zLjk5NCwwLTcuNjIzLDEuNjAyLTEwLjI3OSw0LjIxNmwtMTAuNzMsMTAuNzMyTDQ0OC44MDQsMTExLjQxNnoiLz4NCgkJPGxpbmVhckdyYWRpZW50IGlkPSJTVkdJRF8xM18iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iNDc2LjE5OTIiIHkxPSIxMzguMjM4OCIgeDI9IjQ3Ni4xOTkyIiB5Mj0iMTE3Ljk5MjciPg0KCQkJPHN0b3AgIG9mZnNldD0iMCIgc3R5bGU9InN0b3AtY29sb3I6IzI4MjU2MSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4xNzA4IiBzdHlsZT0ic3RvcC1jb2xvcjojMjQzNzcyIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjM2ODkiIHN0eWxlPSJzdG9wLWNvbG9yOiMxODQ4ODQiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNDkwOCIgc3R5bGU9InN0b3AtY29sb3I6IzBFNEU4QSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC42OTMzIiBzdHlsZT0ic3RvcC1jb2xvcjojMDE1MzkxIi8+DQoJCTwvbGluZWFyR3JhZGllbnQ+DQoJCTxwb2x5Z29uIGZpbGw9InVybCgjU1ZHSURfMTNfKSIgcG9pbnRzPSI0NjQuMDYyLDEzOC4yMzkgNDg4LjM2NCwxMzguMjM5IDQ4OC4zNjQsMTE3Ljk5MyA0NjQuMDM0LDExNy45OTMgCQkiLz4NCgkJDQoJCQk8bGluZWFyR3JhZGllbnQgaWQ9IlNWR0lEXzE0XyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSI3NzUuNzY5NSIgeTE9IjQ3NS40Nzk1IiB4Mj0iNzc1Ljc2OTUiIHkyPSI0NTUuMjMzNCIgZ3JhZGllbnRUcmFuc2Zvcm09Im1hdHJpeCgtMSAwIDAgLTEgMTI1MS45Njg4IDYzOC4xMjExKSI+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwIiBzdHlsZT0ic3RvcC1jb2xvcjojMjgyNTYxIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjE3MDgiIHN0eWxlPSJzdG9wLWNvbG9yOiMyNDM3NzIiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMzY4OSIgc3R5bGU9InN0b3AtY29sb3I6IzE4NDg4NCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC40OTA4IiBzdHlsZT0ic3RvcC1jb2xvcjojMEU0RThBIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjY5MzMiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMTUzOTEiLz4NCgkJPC9saW5lYXJHcmFkaWVudD4NCgkJPHBvbHlnb24gZmlsbD0idXJsKCNTVkdJRF8xNF8pIiBwb2ludHM9IjQ4OC4zMzcsMTYyLjY0MSA0NjQuMDM0LDE2Mi42NDEgNDY0LjAzNCwxODIuODg3IDQ4OC4zNjQsMTgyLjg4NyAJCSIvPg0KCQk8bGluZWFyR3JhZGllbnQgaWQ9IlNWR0lEXzE1XyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSIzMjcuNDE4OSIgeTE9IjU1LjM4MTMiIHgyPSIzMjcuNDE4OSIgeTI9IjQ2LjQwNTMiPg0KCQkJPHN0b3AgIG9mZnNldD0iMCIgc3R5bGU9InN0b3AtY29sb3I6IzA1NTQ5MSIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4wNCIgc3R5bGU9InN0b3AtY29sb3I6IzAwNUM5OCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4xNTQ2IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA3MUFBIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjI3NDYiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDg0QkQiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuMzk4NSIgc3R5bGU9InN0b3AtY29sb3I6IzAwOTVDRCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC41Mjc3IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBMkRBIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjY2NDUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEFCRTUiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuODE0IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBCMUVDIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIxIiBzdHlsZT0ic3RvcC1jb2xvcjojMDBCNEVGIi8+DQoJCTwvbGluZWFyR3JhZGllbnQ+DQoJCTxwb2x5Z29uIG9wYWNpdHk9IjAuNSIgZmlsbD0idXJsKCNTVkdJRF8xNV8pIiBwb2ludHM9IjMxNS4yODIsNTUuMzgxIDMzOS41ODQsNTUuMzgxIDMzOS41ODQsNDYuNDA1IDMxNS4yNTQsNDYuNDA1IAkJIi8+DQoJCTxsaW5lYXJHcmFkaWVudCBpZD0iU1ZHSURfMTZfIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjMyNy40ODI0IiB5MT0iODguNzY2NiIgeDI9IjMyNy40ODI0IiB5Mj0iNzkuNzkwNSI+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwIiBzdHlsZT0ic3RvcC1jb2xvcjojMDBCNEVGIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjE4NiIgc3R5bGU9InN0b3AtY29sb3I6IzAwQjFFQyIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC4zMzU1IiBzdHlsZT0ic3RvcC1jb2xvcjojMDBBQkU1Ii8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjQ3MjMiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMEEyREEiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuNjAxNSIgc3R5bGU9InN0b3AtY29sb3I6IzAwOTVDRCIvPg0KCQkJPHN0b3AgIG9mZnNldD0iMC43MjU0IiBzdHlsZT0ic3RvcC1jb2xvcjojMDA4NEJEIi8+DQoJCQk8c3RvcCAgb2Zmc2V0PSIwLjg0NTQiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDcxQUEiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjAuOTYiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDVDOTgiLz4NCgkJCTxzdG9wICBvZmZzZXQ9IjEiIHN0eWxlPSJzdG9wLWNvbG9yOiMwNTU0OTEiLz4NCgkJPC9saW5lYXJHcmFkaWVudD4NCgkJPHBvbHlnb24gb3BhY2l0eT0iMC41IiBmaWxsPSJ1cmwoI1NWR0lEXzE2XykiIHBvaW50cz0iMzE1LjM0Niw4OC43NjcgMzM5LjY0Nyw4OC43NjcgMzM5LjY0Nyw3OS43OTEgMzE1LjMxNyw3OS43OTEgCQkiLz4NCgk8L2c+DQoJPGc+DQoJCTxnPg0KCQkJPHBhdGggZmlsbD0iIzA1NTQ5MSIgZD0iTTI5LjU0NiwyMDIuMzY2aC0xLjM3NGMtMi41MDEsMC0zLjY4LDEuMTc3LTMuNjgsMy45NzV2My44NzVoNC4xN2MxLjA4LDAsMS45NjQsMC44ODQsMS45NjQsMS45NjQNCgkJCQlzLTAuODg0LDIuMDExLTEuOTY0LDIuMDExaC00LjE3djE1LjI2MWMwLDEuMzI0LTEuMDgsMi40MDQtMi40MDQsMi40MDRjLTEuMzI1LDAtMi40MDQtMS4wOC0yLjQwNC0yLjQwNFYyMTQuMTloLTIuOTQyDQoJCQkJYy0xLjA4LDAtMS45NjQtMC45MzEtMS45NjQtMi4wMTFzMC44ODQtMS45NjQsMS45NjQtMS45NjRoMi45NDJ2LTMuMzg1YzAtNS4xNTEsMi4zNTYtOC40MzksOC4wOTgtOC40MzloMS43NjUNCgkJCQljMS4wOCwwLDEuOTY0LDAuOTMxLDEuOTY0LDIuMDExUzMwLjYyNiwyMDIuMzY2LDI5LjU0NiwyMDIuMzY2Ii8+DQoJCQk8cGF0aCBmaWxsPSIjMDU1NDkxIiBkPSJNNDIuNzk1LDIzMi4wNWMtNi4yMzEsMC0xMS4yMzYtNS4wMDQtMTEuMjM2LTExLjIzNnM1LjAwNS0xMS4yMzYsMTEuMjM2LTExLjIzNg0KCQkJCWM2LjIzLDAsMTEuMjM1LDUuMDA0LDExLjIzNSwxMS4yMzZTNDkuMDI1LDIzMi4wNSw0Mi43OTUsMjMyLjA1IE00Mi43OTUsMjEzLjg0NmMtMy45MjUsMC02LjQ3NywzLjE0MS02LjQ3Nyw2Ljk2OA0KCQkJCWMwLDMuODI4LDIuNTUyLDYuOTY5LDYuNDc3LDYuOTY5czYuNDc2LTMuMTQxLDYuNDc2LTYuOTY5QzQ5LjI3MSwyMTYuOTg3LDQ2LjcyLDIxMy44NDYsNDIuNzk1LDIxMy44NDYiLz4NCgkJCTxwYXRoIGZpbGw9IiMwNTU0OTEiIGQ9Ik02OS42ODQsMjEzLjg0NmMtMy44NzYsMC03LjU1NiwyLjExLTcuNTU2LDYuMzMxdjkuMjczYzAsMS4zMjQtMS4wOCwyLjQwMi0yLjQwNCwyLjQwMg0KCQkJCWMtMS4zMjUsMC0yLjQwNC0xLjA3OC0yLjQwNC0yLjQwMnYtMTcuMjczYzAtMS4zMjQsMS4wMy0yLjQwMiwyLjM1NC0yLjQwMmMxLjMyNSwwLDIuNDU0LDEuMDc4LDIuNDU0LDIuNDAydjEuMDMyDQoJCQkJYzEuOTYyLTIuNjAzLDQuMTcxLTMuNjMyLDcuNTU2LTMuNjMyYzEuMTc4LDAsMi4xMSwwLjkzNCwyLjExLDIuMTA5QzcxLjc5NCwyMTIuODY2LDcwLjg2MSwyMTMuODQ2LDY5LjY4NCwyMTMuODQ2Ii8+DQoJCQk8cGF0aCBmaWxsPSIjMDU1NDkxIiBkPSJNOTIuMzA2LDIyMi4yODZINzcuMTQzYzAuMjQ0LDMuMjg2LDIuODk0LDUuNzQxLDYuNDI4LDUuNzQxYzIuNTAyLDAsNC42NjEtMS4wMzEsNi4zNzctMi42OTkNCgkJCQljMC4zNDQtMC4zNDIsMC43MzgtMC40NDEsMS4xNzktMC40NDFjMC41OSwwLDEuMTgsMC4yOTUsMS41NzEsMC43ODVjMC4yNDQsMC4zNDUsMC4zOTEsMC43MzYsMC4zOTEsMS4xMjkNCgkJCQljMCwwLjU0LTAuMjQ2LDEuMTMtMC42ODcsMS41N2MtMi4wNjEsMi4yMDgtNS41NDUsMy42OC04Ljk3OSwzLjY4Yy02LjIzLDAtMTEuMjM1LTUuMDA0LTExLjIzNS0xMS4yMzYNCgkJCQlzNC44NTYtMTEuMjM2LDExLjA5LTExLjIzNmM2LjE4MSwwLDEwLjc5NCw0LjgwOSwxMC43OTQsMTEuMTM4Qzk0LjA3LDIyMS42NDksOTMuMjM2LDIyMi4yODYsOTIuMzA2LDIyMi4yODYgTTgzLjI3NiwyMTMuNjAyDQoJCQkJYy0zLjI4OSwwLTUuNTQ1LDIuMTU4LTYuMDM1LDUuMjk5aDEyLjA3Qzg4Ljg2OSwyMTUuOTA3LDg2LjUxMywyMTMuNjAyLDgzLjI3NiwyMTMuNjAyIi8+DQoJCQk8cGF0aCBmaWxsPSIjMDU1NDkxIiBkPSJNMTE1Ljk3OSwyMTIuODE2bC03Ljk0OSwxNy43NjJjLTAuMzQzLDAuNzM3LTEuMTI4LDEuMjc1LTEuOTYzLDEuMjc1Yy0wLjgzNCwwLTEuNTctMC41MzgtMS45MTQtMS4yNzUNCgkJCQlsLTcuOTk3LTE3Ljc2MmMtMC4xNDgtMC4yOTQtMC4xOTYtMC41ODgtMC4xOTYtMC44ODRjMC0wLjg4MSwwLjU0LTEuNjE4LDEuMjc2LTEuOTYxYzAuMjQ2LTAuMSwwLjU4OC0wLjE5NiwwLjg4NC0wLjE5Ng0KCQkJCWMwLjgzMywwLDEuNjE4LDAuNDksMS45NjEsMS4yNzZsNS45ODYsMTMuNDQ0bDYuMDM1LTEzLjQ0NGMwLjM0My0wLjc4NiwxLjEyOS0xLjI3NiwxLjk2My0xLjI3Ng0KCQkJCWMwLjI5NCwwLDAuNTM4LDAuMDQ5LDAuNzg2LDAuMTQ2YzAuNzg0LDAuMzQ0LDEuMzI0LDEuMTc2LDEuMzI0LDIuMDYxQzExNi4xNzYsMjEyLjI3NiwxMTYuMTI2LDIxMi41MjIsMTE1Ljk3OSwyMTIuODE2Ii8+DQoJCQk8cGF0aCBmaWxsPSIjMDU1NDkxIiBkPSJNMTM3Ljk5MiwyMjIuMjg2aC0xNS4xNjNjMC4yNDQsMy4yODYsMi44OTYsNS43NDEsNi40MjksNS43NDFjMi41MDEsMCw0LjY2MS0xLjAzMSw2LjM3OC0yLjY5OQ0KCQkJCWMwLjM0NC0wLjM0MiwwLjczNi0wLjQ0MSwxLjE3Ny0wLjQ0MWMwLjU5LDAsMS4xOCwwLjI5NSwxLjU3MSwwLjc4NWMwLjI0NCwwLjM0NSwwLjM5MywwLjczNiwwLjM5MywxLjEyOQ0KCQkJCWMwLDAuNTQtMC4yNDgsMS4xMy0wLjY4NywxLjU3Yy0yLjA2MiwyLjIwOC01LjU0NywzLjY4LTguOTgxLDMuNjhjLTYuMjMsMC0xMS4yMzUtNS4wMDQtMTEuMjM1LTExLjIzNg0KCQkJCXM0Ljg1Ni0xMS4yMzYsMTEuMDktMTEuMjM2YzYuMTgzLDAsMTAuNzk0LDQuODA5LDEwLjc5NCwxMS4xMzhDMTM5Ljc1NywyMjEuNjQ5LDEzOC45MjQsMjIyLjI4NiwxMzcuOTkyLDIyMi4yODYNCgkJCQkgTTEyOC45NjMsMjEzLjYwMmMtMy4yODcsMC01LjU0NSwyLjE1OC02LjAzNSw1LjI5OWgxMi4wNjlDMTM0LjU1NiwyMTUuOTA3LDEzMi4yMDIsMjEzLjYwMiwxMjguOTYzLDIxMy42MDIiLz4NCgkJCTxwYXRoIGZpbGw9IiMwNTU0OTEiIGQ9Ik0xNTYuMzQzLDIxMy44NDZjLTMuODc3LDAtNy41NTcsMi4xMS03LjU1Nyw2LjMzMXY5LjI3M2MwLDEuMzI0LTEuMDgsMi40MDItMi40MDQsMi40MDINCgkJCQljLTEuMzI1LDAtMi40MDUtMS4wNzgtMi40MDUtMi40MDJ2LTE3LjI3M2MwLTEuMzI0LDEuMDMyLTIuNDAyLDIuMzU2LTIuNDAyczIuNDUzLDEuMDc4LDIuNDUzLDIuNDAydjEuMDMyDQoJCQkJYzEuOTYyLTIuNjAzLDQuMTcyLTMuNjMyLDcuNTU3LTMuNjMyYzEuMTc4LDAsMi4xMDgsMC45MzQsMi4xMDgsMi4xMDlDMTU4LjQ1MSwyMTIuODY2LDE1Ny41MjEsMjEzLjg0NiwxNTYuMzQzLDIxMy44NDYiLz4NCgkJCTxwYXRoIGZpbGw9IiMwNTU0OTEiIGQ9Ik0xOTQuNTE4LDIyOC41NjZjLTEuNzE3LDEuOTE1LTUuMDA1LDMuNDg0LTguMTQ2LDMuNDg0Yy02LjIzMSwwLTExLjIzNi01LjAwNC0xMS4yMzYtMTEuMjM2DQoJCQkJczUuMDA1LTExLjIzNiwxMS4yMzYtMTEuMjM2YzIuNzQ4LDAsNS4wMDUsMC41OSw3LjI2MSwyLjQ1NGMwLjQ0MiwwLjM5MiwwLjczNiwxLjAzLDAuNzM2LDEuNjY3YzAsMC4zOTQtMC4xNDcsMC44MzQtMC40NCwxLjIyOA0KCQkJCWMtMC4zOTQsMC40OS0wLjk4MywwLjc4Ni0xLjU3LDAuNzg2Yy0wLjQ0MSwwLTAuOTM0LTAuMTUtMS4zMjUtMC40NDJjLTEuNDczLTEuMDgtMy4wNDEtMS41MjItNC42NjEtMS41MjINCgkJCQljLTMuOTI1LDAtNi41MjUsMy4yMzktNi41MjUsNy4wNjZjMCwzLjgyOCwyLjYwMSw3LjA2Niw2LjUyNSw3LjA2NmMyLjM1NCwwLDQuMDI0LTAuOTM0LDUuNDk1LTIuMjU4DQoJCQkJYzAuMzk0LTAuMzQzLDAuODM0LTAuNDksMS4yNzctMC40OWMwLjU0LDAsMS4xMjcsMC4xOTUsMS41MjEsMC42MzdjMC4zNDQsMC4zNDQsMC40ODgsMC43ODcsMC40ODgsMS4yMjcNCgkJCQlDMTk1LjE1MywyMjcuNTM3LDE5NC45NTksMjI4LjA3NiwxOTQuNTE4LDIyOC41NjYiLz4NCgkJCTxwYXRoIGZpbGw9IiMwNTU0OTEiIGQ9Ik0yMDkuNTgsMjMyLjA1Yy02LjIyOSwwLTExLjIzNC01LjAwNC0xMS4yMzQtMTEuMjM2czUuMDA1LTExLjIzNiwxMS4yMzQtMTEuMjM2DQoJCQkJYzYuMjMyLDAsMTEuMjM1LDUuMDA0LDExLjIzNSwxMS4yMzZTMjE1LjgxMiwyMzIuMDUsMjA5LjU4LDIzMi4wNSBNMjA5LjU4LDIxMy44NDZjLTMuOTI1LDAtNi40NzYsMy4xNDEtNi40NzYsNi45NjgNCgkJCQljMCwzLjgyOCwyLjU1MSw2Ljk2OSw2LjQ3Niw2Ljk2OWMzLjkyOCwwLDYuNDc3LTMuMTQxLDYuNDc3LTYuOTY5QzIxNi4wNTcsMjE2Ljk4NywyMTMuNTA4LDIxMy44NDYsMjA5LjU4LDIxMy44NDYiLz4NCgkJCTxwYXRoIGZpbGw9IiMwNTU0OTEiIGQ9Ik0yNDIuNzk5LDIzMS44NTNjLTEuMzI0LDAtMi40MDQtMS4wNzgtMi40MDQtMi40MDR2LTEwLjEwNWMwLTMuMDkyLTIuMzA2LTUuNDk2LTUuNTQ1LTUuNDk2DQoJCQkJYy0zLjIzNiwwLTUuNTQzLDIuNDA0LTUuNTQzLDUuNDk2djEwLjEwNWMwLDEuMzI2LTEuMDgsMi40MDQtMi40MDQsMi40MDRzLTIuNDA0LTEuMDc4LTIuNDA0LTIuNDA0di05LjYxNQ0KCQkJCWMwLTUuNjkxLDQuNjEyLTEwLjI1NiwxMC4zNTItMTAuMjU2YzUuNzQxLDAsMTAuMzU0LDQuNTY0LDEwLjM1NCwxMC4yNTZ2OS42MTVDMjQ1LjIwNCwyMzAuNzc1LDI0NC4xMjUsMjMxLjg1MywyNDIuNzk5LDIzMS44NTMNCgkJCQkiLz4NCgkJCTxwYXRoIGZpbGw9IiMwNTU0OTEiIGQ9Ik0yNjcuNjIzLDIzMS44NTNjLTEuMzI1LDAtMi40MDUtMS4wNzgtMi40MDUtMi40MDR2LTEwLjEwNWMwLTMuMDkyLTIuMzA4LTUuNDk2LTUuNTQ1LTUuNDk2DQoJCQkJYy0zLjIzOCwwLTUuNTQ0LDIuNDA0LTUuNTQ0LDUuNDk2djEwLjEwNWMwLDEuMzI2LTEuMDgsMi40MDQtMi40MDUsMi40MDRjLTEuMzI0LDAtMi40MDQtMS4wNzgtMi40MDQtMi40MDR2LTkuNjE1DQoJCQkJYzAtNS42OTEsNC42MTMtMTAuMjU2LDEwLjM1NC0xMC4yNTZjNS43NDEsMCwxMC4zNTMsNC41NjQsMTAuMzUzLDEwLjI1NnY5LjYxNUMyNzAuMDI1LDIzMC43NzUsMjY4Ljk0NywyMzEuODUzLDI2Ny42MjMsMjMxLjg1Mw0KCQkJCSIvPg0KCQkJPHBhdGggZmlsbD0iIzA1NTQ5MSIgZD0iTTI5My44MjMsMjIyLjI4NmgtMTUuMTU5YzAuMjQ0LDMuMjg2LDIuODkzLDUuNzQxLDYuNDI3LDUuNzQxYzIuNTAzLDAsNC42NjEtMS4wMzEsNi4zNzgtMi42OTkNCgkJCQljMC4zNDQtMC4zNDIsMC43MzctMC40NDEsMS4xNzgtMC40NDFjMC41OSwwLDEuMTc3LDAuMjk1LDEuNTcsMC43ODVjMC4yNDYsMC4zNDUsMC4zOTQsMC43MzYsMC4zOTQsMS4xMjkNCgkJCQljMCwwLjU0LTAuMjQ3LDEuMTMtMC42ODgsMS41N2MtMi4wNjEsMi4yMDgtNS41NDUsMy42OC04Ljk3OSwzLjY4Yy02LjIzMiwwLTExLjIzNi01LjAwNC0xMS4yMzYtMTEuMjM2DQoJCQkJczQuODU3LTExLjIzNiwxMS4wOS0xMS4yMzZjNi4xODIsMCwxMC43OTQsNC44MDksMTAuNzk0LDExLjEzOEMyOTUuNTkxLDIyMS42NDksMjk0Ljc1NywyMjIuMjg2LDI5My44MjMsMjIyLjI4Ng0KCQkJCSBNMjg0Ljc5NywyMTMuNjAyYy0zLjI4OCwwLTUuNTQ1LDIuMTU4LTYuMDM1LDUuMjk5aDEyLjA3QzI5MC4zOTEsMjE1LjkwNywyODguMDM0LDIxMy42MDIsMjg0Ljc5NywyMTMuNjAyIi8+DQoJCQk8cGF0aCBmaWxsPSIjMDU1NDkxIiBkPSJNMzE3Ljk1NCwyMjguNTY2Yy0xLjcxNywxLjkxNS01LjAwNSwzLjQ4NC04LjE0NiwzLjQ4NGMtNi4yMjksMC0xMS4yMzQtNS4wMDQtMTEuMjM0LTExLjIzNg0KCQkJCXM1LjAwNS0xMS4yMzYsMTEuMjM0LTExLjIzNmMyLjc0OCwwLDUuMDA1LDAuNTksNy4yNjUsMi40NTRjMC40NDEsMC4zOTIsMC43MzQsMS4wMywwLjczNCwxLjY2Nw0KCQkJCWMwLDAuMzk0LTAuMTQ2LDAuODM0LTAuNDQyLDEuMjI4Yy0wLjM5MiwwLjQ5LTAuOTgsMC43ODYtMS41NjgsMC43ODZjLTAuNDQzLDAtMC45MzQtMC4xNS0xLjMyNC0wLjQ0Mg0KCQkJCWMtMS40NzQtMS4wOC0zLjA0NC0xLjUyMi00LjY2NC0xLjUyMmMtMy45MjUsMC02LjUyNSwzLjIzOS02LjUyNSw3LjA2NmMwLDMuODI4LDIuNjAxLDcuMDY2LDYuNTI1LDcuMDY2DQoJCQkJYzIuMzU3LDAsNC4wMjQtMC45MzQsNS40OTctMi4yNThjMC4zOTItMC4zNDMsMC44MzItMC40OSwxLjI3NS0wLjQ5YzAuNTQsMCwxLjEyOSwwLjE5NSwxLjUyMSwwLjYzNw0KCQkJCWMwLjM0NCwwLjM0NCwwLjQ5MiwwLjc4NywwLjQ5MiwxLjIyN0MzMTguNTk0LDIyNy41MzcsMzE4LjM5NywyMjguMDc2LDMxNy45NTQsMjI4LjU2NiIvPg0KCQkJPHBhdGggZmlsbD0iIzA1NTQ5MSIgZD0iTTMzNC44MzQsMjE0LjE5aC00LjEyMnYxNS4zMDljMCwxLjMyNi0xLjA3OCwyLjM1Ni0yLjQwNCwyLjM1NmMtMS4zMjQsMC0yLjQwNC0xLjAzLTIuNDA0LTIuMzU2VjIxNC4xOQ0KCQkJCWgtMy41ODFjLTEuMDgsMC0xLjk2NC0wLjkzMS0xLjk2NC0yLjAxMXMwLjg4NC0xLjk2NCwxLjk2NC0xLjk2NGgzLjU4MXYtNy4wNjVjMC0xLjMyNCwxLjA4LTIuMzU0LDIuNDA0LTIuMzU0DQoJCQkJYzEuMzI2LDAsMi40MDQsMS4wMywyLjQwNCwyLjM1NHY3LjA2NWg0LjEyMmMxLjA3OSwwLDEuOTYzLDAuODg0LDEuOTYzLDEuOTY0UzMzNS45MTMsMjE0LjE5LDMzNC44MzQsMjE0LjE5Ii8+DQoJCQk8cGF0aCBmaWxsPSIjMDU1NDkxIiBkPSJNMzU3Ljg0OCwyMjIuMjg2aC0xNS4xNjJjMC4yNDYsMy4yODYsMi44OTYsNS43NDEsNi40MjYsNS43NDFjMi41MDQsMCw0LjY2Mi0xLjAzMSw2LjM4MS0yLjY5OQ0KCQkJCWMwLjM0NC0wLjM0MiwwLjczNS0wLjQ0MSwxLjE3Ni0wLjQ0MWMwLjU5LDAsMS4xOCwwLjI5NSwxLjU3MiwwLjc4NWMwLjI0NCwwLjM0NSwwLjM5MiwwLjczNiwwLjM5MiwxLjEyOQ0KCQkJCWMwLDAuNTQtMC4yNDcsMS4xMy0wLjY4NiwxLjU3Yy0yLjA2MiwyLjIwOC01LjU0NSwzLjY4LTguOTgxLDMuNjhjLTYuMjMxLDAtMTEuMjM2LTUuMDA0LTExLjIzNi0xMS4yMzYNCgkJCQlzNC44NTctMTEuMjM2LDExLjA5LTExLjIzNmM2LjE4NCwwLDEwLjc5NCw0LjgwOSwxMC43OTQsMTEuMTM4QzM1OS42MTIsMjIxLjY0OSwzNTguNzc4LDIyMi4yODYsMzU3Ljg0OCwyMjIuMjg2DQoJCQkJIE0zNDguODE4LDIxMy42MDJjLTMuMjg4LDAtNS41NDUsMi4xNTgtNi4wMzUsNS4yOTloMTIuMDdDMzU0LjQxMiwyMTUuOTA3LDM1Mi4wNTgsMjEzLjYwMiwzNDguODE4LDIxMy42MDIiLz4NCgkJCTxwYXRoIGZpbGw9IiMwNTU0OTEiIGQ9Ik0zODIuNDgsMjMxLjg1M2MtMS4zMjUsMC0yLjQwNS0xLjA3OC0yLjQwNS0yLjQwMnYtMS4xM2MtMS4zNzQsMi4zNTYtMy45NzUsMy43MjktNy4wMTcsMy43MjkNCgkJCQljLTYuMjMyLDAtMTAuNjQ3LTQuODA5LTEwLjY0Ny0xMS4yMzZzNC4yNy0xMS4yMzYsMTAuNjQ3LTExLjIzNmMzLjEzOSwwLDUuNzg5LDEuNTIxLDcuMDE3LDMuNzc4di0xMi42NTgNCgkJCQljMC0xLjMyNiwxLjA4LTIuMzU2LDIuNDA1LTIuMzU2YzEuMzIyLDAsMi40MDQsMS4wMywyLjQwNCwyLjM1NnYyOC43NTNDMzg0Ljg4NSwyMzAuNzc1LDM4My44MDMsMjMxLjg1MywzODIuNDgsMjMxLjg1Mw0KCQkJCSBNMzczLjY0NiwyMTMuODQ2Yy0zLjkyNSwwLTYuNDI5LDMuMTQxLTYuNDI5LDYuOTY4YzAsMy44MjgsMi41MDQsNi45NjksNi40MjksNi45NjlzNi40MjktMi45OTQsNi40MjktNi45NjkNCgkJCQlDMzgwLjA3NSwyMTYuODQsMzc3LjU3MSwyMTMuODQ2LDM3My42NDYsMjEzLjg0NiIvPg0KCQk8L2c+DQoJPC9nPg0KPC9nPg0KPC9zdmc+DQo=" alt="Zest4" class="brand-logo">
+          <span class="brand-sub">Cloud &amp; Connectivity Pricing Calculator</span>
+        </div>
+        <div class="mode-pill">
+          <span class="dot"></span>
+          Pricing as: <strong>${data.label}</strong>
+          <button id="switch-mode">Switch</button>
+        </div>
+      </div>
+
+      <div class="layout">
+        <div class="panel">
+          <h2>Add a product</h2>
+
+          <div class="search-wrap">
+            <label class="field-label" for="search-input">Quick search</label>
+            <input type="text" id="search-input" placeholder="Type to filter products, e.g. &quot;X4&quot; or &quot;call recording&quot;">
+          </div>
+
+          <div class="selector-row">
+            <div>
+              <label class="field-label" for="group-select">Product group</label>
+              <select id="group-select"></select>
+            </div>
+            <div>
+              <label class="field-label" for="category-select">Category</label>
+              <select id="category-select"></select>
+            </div>
+          </div>
+
+          <div class="selector-row" style="grid-template-columns: 1fr;">
+            <div>
+              <label class="field-label" for="item-select">Product / item</label>
+              <select id="item-select"></select>
+            </div>
+          </div>
+
+          <div class="item-preview" id="item-preview">Select a product to see pricing details.</div>
+
+          <div class="qty-row">
+            <div class="qty-field">
+              <label class="field-label" for="qty-input">Quantity</label>
+              <input type="number" id="qty-input" value="1" min="1" step="1">
+            </div>
+            <button class="add-btn" id="add-btn">Add to quote</button>
+          </div>
+
+          <div id="setup-fee-row" style="display:none;margin-top:12px;background:#f0f4ff;border:1.5px solid #c5ccf7;border-radius:8px;padding:12px 14px;">
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13.5px;">
+              <input type="checkbox" id="setup-fee-checkbox" style="margin-top:3px;width:16px;height:16px;flex:none;">
+              <span>
+                <strong>Include Zest4 setup fee — £15.00 per licence (one-off)</strong><br>
+                <span style="color:#565a72;font-size:12.5px;line-height:1.5;">By including the setup fee, Zest4 will handle the full system configuration on your behalf. We will contact you to gather the information needed — including call routing, ring groups, auto attendant, users, and any other configuration requirements.</span>
+              </span>
+            </label>
+          </div>
+
+          <div class="notes-line" id="category-notes"></div>
+        </div>
+
+        <div class="panel">
+          <h2>Quote summary</h2>
+          <div id="quote-list"></div>
+          <div class="totals-box">
+            <div class="totals-row">
+              <span>Recurring (per month)</span>
+              <span class="val" id="total-recurring">£0.00</span>
+            </div>
+            <div class="totals-row">
+              <span>One-off &amp; hardware</span>
+              <span class="val" id="total-onetime">£0.00</span>
+            </div>
+            <div class="totals-row" id="total-setup-row" style="display:none;color:#b45309;">
+              <span>⚙ Zest4 setup fees (£15/licence)</span>
+              <span class="val" id="total-setup">£0.00</span>
+            </div>
+            <div class="totals-row grand">
+              <span>Total (first invoice)</span>
+              <span class="val" id="total-grand">£0.00</span>
+            </div>
+          </div>
+          <button class="clear-btn" id="clear-btn">Clear quote</button>
+          <button class="clear-btn" id="export-btn" style="display:none;margin-top:10px;background:#1421e0;color:#fff;border-color:#1421e0;font-weight:700;">⬇ Export Quote</button>
+          <div class="footer-note">
+            ${data.sourceNote}. All prices exclude VAT. "First invoice" total combines one month of recurring charges with any one-off setup fees &mdash; recurring charges alone will apply from month two onward.
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('switch-mode').addEventListener('click', switchMode);
+    document.getElementById('clear-btn').addEventListener('click', () => {
+      if(quoteItems.length === 0) return;
+      if(confirm('Clear all items from the current quote?')){
+        quoteItems = [];
+        dismissRouter();
+        renderQuote();
+      }
+    });
+    document.getElementById('export-btn').addEventListener('click', exportQuote);
+
+    setupSelectors(data);
+    renderQuote();
+  }
+
+  // ---------- Selector logic ----------
+  function setupSelectors(data){
+    const groupSelect = document.getElementById('group-select');
+    const categorySelect = document.getElementById('category-select');
+    const itemSelect = document.getElementById('item-select');
+    const searchInput = document.getElementById('search-input');
+    const qtyInput = document.getElementById('qty-input');
+    const addBtn = document.getElementById('add-btn');
+    const preview = document.getElementById('item-preview');
+    const notesLine = document.getElementById('category-notes');
+
+    // Build group list (unique, ordered by first appearance)
+    const groups = [];
+    data.categories.forEach(c => { if(!groups.includes(c.group)) groups.push(c.group); });
+
+    groupSelect.innerHTML = groups.map(g => `<option value="${g}">${g}</option>`).join('');
+
+    function populateCategories(){
+      const g = groupSelect.value;
+      const cats = data.categories.filter(c => c.group === g);
+      categorySelect.innerHTML = cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      populateItems();
+    }
+
+    function populateItems(){
+      const catId = categorySelect.value;
+      const cat = data.categories.find(c => c.id === catId);
+      if(!cat){ itemSelect.innerHTML=''; return; }
+      itemSelect.innerHTML = cat.items.map((it, idx) =>
+        `<option value="${idx}">${it.name} — ${it.price === 0 ? 'FOC' : fmtGBP(it.price) + ' / ' + it.unit}</option>`
+      ).join('');
+      notesLine.textContent = cat.notes ? cat.notes : '';
+      updatePreview();
+    }
+
+    function currentItem(){
+      const catId = categorySelect.value;
+      const cat = data.categories.find(c => c.id === catId);
+      if(!cat) return null;
+      const idx = parseInt(itemSelect.value, 10);
+      return { cat, item: cat.items[idx] };
+    }
+
+    const SETUP_FEE_CATS = ['8x8-xseries', 'csw-licences', '8x8-engage'];
+
+    function showSetupFeeToggle(catId){
+      const row = document.getElementById('setup-fee-row');
+      if(!row) return;
+      if(SETUP_FEE_CATS.includes(catId)){
+        row.style.display = 'block';
+      } else {
+        row.style.display = 'none';
+        const cb = document.getElementById('setup-fee-checkbox');
+        if(cb) cb.checked = false;
+      }
+    }
+
+    function updatePreview(){
+      const sel = currentItem();
+      if(!sel || !sel.item){
+        preview.innerHTML = 'Select a product to see pricing details.';
+        showSetupFeeToggle('');
+        return;
+      }
+      const { cat, item } = sel;
+      let html = `<strong>${item.name}</strong> &mdash; <span class="price-tag">${item.price === 0 ? 'FOC' : fmtGBP(item.price) + ' per ' + item.unit}</span>`;
+      if(item.setup){
+        html += `<br>Plus one-off setup fee: <strong>${fmtGBP(item.setup)}</strong>`;
+      }
+      if(item.note){
+        html += `<br><em>${item.note}</em>`;
+      }
+      html += `<br><span style="color:#9094ab;">${cat.group} &rsaquo; ${cat.name}</span>`;
+      preview.innerHTML = html;
+      showSetupFeeToggle(cat.id);
+    }
+
+    groupSelect.addEventListener('change', populateCategories);
+    categorySelect.addEventListener('change', populateItems);
+    itemSelect.addEventListener('change', updatePreview);
+
+    // Search across all items
+    let searchResults = []; // flat list when searching
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim().toLowerCase();
+      if(q.length < 2){
+        searchResults = [];
+        groupSelect.disabled = false;
+        categorySelect.disabled = false;
+        groupSelect.style.display = '';
+        categorySelect.style.display = '';
+        populateCategories();
+        return;
+      }
+      const flat = [];
+      data.categories.forEach(cat => {
+        cat.items.forEach((item, idx) => {
+          if(item.name.toLowerCase().includes(q) || cat.name.toLowerCase().includes(q) || cat.group.toLowerCase().includes(q)){
+            flat.push({ cat, item, idx });
+          }
+        });
+      });
+      searchResults = flat;
+      groupSelect.style.display = 'none';
+      categorySelect.style.display = 'none';
+      if(flat.length === 0){
+        itemSelect.innerHTML = `<option value="">No matches found</option>`;
+        preview.innerHTML = 'No matching products. Try a different search term.';
+        notesLine.textContent = '';
+        return;
+      }
+      itemSelect.innerHTML = flat.map((f, i) =>
+        `<option value="${i}">${f.cat.group} — ${f.item.name} — ${f.item.price === 0 ? 'FOC' : fmtGBP(f.item.price) + ' / ' + f.item.unit}</option>`
+      ).join('');
+      itemSelect.dataset.searchMode = 'true';
+      updatePreviewFromSearch();
+    });
+
+    function updatePreviewFromSearch(){
+      const i = parseInt(itemSelect.value, 10);
+      const f = searchResults[i];
+      if(!f){ return; }
+      const { cat, item } = f;
+      let html = `<strong>${item.name}</strong> &mdash; <span class="price-tag">${item.price === 0 ? 'FOC' : fmtGBP(item.price) + ' per ' + item.unit}</span>`;
+      if(item.setup){
+        html += `<br>Plus one-off setup fee: <strong>${fmtGBP(item.setup)}</strong>`;
+      }
+      if(item.note){
+        html += `<br><em>${item.note}</em>`;
+      }
+      html += `<br><span style="color:#9094ab;">${cat.group} &rsaquo; ${cat.name}</span>`;
+      preview.innerHTML = html;
+      notesLine.textContent = cat.notes ? cat.notes : '';
+      showSetupFeeToggle(cat.id);
+    }
+
+    itemSelect.addEventListener('change', () => {
+      if(itemSelect.dataset.searchMode === 'true' && searchInput.value.trim().length >= 2){
+        updatePreviewFromSearch();
+      }
+    });
+
+    addBtn.addEventListener('click', () => {
+      const qty = Math.max(1, parseInt(qtyInput.value, 10) || 1);
+      const includeSetup = document.getElementById('setup-fee-checkbox')?.checked || false;
+      let cat, item;
+      if(itemSelect.dataset.searchMode === 'true' && searchInput.value.trim().length >= 2){
+        const i = parseInt(itemSelect.value, 10);
+        const f = searchResults[i];
+        if(!f) return;
+        cat = f.cat; item = f.item;
+      } else {
+        const sel = currentItem();
+        if(!sel || !sel.item) return;
+        cat = sel.cat; item = sel.item;
+      }
+      addToQuote(cat, item, qty, includeSetup);
+      qtyInput.value = 1;
+      // Reset checkbox after adding
+      const cb = document.getElementById('setup-fee-checkbox');
+      if(cb) cb.checked = false;
+    });
+
+    // init
+    populateCategories();
+  }
+
+  // ---------- Router prompt ----------
+  const ROUTER = {
+    key: 'addon::Zyxel DX-3301 Router',
+    group: 'Connectivity',
+    category: 'Router',
+    name: 'Zyxel DX-3301 Router',
+    price: 74.95,
+    unit: 'unit',
+    setup: 0,
+    qty: 1
+  };
+
+  const BROADBAND_KEYWORDS = ['sogea','fttp','soGEA','FTTP'];
+
+  function isBroadband(item){ return BROADBAND_KEYWORDS.some(k => item.name.toLowerCase().includes(k.toLowerCase())); }
+  function hasRouter(){ return quoteItems.some(q => q.key === ROUTER.key); }
+  function hasBroadband(){ return quoteItems.some(q => isBroadband(q)); }
+
+  function promptRouter(){
+    // Only prompt once — if router already in quote, skip
+    if(hasRouter()) return;
+    const banner = document.getElementById('router-prompt');
+    if(banner) banner.style.display = 'flex';
+  }
+
+  function dismissRouter(){
+    const banner = document.getElementById('router-prompt');
+    if(banner) banner.style.display = 'none';
+  }
+
+  function addRouter(){
+    if(!hasRouter()){
+      quoteItems.push({...ROUTER});
+    }
+    dismissRouter();
+    renderQuote();
+  }
+
+  // ---------- Product descriptions for export ----------
+  const DESCRIPTIONS = {
+    // 8x8
+    'Lobby': 'Internal-only calling licence for users who only need on-site extension dialling. Includes Auto Attendant and HD Voice.',
+    'X1': 'Entry-level hosted UC licence with unlimited UK landline and mobile calling, voicemail, call recording, and mobile/desktop apps.',
+    'X2': 'UC licence with unlimited calling across 14 countries, CRM integrations, internet fax, and conferencing for up to 100 participants.',
+    'X3': 'UC licence with unlimited calling across 32 countries, Operator Switchboard, and 130-day hot storage for call recordings.',
+    'X4': 'Advanced UC licence with 47-country calling, Premium Analytics, Call Quality Reporting, and Barge/Monitor/Whisper.',
+    'X6': 'Contact Centre licence with IVR, Skills-Based Routing, Graphical Call Flows, Queued & Web Callback, and Native CRM.',
+    'X7': 'Full Contact Centre licence with inbound Chat, Email and Social Channels, Co-Browse, and optional Quality Management.',
+    'X8': 'Top-tier Contact Centre licence including Quality Management & Speech Analytics, Co-Browse, and all omnichannel features.',
+    '8x8 Engage': 'Lightweight contact centre add-on for teams handling customer calls within the familiar 8x8 Work app, without a full CC licence.',
+    // CallSwitch
+    'CallSwitch Business': 'Hosted VoIP licence including 2,000 minutes to UK landlines and mobiles, mobile/desktop apps, CRM integration, 90-day call recording, and SMS.',
+    'CallSwitch One Hardware': 'IP desk phone or DECT handset compatible with the CallSwitch One platform.',
+    // Horizon
+    'Premium Licence': 'Horizon hosted PBX licence with unlimited calls to UK 01, 02, 03 and 07 numbers (500 mobile minutes fair use per seat).',
+    // Connectivity
+    'SoGEA': 'Single Order Generic Ethernet Access — full-fibre broadband delivered without a phone line, suitable for VoIP-only sites.',
+    'FTTP': 'Fibre to the Premises — ultrafast symmetrical broadband with speeds from 80Mbps up to 1Gbps, ideal for high-demand VoIP sites.',
+    'SIP': 'Session Initiation Protocol trunk connecting an existing PBX to the PSTN over an IP connection.',
+    'Zyxel DX-3301 Router': 'The Zyxel DX-3301-T0 is a dual-band Wi-Fi 6 router providing high-speed internet access with QoS support. It features 2x2 802.11ax WLAN with speeds up to 1,200 Mbps on 5 GHz, and supports Zyxel MPro Mesh for seamless whole-premises WiFi coverage. Recommended for use with SoGEA and FTTP broadband connections.',
+    // Hardware
+    '8x8 Hardware': 'IP desk phone, DECT handset, or accessory certified for use with the 8x8 platform.',
+    // Engineering
+    'Site Survey': 'On-site pre-installation survey to assess network readiness, cabling, and equipment placement for up to 50 extensions.',
+    'Install': 'On-site installation and configuration of hardware and telephony system by a Zest4 engineer.',
+    'Training': 'End-user or admin training session delivered on-site or via webinar.',
+    // Akixi
+    'Akixi': 'Cloud-based call management and reporting platform providing real-time wallboards, historical reporting, and call analytics.',
+    // PCI
+    'DTMF Capture': 'PCI-compliant DTMF tone suppression — pauses call recording during card payment to prevent cardholder data capture.',
+    'Digital Payment Link': 'Sends a secure payment link to the customer mid-call, allowing card payments without agents handling card data.',
+    // Atmos / Compliance
+    'Atmos Core Recording Licence': 'Compliance call recording with search, retrieval, and playback. Includes unlimited cloud storage for up to 7 years.',
+    'Atmos Advanced Recording Licence': 'Advanced compliance recording with screen capture, speech-to-text transcription, PCI redaction, and call sharing.',
+    'Setup Fee': 'One-off Zest4 configuration fee. Zest4 will handle full system setup on your behalf. We will contact you to collect all configuration requirements including call routing, ring groups, auto attendant settings, user details, and any other preferences.',
+  };
+
+  function getDescription(item){
+    // Try exact name match first, then partial keyword match
+    for(const [key, desc] of Object.entries(DESCRIPTIONS)){
+      if(item.name.includes(key) || item.category.includes(key) || item.group.includes(key)){
+        return desc;
+      }
+    }
+    return '';
+  }
+
+  // ---------- Quote manipulation ----------
+  function addToQuote(cat, item, qty, includeSetup){
+    const key = cat.id + '::' + item.name;
+    const setupFee = includeSetup ? 15.00 : (item.setup || 0);
+    const existing = quoteItems.find(q => q.key === key);
+    if(existing){
+      existing.qty += qty;
+      // If they're adding more with setup fee ticked, keep setup fee if it was already set
+      if(includeSetup && !existing.setup) existing.setup = 15.00;
+    } else {
+      quoteItems.push({
+        key,
+        group: cat.group,
+        category: cat.name,
+        name: item.name,
+        price: item.price,
+        unit: item.unit,
+        setup: setupFee,
+        qty,
+        hasSetupFee: includeSetup || false,
+      });
+    }
+    // If a broadband product was just added, prompt to add the router
+    if(isBroadband(item)) promptRouter();
+    renderQuote();
+  }
+
+  function removeFromQuote(key){
+    quoteItems = quoteItems.filter(q => q.key !== key);
+    // Hide router prompt if no broadband left in quote
+    if(!hasBroadband()) dismissRouter();
+    renderQuote();
+  }
+
+  function changeQty(key, delta){
+    const q = quoteItems.find(q => q.key === key);
+    if(!q) return;
+    q.qty = Math.max(1, q.qty + delta);
+    renderQuote();
+  }
+
+  function setQty(key, val){
+    const q = quoteItems.find(q => q.key === key);
+    if(!q) return;
+    q.qty = Math.max(1, parseInt(val, 10) || 1);
+    renderQuote();
+  }
+
+  // ---------- Render quote ----------
+  function renderQuote(){
+    const list = document.getElementById('quote-list');
+    if(!list) return;
+
+    // Router prompt banner (persists above list)
+    const routerBannerExists = document.getElementById('router-prompt');
+    if(!routerBannerExists){
+      const banner = document.createElement('div');
+      banner.id = 'router-prompt';
+      banner.style.cssText = 'display:none;align-items:center;gap:12px;background:#fffbea;border:1.5px solid #f0c000;border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13.5px;flex-wrap:wrap;';
+      banner.innerHTML = `
+        <span style="flex:1;min-width:180px;">📦 <strong>Router needed?</strong> A Zyxel DX-3301 is recommended for SoGEA / FTTP connections — <strong>£74.95</strong></span>
+        <button id="router-add-btn" style="background:#1421e0;color:#fff;border:none;border-radius:7px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer;">Add Router</button>
+        <button id="router-dismiss-btn" style="background:transparent;border:1px solid #ccc;border-radius:7px;padding:8px 10px;font-size:12px;cursor:pointer;color:#666;">No thanks</button>
+      `;
+      list.parentNode.insertBefore(banner, list);
+      // Listeners wired after insert (IDs exist in DOM now)
+      document.getElementById('router-add-btn').addEventListener('click', addRouter);
+      document.getElementById('router-dismiss-btn').addEventListener('click', dismissRouter);
+    }
+
+    if(quoteItems.length === 0){
+      list.innerHTML = `<div class="quote-empty">No products added yet.<br>Use the panel on the left to build a quote.</div>`;
+    } else {
+      list.innerHTML = quoteItems.map(q => {
+        const lineTotal = q.price * q.qty;
+        return `
+          <div class="quote-item">
+            <div class="qi-name">
+              <span class="qi-group">${q.group} &rsaquo; ${q.category}</span>
+              ${q.name}
+            </div>
+            <div class="qi-qty">
+              <button data-action="dec" data-key="${escapeAttr(q.key)}">&minus;</button>
+              <input type="number" min="1" value="${q.qty}" data-action="set" data-key="${escapeAttr(q.key)}">
+              <button data-action="inc" data-key="${escapeAttr(q.key)}">&plus;</button>
+            </div>
+            <div class="qi-price">${q.price === 0 ? 'FOC' : fmtGBP(q.price) + '/' + q.unit}</div>
+            <div class="qi-total">${fmtGBP(lineTotal)}</div>
+            <button class="qi-remove" data-action="remove" data-key="${escapeAttr(q.key)}">Remove</button>
+            ${q.hasSetupFee ? `<div class="qi-setup-note">
+              ⚙ Zest4 setup fee: £15.00 × ${q.qty} = <strong>${fmtGBP(15 * q.qty)}</strong> (one-off) &mdash; <em>configuration details required</em>
+            </div>` : ''}
+          </div>
+        `;
+      }).join('');
+
+      list.querySelectorAll('[data-action="dec"]').forEach(b => b.addEventListener('click', () => changeQty(b.dataset.key, -1)));
+      list.querySelectorAll('[data-action="inc"]').forEach(b => b.addEventListener('click', () => changeQty(b.dataset.key, 1)));
+      list.querySelectorAll('[data-action="remove"]').forEach(b => b.addEventListener('click', () => removeFromQuote(b.dataset.key)));
+      list.querySelectorAll('input[data-action="set"]').forEach(inp => inp.addEventListener('change', () => setQty(inp.dataset.key, inp.value)));
+    }
+
+    // ---------- Totals ----------
+    const hardwareKeys = ['unit','one-off','hour','CLI','billing number','order/day','number','order','request','day','connection'];
+    const recurringItems = quoteItems.filter(q => !hardwareKeys.includes(q.unit));
+    const onetimeItems   = quoteItems.filter(q =>  hardwareKeys.includes(q.unit));
+
+    const recurringTotal = recurringItems.reduce((s,q) => s + q.price * q.qty, 0);
+    const hardwareTotal  = onetimeItems.reduce((s,q) => s + q.price * q.qty, 0);
+
+    // Setup fees: £15 per licence for items where the checkbox was ticked
+    const setupFeeTotal  = quoteItems
+      .filter(q => q.hasSetupFee)
+      .reduce((s,q) => s + 15 * q.qty, 0);
+
+    const onetimeTotal = hardwareTotal + setupFeeTotal;
+    const grandTotal   = recurringTotal + onetimeTotal;
+
+    const elR = document.getElementById('total-recurring');
+    const elO = document.getElementById('total-onetime');
+    const elG = document.getElementById('total-grand');
+    const elS = document.getElementById('total-setup');
+    if(elR) elR.textContent = fmtGBP(recurringTotal);
+    if(elO) elO.textContent = fmtGBP(hardwareTotal);
+    if(elS){
+      elS.textContent = fmtGBP(setupFeeTotal);
+      document.getElementById('total-setup-row').style.display = setupFeeTotal > 0 ? 'flex' : 'none';
+    }
+    if(elG) elG.textContent = fmtGBP(grandTotal);
+
+    // Show/hide export button
+    const exportBtn = document.getElementById('export-btn');
+    if(exportBtn) exportBtn.style.display = quoteItems.length > 0 ? 'block' : 'none';
+  }
+
+  // ---------- Export as PDF ----------
+  function exportQuote(){
+    const data = PRICING_DATA[mode];
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-GB', { day:'2-digit', month:'long', year:'numeric' });
+    const fileName = `Zest4-Quote-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.pdf`;
+
+    const hardwareKeys = ['unit','one-off','hour','CLI','billing number','order/day','number','order','request','day','connection'];
+    const recurringItems = quoteItems.filter(q => !hardwareKeys.includes(q.unit));
+    const onetimeItems   = quoteItems.filter(q =>  hardwareKeys.includes(q.unit));
+    const setupFeeItems  = quoteItems.filter(q => q.hasSetupFee);
+
+    const recurringTotal = recurringItems.reduce((s,q) => s + q.price * q.qty, 0);
+    const hardwareTotal  = onetimeItems.reduce((s,q) => s + q.price * q.qty, 0);
+    const setupFeeTotal  = setupFeeItems.reduce((s,q) => s + 15 * q.qty, 0);
+    const onetimeTotal   = hardwareTotal + setupFeeTotal;
+    const grandTotal     = recurringTotal + onetimeTotal;
+
+    // Colours
+    const BLUE      = [20, 33, 224];
+    const BLUE_LIGHT= [230, 233, 252];
+    const AMBER     = [180, 83, 9];
+    const AMBER_LITE= [255, 248, 230];
+    const GREY_HDR  = [245, 245, 245];
+    const GREY_TEXT = [100, 100, 110];
+    const INK       = [21, 24, 44];
+    const WHITE     = [255, 255, 255];
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const PW = 210; // page width mm
+    const ML = 14;  // margin left
+    const MR = 14;  // margin right
+    const CW = PW - ML - MR; // content width
+
+    // ---- Header bar ----
+    doc.setFillColor(...BLUE);
+    doc.rect(0, 0, PW, 28, 'F');
+
+    doc.setTextColor(...WHITE);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.text('Zest4', ML, 12);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.text('Cloud & Connectivity', ML, 18);
+    doc.text('Quote', ML, 23);
+
+    // Right-aligned date + pricing book
+    doc.setFontSize(8);
+    doc.text(`Prepared: ${dateStr}`, PW - MR, 13, { align: 'right' });
+    doc.text(data.label + ' pricing', PW - MR, 18, { align: 'right' });
+    doc.text('All prices exc. VAT', PW - MR, 23, { align: 'right' });
+
+    let y = 36;
+
+    // ---- Helper: section label ----
+    function sectionLabel(label, bgColor, textColor){
+      doc.setFillColor(...bgColor);
+      doc.rect(ML, y, CW, 7, 'F');
+      doc.setTextColor(...textColor);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.text(label.toUpperCase(), ML + 3, y + 4.8);
+      y += 7;
+    }
+
+    // ---- Helper: table row ----
+    function tableRow(name, qty, unitPrice, lineTotal, unit, shade){
+      const rowH = 8;
+      // check page overflow
+      if(y + rowH > 272){
+        doc.addPage();
+        y = 16;
+      }
+      if(shade){
+        doc.setFillColor(249, 249, 252);
+        doc.rect(ML, y, CW, rowH, 'F');
+      }
+      doc.setTextColor(...INK);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+
+      const col1 = ML + 3;
+      const col2 = ML + CW * 0.58;
+      const col3 = ML + CW * 0.70;
+      const col4 = ML + CW * 0.84;
+      const col5 = ML + CW;
+
+      // Truncate long names
+      const maxNameW = CW * 0.55;
+      const nameStr = doc.splitTextToSize(name, maxNameW)[0];
+
+      doc.text(nameStr, col1, y + 5.2);
+      doc.text(String(qty), col2, y + 5.2, { align: 'center' });
+      doc.text(unitPrice === 0 ? 'FOC' : fmtGBP(unitPrice), col3 + (col4-col3)/2, y + 5.2, { align: 'center' });
+      doc.setFont('helvetica', 'bold');
+      doc.text(fmtGBP(lineTotal), col5 - 2, y + 5.2, { align: 'right' });
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...GREY_TEXT);
+      doc.setFontSize(7);
+      doc.text(unit, col4 + 2, y + 5.2);
+
+      // bottom border
+      doc.setDrawColor(230, 230, 235);
+      doc.setLineWidth(0.2);
+      doc.line(ML, y + rowH, ML + CW, y + rowH);
+
+      y += rowH;
+    }
+
+    // ---- Table header row ----
+    function tableHeader(){
+      const rowH = 7;
+      doc.setFillColor(...BLUE);
+      doc.rect(ML, y, CW, rowH, 'F');
+      doc.setTextColor(...WHITE);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+
+      const col1 = ML + 3;
+      const col2 = ML + CW * 0.58;
+      const col3 = ML + CW * 0.70;
+      const col4 = ML + CW * 0.84;
+      const col5 = ML + CW;
+
+      doc.text('Product', col1, y + 4.8);
+      doc.text('Qty', col2, y + 4.8, { align: 'center' });
+      doc.text('Unit Price', col3 + (col4-col3)/2, y + 4.8, { align: 'center' });
+      doc.text('Line Total', col5 - 2, y + 4.8, { align: 'right' });
+      doc.text('Billing', col4 + 2, y + 4.8);
+      y += rowH;
+    }
+
+    // ---- Draw line items ----
+    tableHeader();
+
+    if(recurringItems.length){
+      sectionLabel('Recurring Monthly Charges', BLUE_LIGHT, BLUE);
+      recurringItems.forEach((q, i) => tableRow(q.name, q.qty, q.price, q.price * q.qty, q.unit, i % 2 === 0));
+    }
+
+    if(onetimeItems.length){
+      y += 3;
+      sectionLabel('One-off & Hardware Charges', GREY_HDR, GREY_TEXT);
+      onetimeItems.forEach((q, i) => tableRow(q.name, q.qty, q.price, q.price * q.qty, q.unit, i % 2 === 0));
+    }
+
+    if(setupFeeItems.length){
+      y += 3;
+      sectionLabel('Zest4 Setup Fees (£15.00 per licence)', AMBER_LITE, AMBER);
+      setupFeeItems.forEach((q, i) => tableRow(`${q.name} — Zest4 Configuration`, q.qty, 15.00, 15 * q.qty, 'one-off', i % 2 === 0));
+    }
+
+    // ---- Totals box ----
+    y += 6;
+    if(y > 245){ doc.addPage(); y = 16; }
+
+    const totalsX = ML + CW * 0.45;
+    const totalsW = CW * 0.55;
+
+    function totalsRow(label, value, bold, colorArr){
+      if(y + 8 > 275){ doc.addPage(); y = 16; }
+      doc.setFont('helvetica', bold ? 'bold' : 'normal');
+      doc.setFontSize(bold ? 10 : 8.5);
+      doc.setTextColor(...(colorArr || INK));
+      doc.text(label, totalsX + 3, y + 5.5);
+      doc.text(value, totalsX + totalsW - 2, y + 5.5, { align: 'right' });
+      y += 8;
+    }
+
+    // thin divider
+    doc.setDrawColor(200, 200, 210);
+    doc.setLineWidth(0.3);
+    doc.line(totalsX, y, totalsX + totalsW, y);
+    y += 2;
+
+    totalsRow('Recurring total (per month)', fmtGBP(recurringTotal));
+    totalsRow('One-off & hardware charges', fmtGBP(hardwareTotal));
+    if(setupFeeTotal > 0) totalsRow('Zest4 setup fees', fmtGBP(setupFeeTotal), false, AMBER);
+
+    // grand total bar
+    y += 1;
+    doc.setFillColor(...BLUE);
+    doc.rect(totalsX, y, totalsW, 10, 'F');
+    doc.setTextColor(...WHITE);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.text('Total (first invoice)', totalsX + 3, y + 6.8);
+    doc.text(fmtGBP(grandTotal), totalsX + totalsW - 2, y + 6.8, { align: 'right' });
+    y += 14;
+
+    // ---- Product descriptions ----
+    const descItems = quoteItems.filter(q => getDescription(q) || q.hasSetupFee);
+    if(descItems.length){
+      if(y > 220){ doc.addPage(); y = 16; }
+
+      y += 4;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(...BLUE);
+      doc.text('Product Descriptions', ML, y);
+      y += 6;
+
+      descItems.forEach(q => {
+        const desc = getDescription(q) + (q.hasSetupFee
+          ? ' Note: Zest4 setup fee included — configuration details will be required before provisioning can begin.'
+          : '');
+        if(!desc.trim()) return;
+
+        // name row
+        if(y + 12 > 272){ doc.addPage(); y = 16; }
+        doc.setFillColor(...BLUE_LIGHT);
+        doc.rect(ML, y, CW, 6.5, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(...BLUE);
+        doc.text(q.name, ML + 3, y + 4.5);
+        y += 6.5;
+
+        // description text (wrapped)
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.setTextColor(...INK);
+        const lines = doc.splitTextToSize(desc, CW - 6);
+        lines.forEach(line => {
+          if(y + 5 > 272){ doc.addPage(); y = 16; }
+          doc.text(line, ML + 3, y + 4);
+          y += 5;
+        });
+        y += 3;
+      });
+    }
+
+    // ---- Footer on every page ----
+    const pageCount = doc.getNumberOfPages();
+    for(let p = 1; p <= pageCount; p++){
+      doc.setPage(p);
+      doc.setFillColor(245, 245, 248);
+      doc.rect(0, 285, PW, 12, 'F');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(...GREY_TEXT);
+      doc.text('Zest4 Ltd  |  0161 956 3300  |  cloudsales@zest4.com  |  All prices exc. VAT. Indicative only, subject to formal order confirmation.', ML, 291);
+      doc.text(`Page ${p} of ${pageCount}`, PW - MR, 291, { align: 'right' });
+    }
+
+    doc.save(fileName);
+  }
+
+  function escapeAttr(s){
+    return s.replace(/"/g, '&quot;');
+  }
+
+  // Exposed so the call-routing gate can start the calculator only after
+  // it confirms the call came through the correct 8x8 ring group extension.
+  window.startPricingCalculator = render;
+})();
+</script>
+
+<script>
+(function(){
+  // ---------- 8x8 Call Router Gate ----------
+  // Pops this page up only when an inbound call lands on the configured
+  // ring group extension. If the extension doesn't match, the tab closes
+  // itself and the pricing calculator never initialises.
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const callee = urlParams.get('callee'); // Extension dialed
+  const caller = urlParams.get('caller'); // Customer phone number
+  const hasParams = window.location.search.length > 0;
+
+  // TARGET EXTENSION TO FILTER FOR
+  const targetExtension = "1061";
+
+  const checkingStatus = document.getElementById("checking-status");
+  const appEl = document.getElementById("app");
+
+  function startCalculator() {
+    checkingStatus.classList.add("call-gate-hidden");
+    appEl.classList.remove("call-gate-hidden");
+    if (typeof window.startPricingCalculator === "function") {
+      window.startPricingCalculator();
+    }
+  }
+
+  if (!hasParams) {
+    // No URL parameters — direct access, skip the gate and open calculator.
+    startCalculator();
+  } else if (callee === targetExtension) {
+    // MATCH: called via 8x8 screen pop on the correct ring group extension.
+    startCalculator();
+  } else {
+    // URL params present but extension doesn't match — not our call, close silently.
+    window.close();
+  }
+})();
+</script>
+
+</body>
+</html>
