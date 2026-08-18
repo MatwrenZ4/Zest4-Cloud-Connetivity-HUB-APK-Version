@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8x8 / Callswitch One System Setup Configuration | Zest4</title>
+<link rel="icon" href="https://i0.wp.com/zest4.com/wp-content/uploads/2018/10/cropped-4-site-icon.png?fit=32%2C32&ssl=1">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+/* ── Reset & Base ── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0f1929;
+  --navy2:#1a2035;
+  --green:#3ab54a;
+  --green-dark:#2a9038;
+  --green-light:#eaf7ec;
+  --bg:#f0f2f5;
+  --white:#ffffff;
+  --text:#1c2330;
+  --muted:#5a6378;
+  --border:rgba(0,0,0,0.11);
+  --border2:rgba(0,0,0,0.20);
+  --radius:8px;
+  --radius-lg:12px;
+}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+
+/* ── Utility bar ── */
+.topbar{background:#0a1020;padding:8px 0;font-size:12px}
+.topbar-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.topbar a{color:#7a8499;text-decoration:none;transition:color .15s}
+.topbar a:hover{color:#fff}
+.topbar-left{display:flex;align-items:center;gap:16px}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.topbar-phone{color:#7a8499;display:flex;align-items:center;gap:5px}
+.topbar-phone i{color:var(--green);font-size:13px}
+
+/* ── Main nav ── */
+.mainnav{background:var(--navy2);border-bottom:1px solid rgba(255,255,255,0.05)}
+.mainnav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:72px}
+.nav-logo img{height:40px;display:block}
+.nav-links{display:flex;align-items:center;gap:32px;list-style:none}
+.nav-links a{color:#b8c0d4;text-decoration:none;font-size:14px;font-weight:500;transition:color .15s}
+.nav-links a:hover{color:#fff}
+.nav-cta{background:var(--green);color:#fff!important;padding:9px 22px;border-radius:6px;font-size:13px;font-weight:600;transition:background .15s}
+.nav-cta:hover{background:var(--green-dark)!important}
+
+/* ── Hero ── */
+.hero{background:linear-gradient(135deg,#0f1929 0%,#162540 50%,#0f1929 100%);border-bottom:3px solid var(--green);padding:44px 24px 0}
+.hero-inner{max-width:700px;margin:0 auto;text-align:center;padding-bottom:32px}
+.hero-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(58,181,74,0.12);border:1px solid rgba(58,181,74,0.3);border-radius:20px;padding:5px 16px;font-size:12px;color:#6ee07a;font-weight:500;margin-bottom:18px}
+.hero h1{font-size:30px;font-weight:700;color:#fff;line-height:1.25;margin-bottom:10px}
+.hero p{font-size:15px;color:#8a96b4;margin-bottom:26px}
+.progress-bar{display:flex;gap:6px;margin-bottom:8px}
+.pb{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,0.12);transition:background .3s}
+.pb.done{background:var(--green)}.pb.active{background:#6ee07a}
+.step-label{font-size:12px;color:rgba(255,255,255,0.45);text-align:left;margin-bottom:0}
+.step-label strong{color:rgba(255,255,255,0.85);font-weight:600}
+
+/* ── Form content ── */
+.content{flex:1;padding:32px 24px 60px}
+.wrap{max-width:700px;margin:0 auto}
+
+/* ── Cards ── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+.card-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:9px}
+.card-title i{font-size:18px;color:var(--green)}
+.card-sub{font-size:13px;color:var(--muted);margin-bottom:1.25rem}
+.hint-box{font-size:12px;color:var(--green-dark);background:var(--green-light);border:1px solid #b6e5bc;border-radius:var(--radius);padding:10px 13px;margin-bottom:1.25rem;display:flex;align-items:flex-start;gap:7px;line-height:1.55}
+.hint-box i{flex-shrink:0;margin-top:1px;font-size:14px}
+
+/* ── Form elements ── */
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px;margin-top:12px;font-weight:500}
+label:first-of-type{margin-top:0}
+input[type=text],input[type=email],input[type=time],select,textarea{
+  width:100%;font-size:14px;border-radius:var(--radius);
+  border:1px solid var(--border2);background:var(--white);
+  color:var(--text);padding:9px 11px;outline:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+input[type=text]:focus,input[type=email]:focus,input[type=time]:focus,select:focus,textarea:focus{
+  border-color:var(--green);box-shadow:0 0 0 3px rgba(58,181,74,0.15);
+}
+textarea{resize:vertical;min-height:80px}
+.err-msg{font-size:12px;color:#d93025;margin-top:4px;display:none}
+.has-err input,.has-err select,.has-err textarea{border-color:#d93025!important}
+.has-err .err-msg{display:block}
+hr{border:none;border-top:1px solid var(--border);margin:1.25rem 0}
+
+/* ── Buttons ── */
+.btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;gap:12px}
+.btn{font-size:14px;padding:9px 20px;border-radius:var(--radius);cursor:pointer;border:1px solid var(--border2);background:var(--white);color:var(--text);transition:background .15s,transform .1s;display:inline-flex;align-items:center;gap:6px;font-weight:500}
+.btn:hover{background:#f4f5f7}.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--green);color:#fff;border-color:var(--green);font-weight:600}
+.btn.primary:hover{background:var(--green-dark);border-color:var(--green-dark)}
+.add-btn{font-size:13px;color:var(--green);border:1.5px dashed #8dd494;background:transparent;padding:8px 14px;border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;gap:6px;margin-top:12px;font-weight:500}
+.add-btn:hover{background:var(--green-light)}
+.mainNav-bar{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;gap:12px}
+
+/* ── Steps ── */
+.step{display:none}.step.active{display:block}
+
+/* ── Hours ── */
+.hours-head{display:grid;grid-template-columns:110px 1fr 1fr 80px;gap:8px;font-size:11px;color:var(--muted);font-weight:600;padding-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.hours-row{display:grid;grid-template-columns:110px 1fr 1fr 80px;gap:8px;align-items:center;margin-bottom:6px}
+.day-lbl{font-size:13px;font-weight:500;color:var(--text)}
+.closed-tog{display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;color:var(--muted)}
+.closed-tog input{accent-color:var(--green)}
+input[type=time]:disabled,select:disabled{opacity:.38;pointer-events:none}
+
+/* ── Users ── */
+.user-row{display:flex;align-items:flex-end;gap:8px;margin-top:10px;padding:12px;background:#f7f8fa;border-radius:var(--radius);border:1px solid var(--border)}
+.user-row>div{flex:1;min-width:0}
+.user-row label{margin-top:0}
+.rm-btn{flex:0 0 auto;font-size:18px;color:#d93025;cursor:pointer;padding:6px;border:none;background:none;border-radius:var(--radius)}
+.rm-btn:hover{background:#fce8e8}
+.user-block{margin-top:10px;padding:12px 14px;background:#f7f8fa;border-radius:var(--radius);border:1px solid var(--border)}
+.user-top-row{display:flex;align-items:flex-end;gap:8px}
+.user-top-row>div{flex:1;min-width:0}
+.user-top-row label{margin-top:0}
+.user-phone-section{margin-top:12px;padding-top:12px;border-top:1px dashed var(--border2)}
+.uq-label{font-size:13px;font-weight:600;color:var(--text);display:block}
+.radio-group-sm{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.radio-opt-sm{display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:6px 12px;border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-weight:500;background:var(--white);transition:all .12s}
+.radio-opt-sm.sel{border-color:var(--green);background:var(--green-light);color:var(--green-dark)}
+.uc-extra{font-size:11px;color:var(--text);margin-top:4px;display:flex;align-items:center;gap:4px}
+.cq-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:10px 0 14px}
+.cq-grid label{margin-top:0}
+.cq-ivr-block{margin-top:14px;padding-top:12px;border-top:1px dashed var(--border2)}
+
+/* ── Ring groups ── */
+.rg-block{margin-bottom:14px;padding:14px;background:#f7f8fa;border-radius:var(--radius);border:1px solid var(--border)}
+.rg-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.rg-name-input{flex:1;font-size:14px;font-weight:500;border:1px solid var(--border2);border-radius:var(--radius);padding:8px 10px;outline:none}
+.rg-name-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(58,181,74,0.15)}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+.chip{font-size:12px;padding:6px 14px;border-radius:20px;border:1.5px solid var(--border2);background:var(--white);cursor:pointer;transition:all .12s;color:var(--text);font-weight:500;line-height:1}
+.chip.on{background:var(--green);border-color:var(--green);color:#fff}
+.chip:hover:not(.on){background:#f0f2f5;border-color:#aaa}
+
+/* ── Radio options ── */
+.radio-group{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.radio-opt{display:flex;align-items:center;gap:7px;font-size:14px;cursor:pointer;padding:9px 15px;border:1.5px solid var(--border);border-radius:var(--radius);transition:all .15s;color:var(--text);font-weight:500;background:var(--white)}
+.radio-opt input{accent-color:var(--green)}
+.radio-opt.sel{border-color:var(--green);background:var(--green-light);color:var(--green-dark)}
+
+/* ── Summary (overview page) ── */
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sum-card{background:#f7f8fa;border-radius:var(--radius);padding:12px 14px;border:1px solid var(--border)}
+.sum-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;font-weight:600}
+.sum-val{font-size:13px;color:var(--text);font-weight:600}
+.sum-val-sm{font-size:12px;color:var(--text);font-weight:400;line-height:1.55}
+.ov-section{margin-bottom:1.5rem}
+.ov-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ov-title i{font-size:14px;color:var(--green)}
+.user-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:8px}
+.user-card{background:#f7f8fa;border-radius:var(--radius);padding:10px 12px;border:1px solid var(--border)}
+.uc-name{font-size:13px;font-weight:600;color:var(--text)}
+.uc-email{font-size:12px;color:var(--muted);word-break:break-all;margin-top:2px}
+.rg-ov{background:#f7f8fa;border-radius:var(--radius);padding:10px 14px;margin-bottom:8px;border:1px solid var(--border)}
+.rg-ov-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
+.rg-ov-info{font-size:12px;color:var(--muted)}
+.hours-ov{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.hours-day{background:#f7f8fa;border-radius:var(--radius);padding:9px 10px;border:1px solid var(--border)}
+.hours-day.closed{opacity:.45}
+.hours-day .hd-name{font-size:12px;font-weight:600;color:var(--text)}
+.hours-day .hd-time{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ── Success screen ── */
+.success-top{text-align:center;padding:1.5rem 1rem 1.25rem}
+.check-circle{width:56px;height:56px;background:var(--green-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;border:2px solid #b6e5bc}
+.check-circle i{font-size:28px;color:var(--green)}
+
+/* ── Footer ── */
+.footer{background:#090e1a;border-top:1px solid rgba(255,255,255,0.04);padding:48px 24px 28px}
+.footer-inner{max-width:1200px;margin:0 auto}
+.footer-grid{display:flex;flex-wrap:wrap;gap:48px;margin-bottom:40px}
+.footer-brand{flex:1;min-width:200px}
+.footer-brand img{height:30px;display:block;margin-bottom:14px;opacity:.9}
+.footer-brand p{font-size:12px;line-height:1.7;color:#4a5268}
+.footer-brand .phone{font-size:12px;color:#4a5268;margin-top:12px;display:flex;align-items:center;gap:5px}
+.footer-brand .phone i{color:var(--green);font-size:12px}
+.footer-brand .phone a{color:#4a5268;text-decoration:none}
+.footer-col{min-width:140px}
+.footer-col h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#c0c8dc;margin-bottom:14px}
+.footer-col a{display:block;color:#4a5268;text-decoration:none;font-size:12px;margin-bottom:9px;transition:color .15s}
+.footer-col a:hover{color:#fff}
+.footer-bottom{border-top:1px solid #151d30;padding-top:22px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center}
+.footer-bottom span{font-size:12px;color:#2e3650}
+.footer-bottom a{font-size:12px;color:#2e3650;text-decoration:none;margin-left:18px}
+.footer-bottom a:hover{color:#fff}
+</style>
+</head>
+<body>
+
+<style>
+  #zest4BackToHub {
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    padding-top: calc(10px + env(safe-area-inset-top, 0px));
+    background: #055491;
+    color: #fff;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #zest4BackToHub:active { background: #033B66; }
+</style>
+<a id="zest4BackToHub" href="../index.html" aria-label="Back to Cloud &amp; Connectivity Hub">&larr; Back to Hub</a>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- UTILITY BAR                               -->
+<!-- ══════════════════════════════════════════ -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-left">
+      <span class="topbar-phone"><i class="ti ti-phone"></i><a href="tel:+441619563300">0161 956 3300</a></span>
+      <a href="https://zest4.com/log-a-fault/">Log a Fault</a>
+      <a href="https://zest4.com/service-status/">Service Status</a>
+    </div>
+    <div class="topbar-right">
+      <a href="https://portal.zest4partners.com/">Partner Portal</a>
+      <a href="https://www.zest4customers.com/">Customer Portal</a>
+      <a href="https://zest4connect.com/login.htm">Zest4 Connect</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- MAIN NAV                                  -->
+<!-- ══════════════════════════════════════════ -->
+<nav class="mainnav">
+  <div class="mainnav-inner">
+    <a href="https://zest4.com/" class="nav-logo">
+      <img src="https://zest4.com/wp-content/uploads/2018/10/Zest4-Logo-New.svg" alt="Zest4">
+    </a>
+    <ul class="nav-links">
+      <li><a href="https://zest4.com/business-mobile/">Business Mobile</a></li>
+      <li><a href="https://zest4.com/cloud-telephony/">Cloud Telephony</a></li>
+      <li><a href="https://zest4.com/iot/">IoT &amp; Data</a></li>
+      <li><a href="https://zest4.com/about/">About Us</a></li>
+      <li><a href="https://zest4.com/contact/">Contact</a></li>
+      <li><a href="https://zest4.com/become-a-partner/" class="nav-cta">Become a Partner</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- HERO BANNER                               -->
+<!-- ══════════════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-pill"><i class="ti ti-phone-call"></i>Cloud Telephony Setup</div>
+    <h1>8x8 / Callswitch One<br>System Setup Configuration</h1>
+    <p>Complete the form below to tell us how you'd like your phone system configured. Takes around 5 minutes.</p>
+    <div class="progress-bar" id="progBar"></div>
+    <div class="step-label" id="stepLabel"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- FORM CONTENT                              -->
+<!-- ══════════════════════════════════════════ -->
+<div class="content">
+<div class="wrap">
+
+  <!-- Step 0: Company details -->
+  <div class="step active" id="step0">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-building"></i>Company details</div>
+      <div class="card-sub">Basic information about your business</div>
+      <label for="companyName">Company name</label>
+      <div id="fw0"><input type="text" id="companyName" placeholder="Acme Ltd"><div class="err-msg">Please enter your company name</div></div>
+      <hr>
+      <div class="hint-box"><i class="ti ti-info-circle"></i><span>Your name and email below are for contact purposes only. We'll only get in touch if we need to clarify any details about your setup.</span></div>
+      <label for="contactName">Your name</label>
+      <div id="fw1"><input type="text" id="contactName" placeholder="Jane Smith"><div class="err-msg">Please enter your name</div></div>
+      <label for="contactEmail">Your email address</label>
+      <div id="fw2"><input type="email" id="contactEmail" placeholder="jane@acme.com"><div class="err-msg">Please enter a valid email</div></div>
+    </div>
+  </div>
+
+  <!-- Step 1: Phone numbers -->
+  <div class="step" id="step1">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-device-mobile"></i>Phone numbers</div>
+      <div class="card-sub">Will you be bringing existing numbers over or getting new ones?</div>
+      <label>Number type</label>
+      <div class="radio-group">
+        <label class="radio-opt sel" id="ropt-port"><input type="radio" name="numType" value="port" checked onchange="updateNumType()"><i class="ti ti-transfer"></i>Port existing numbers</label>
+        <label class="radio-opt" id="ropt-new"><input type="radio" name="numType" value="new" onchange="updateNumType()"><i class="ti ti-plus-circle"></i>Claim new numbers</label>
+        <label class="radio-opt" id="ropt-both"><input type="radio" name="numType" value="both" onchange="updateNumType()"><i class="ti ti-arrows-exchange"></i>Both</label>
+      </div>
+      <div id="portSection" style="margin-top:1.25rem">
+        <hr style="margin-top:0">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:8px">List the numbers you want to port (one per line). Once listed here, you'll be able to assign them to users, ring groups, call queues and your auto attendant in the next steps.</p>
+        <textarea id="portNumbers" placeholder="e.g.&#10;020 7946 0123&#10;020 7946 0124" oninput="refreshAllNumberSelects()"></textarea>
+        <label for="currentProvider">Current provider</label>
+        <input type="text" id="currentProvider" placeholder="e.g. BT, Vodafone, Virgin Media">
+      </div>
+      <div id="newSection" style="display:none;margin-top:1.25rem">
+        <hr style="margin-top:0">
+        <label for="areaCode">Preferred area code</label>
+        <input type="text" id="areaCode" placeholder="e.g. 0207 (London), 0161 (Manchester)" style="max-width:340px">
+        <label for="numQty">How many numbers do you need?</label>
+        <input type="text" id="numQty" placeholder="e.g. 3" style="max-width:120px">
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Users -->
+  <div class="step" id="step2">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-users"></i>Users</div>
+      <div class="card-sub">Add everyone who needs a phone extension on the system</div>
+      <div id="usersContainer"><p style="font-size:13px;color:var(--muted)">No users added yet.</p></div>
+      <button class="add-btn" onclick="addUser()"><i class="ti ti-plus"></i>Add another user</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Ring groups -->
+  <div class="step" id="step3">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-phone-incoming"></i>Ring groups</div>
+      <div class="card-sub">Create groups whose phones ring together when a number is called</div>
+      <div id="rgContainer"><p style="font-size:13px;color:var(--muted)">No ring groups added yet.</p></div>
+      <button class="add-btn" onclick="addRingGroup()"><i class="ti ti-plus"></i>Add ring group</button>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-headset"></i>Call queues</div>
+      <div class="card-sub">Set up call queues for teams handling higher call volumes</div>
+      <div id="cqContainer"><p style="font-size:13px;color:var(--muted)">No call queues added yet.</p></div>
+      <button class="add-btn" onclick="addCallQueue()"><i class="ti ti-plus"></i>Add call queue</button>
+    </div>
+  </div>
+
+  <!-- Step 4: Auto attendant -->
+  <div class="step" id="step4">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-phone-check"></i>Auto attendant</div>
+      <div class="card-sub">An auto attendant (IVR) greets callers and lets them press a key to reach the right place</div>
+      <label style="margin-top:0">Do you want an auto attendant?</label>
+      <div class="radio-group">
+        <label class="radio-opt" id="aa-yes-opt"><input type="radio" name="aaEnabled" value="yes" onchange="updateAAUI()"><i class="ti ti-check"></i>Yes</label>
+        <label class="radio-opt sel" id="aa-no-opt"><input type="radio" name="aaEnabled" value="no" checked onchange="updateAAUI()"><i class="ti ti-x"></i>No</label>
+      </div>
+
+      <div id="aaDetails" style="display:none;margin-top:1.25rem">
+        <div id="aaContainer"><p style="font-size:13px;color:var(--muted)">No auto attendants added yet.</p></div>
+        <button class="add-btn" onclick="addAutoAttendant()"><i class="ti ti-plus"></i>Add another auto attendant</button>
+      </div>
+
+      <hr style="margin-top:1.25rem">
+      <label for="voicemailMsg" style="margin-top:0">Voicemail greeting <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+      <textarea id="voicemailMsg" placeholder="e.g. You've reached Acme Ltd. Please leave your name and number..."></textarea>
+    </div>
+  </div>
+
+  <!-- Step 5: Additional settings -->
+  <div class="step" id="step5">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-settings"></i>Additional settings</div>
+      <div class="card-sub">A few extra options to complete your configuration</div>
+
+      <!-- Caller ID -->
+      <div style="margin-bottom:1.25rem">
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:5px;display:flex;align-items:center;gap:7px"><i class="ti ti-id" style="color:var(--green)"></i>External caller ID</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Do you want a single number displayed as the outbound caller ID for all users when they make external calls?</p>
+        <div class="radio-group">
+          <label class="radio-opt sel" id="ci-yes-opt"><input type="radio" name="callerIdYN" value="yes" checked onchange="updateCallerIdUI()"><i class="ti ti-check"></i>Yes, set a number</label>
+          <label class="radio-opt" id="ci-no-opt"><input type="radio" name="callerIdYN" value="no" onchange="updateCallerIdUI()"><i class="ti ti-x"></i>No, use individual numbers</label>
+        </div>
+        <div id="callerIdInput" style="margin-top:12px">
+          <label for="callerIdNumber">Caller ID number</label>
+          <input type="text" id="callerIdNumber" placeholder="e.g. 020 7946 0100" style="max-width:300px">
+          <p style="font-size:12px;color:var(--muted);margin-top:5px">This number must be one of your allocated numbers.</p>
+        </div>
+      </div>
+
+      <hr>
+
+      <!-- Call recording -->
+      <div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:5px;display:flex;align-items:center;gap:7px"><i class="ti ti-microphone" style="color:var(--green)"></i>Call recording</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Would you like all calls to be recorded automatically?</p>
+        <div class="radio-group">
+          <label class="radio-opt" id="cr-yes-opt"><input type="radio" name="callRecYN" value="yes" onchange="updateCallRecUI()"><i class="ti ti-check"></i>Yes, record all calls</label>
+          <label class="radio-opt sel" id="cr-no-opt"><input type="radio" name="callRecYN" value="no" checked onchange="updateCallRecUI()"><i class="ti ti-x"></i>No recording needed</label>
+        </div>
+        <div id="callRecNotice" style="display:none;margin-top:14px;background:#fffbeb;border:1px solid #f5c842;border-radius:var(--radius-lg);padding:1rem 1.25rem">
+          <div style="font-size:13px;font-weight:600;color:#7a5800;margin-bottom:6px;display:flex;align-items:center;gap:6px"><i class="ti ti-alert-triangle"></i>Important — you must notify callers</div>
+          <p style="font-size:13px;color:#5c4000;line-height:1.6">Under UK law, callers must be informed that their call may be recorded. Include a notification in each <strong>auto attendant's welcome message</strong> (or voicemail greeting, if you're not using an auto attendant) when callers first connect.</p>
+          <p style="font-size:13px;color:#5c4000;margin-top:8px;line-height:1.6">For example:<br><em style="background:#fff3c4;padding:2px 7px;border-radius:4px;display:inline-block;margin-top:4px">"Please note that calls may be recorded for training and quality purposes."</em></p>
+          <p style="font-size:12px;color:#7a5800;margin-top:10px">You can update this on the <strong>Auto attendant</strong> step — use the Back button if you'd like to update it now.</p>
+        </div>
+      </div>
+
+      <hr>
+
+      <!-- Additional notes -->
+      <div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:5px;display:flex;align-items:center;gap:7px"><i class="ti ti-notes" style="color:var(--green)"></i>Additional notes</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Any special requirements, preferences, or instructions for your setup?</p>
+        <textarea id="additionalNotes" placeholder="e.g. The main reception number should route to the sales ring group during business hours and voicemail after hours..." style="min-height:110px"></textarea>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="goBack()"><i class="ti ti-arrow-left"></i>Back</button>
+      <button class="btn primary" onclick="submitForm()">Review &amp; finish <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- Step 6: Review & submit -->
+  <div class="step" id="step6">
+    <div class="card">
+      <div class="success-top">
+        <div class="check-circle"><i class="ti ti-check"></i></div>
+        <h2 style="font-size:21px;font-weight:700;margin-bottom:6px">Configuration complete!</h2>
+        <p style="font-size:14px;color:var(--muted)">Review the summary below, then download your PDF and send it to us.</p>
+      </div>
+
+      <!-- Make changes -->
+      <div style="background:#f7f8fa;border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <span style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:7px"><i class="ti ti-edit" style="font-size:15px"></i>Need to change something?</span>
+        <button class="btn" onclick="goBackToEdit()" style="font-size:13px;padding:7px 16px"><i class="ti ti-arrow-left"></i>Go back &amp; make changes</button>
+      </div>
+
+      <!-- Download PDF -->
+      <div style="background:var(--green-light);border:1px solid #b6e5bc;border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.25rem">
+        <div style="font-size:14px;font-weight:600;color:var(--green-dark);margin-bottom:12px;display:flex;align-items:center;gap:7px"><i class="ti ti-file-download" style="font-size:18px"></i>Step 1 — Download your configuration PDF</div>
+        <button class="btn primary" onclick="downloadPDF()" style="padding:10px 24px"><i class="ti ti-download"></i>Download PDF</button>
+        <div id="dlConfirm" style="display:none;margin-top:10px;font-size:13px;color:var(--green-dark);align-items:center;gap:6px"><i class="ti ti-circle-check"></i> PDF downloaded — now send it to us below.</div>
+      </div>
+
+      <!-- Send options -->
+      <div style="background:#f3f3ff;border:1px solid #c8c8ec;border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.25rem">
+        <div style="font-size:14px;font-weight:600;color:#3b3b8f;margin-bottom:12px;display:flex;align-items:center;gap:7px"><i class="ti ti-send" style="font-size:18px"></i>Step 2 — Send us the PDF</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <a href="#" id="emailLink" style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #c8c8ec;border-radius:var(--radius);padding:12px 14px;text-decoration:none;color:#3b3b8f;font-size:13px;font-weight:500">
+            <i class="ti ti-mail" style="font-size:18px;color:#5b5bcc;flex-shrink:0"></i>
+            <span><strong>Email us</strong> — ccsupport@zest4.com<br><span style="font-weight:400;color:var(--muted);font-size:12px">Opens your email app pre-filled. Attach the downloaded PDF before sending.</span></span>
+          </a>
+          <a href="https://www.zest4customers.com/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #c8c8ec;border-radius:var(--radius);padding:12px 14px;text-decoration:none;color:#3b3b8f;font-size:13px;font-weight:500">
+            <i class="ti ti-ticket" style="font-size:18px;color:#5b5bcc;flex-shrink:0"></i>
+            <span><strong>Raise a support ticket</strong> — www.zest4customers.com<br><span style="font-weight:400;color:var(--muted);font-size:12px">Log in to the customer portal and attach the PDF to a new ticket.</span></span>
+          </a>
+        </div>
+      </div>
+
+      <hr>
+      <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">Your configuration summary</div>
+      <div id="overviewOut"></div>
+    </div>
+    <div style="text-align:center;margin-top:1rem">
+      <button class="btn" onclick="resetForm()">Start a new submission</button>
+    </div>
+  </div>
+
+  <!-- Main nav buttons (steps 0–5) -->
+  <div class="btn-row" id="mainNav">
+    <button class="btn" id="backBtn" onclick="goBack()"><i class="ti ti-arrow-left"></i>Back</button>
+    <button class="btn primary" id="nextBtn" onclick="goNext()">Continue <i class="ti ti-arrow-right"></i></button>
+  </div>
+
+</div><!-- /wrap -->
+</div><!-- /content -->
+
+<!-- ══════════════════════════════════════════ -->
+<!-- FOOTER                                    -->
+<!-- ══════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="https://zest4.com/wp-content/uploads/2018/10/Zest4-Logo-New.svg" alt="Zest4">
+        <p>UK-based wholesale telecoms provider offering mobile, IoT, cloud telephony and unified communications solutions for resellers.</p>
+        <div class="phone"><i class="ti ti-phone"></i><a href="tel:+441619563300">0161 956 3300</a></div>
+      </div>
+      <div class="footer-col">
+        <h4>Products</h4>
+        <a href="https://zest4.com/business-mobile/">Business Mobile</a>
+        <a href="https://zest4.com/cloud-telephony/">Cloud Telephony</a>
+        <a href="https://zest4.com/iot/">IoT &amp; Mobile Data</a>
+        <a href="https://zest4.com/bulk-sms/">Bulk SMS</a>
+        <a href="https://zest4.com/pci-compliance/">PCI Compliance</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="https://zest4.com/about/">About Us</a>
+        <a href="https://zest4.com/meet-the-team/">Meet the Team</a>
+        <a href="https://zest4.com/awards-and-recognition/">Awards</a>
+        <a href="https://zest4.com/news/">News &amp; Blog</a>
+        <a href="https://zest4.com/careers/">Careers</a>
+        <a href="https://zest4.com/sustainability/">Sustainability</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="https://zest4.com/log-a-fault/">Log a Fault</a>
+        <a href="https://zest4.com/service-status/">Service Status</a>
+        <a href="https://www.zest4customers.com/">Customer Portal</a>
+        <a href="https://portal.zest4partners.com/">Partner Portal</a>
+        <a href="https://zest4connect.com/login.htm">Zest4 Connect</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2025 Zest4 Ltd. All rights reserved.</span>
+      <div>
+        <a href="https://zest4.com/privacy-policy/">Privacy Policy</a>
+        <a href="https://zest4.com/contact/">Contact Us</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const SNAMES=['Company details','Phone numbers','Users','Ring groups','Auto attendant','Additional settings'];
+var cur=0,users=[],rgs=[],cqs=[],aas=[],nextUserId=1,nextRgId=1,nextCqId=1,nextAaId=1,nextAaOptId=1,_pdfData=null;
+
+/* ── Auto attendant ── */
+function updateAAUI(){
+  var v=document.querySelector('input[name="aaEnabled"]:checked').value;
+  document.getElementById('aaDetails').style.display=v==='yes'?'block':'none';
+  document.getElementById('aa-yes-opt').classList.toggle('sel',v==='yes');
+  document.getElementById('aa-no-opt').classList.toggle('sel',v!=='yes');
+  if(v==='yes'){
+    if(!aas.length)addAutoAttendant();
+    refreshAllNumberSelects();refreshAADestinationSelects();
+  }
+}
+function getPortedNumbersList(){
+  var el=document.getElementById('portNumbers');
+  var raw=el?el.value:'';
+  return raw.split('\n').map(function(s){return s.trim();}).filter(Boolean);
+}
+function buildAANumberOptions(selected){
+  var nums=getPortedNumbersList();
+  var html='<option value="">Select a number...</option>';
+  nums.forEach(function(n){html+='<option value="'+esc(n)+'" '+(selected===n?'selected':'')+'>'+esc(n)+'</option>';});
+  html+='<option value="other" '+(selected==='other'?'selected':'')+'>Other / new number not listed above</option>';
+  return html;
+}
+function refreshAllNumberSelects(){
+  aas.forEach(function(aa){
+    var sel=document.getElementById('aaNumber_'+aa.id);
+    if(!sel)return;
+    var cv=sel.value;sel.innerHTML=buildAANumberOptions(cv);
+    var wrap=document.getElementById('aaNumberOtherWrap_'+aa.id);if(wrap)wrap.style.display=sel.value==='other'?'block':'none';
+  });
+}
+function onAANumberSelect(aaId,val){
+  var aa=aas.find(function(a){return a.id===aaId;});if(!aa)return;aa.number=val;
+  var wrap=document.getElementById('aaNumberOtherWrap_'+aaId);if(wrap)wrap.style.display=val==='other'?'block':'none';
+}
+
+function buildDestinationOptions(selected){
+  var html='<option value="">Select a destination...</option>';
+  html+='<option value="voicemail" '+(selected==='voicemail'?'selected':'')+'>Voicemail</option>';
+  if(users.length){html+='<optgroup label="Users">'+users.map(function(u){var v='user:'+u.id;return '<option value="'+v+'" '+(selected===v?'selected':'')+'>'+esc(getUserLabel(u))+(u.ext?' (ext '+esc(u.ext)+')':'')+'</option>';}).join('')+'</optgroup>';}
+  if(rgs.length){html+='<optgroup label="Ring groups">'+rgs.map(function(rg){var v='rg:'+rg.id;return '<option value="'+v+'" '+(selected===v?'selected':'')+'>'+esc(rg.name||'Unnamed ring group')+'</option>';}).join('')+'</optgroup>';}
+  if(cqs.length){html+='<optgroup label="Call queues">'+cqs.map(function(cq){var v='cq:'+cq.id;return '<option value="'+v+'" '+(selected===v?'selected':'')+'>'+esc(cq.name||'Unnamed queue')+'</option>';}).join('')+'</optgroup>';}
+  html+='<option value="other" '+(selected==='other'?'selected':'')+'>Other (type a destination — e.g. external number)</option>';
+  return html;
+}
+function buildFwRuleHTML(kind,itemId,field,label,hint,val,otherVal){
+  var selId=kind+'fw_'+field+'_'+itemId,otherId=kind+'fwother_'+field+'_'+itemId,wrapId=kind+'fwotherwrap_'+field+'_'+itemId;
+  return '<div style="margin-bottom:12px">'
+    +'<label style="margin-top:0;margin-bottom:2px">'+label+'</label>'
+    +(hint?('<p style="font-size:12px;color:var(--muted);margin:0 0 6px">'+hint+'</p>'):'')
+    +'<select id="'+selId+'" onchange="onFwSelect(\''+kind+'\','+itemId+',\''+field+'\',this.value)">'+buildDestinationOptions(val)+'</select>'
+    +'<div id="'+wrapId+'" style="display:'+(val==='other'?'block':'none')+';margin-top:8px">'
+      +'<input type="text" id="'+otherId+'" placeholder="e.g. External number, specific voicemail box..." value="'+esc(otherVal)+'" oninput="onFwOtherInput(\''+kind+'\','+itemId+',\''+field+'\',this.value)">'
+    +'</div>'
+  +'</div>';
+}
+function onFwSelect(kind,itemId,field,val){
+  var list=kind==='rg'?rgs:cqs;var item=list.find(function(x){return x.id===itemId;});if(!item)return;
+  item[field]=val;
+  var wrap=document.getElementById(kind+'fwotherwrap_'+field+'_'+itemId);if(wrap)wrap.style.display=val==='other'?'block':'none';
+}
+function onFwOtherInput(kind,itemId,field,val){
+  var list=kind==='rg'?rgs:cqs;var item=list.find(function(x){return x.id===itemId;});if(!item)return;
+  item[field+'Other']=val;
+}
+function refreshAADestinationSelects(){
+  aas.forEach(function(aa){
+    var single=document.getElementById('aaSingleDest_'+aa.id);
+    if(single){
+      var cv=single.value;single.innerHTML=buildDestinationOptions(cv);
+      var wrap=document.getElementById('aaSingleDestOtherWrap_'+aa.id);if(wrap)wrap.style.display=single.value==='other'?'block':'none';
+    }
+    (aa.options||[]).forEach(function(o){
+      var sel=document.getElementById('aaoptdest_'+o.id);
+      if(sel){var cv=sel.value;sel.innerHTML=buildDestinationOptions(cv);}
+    });
+    var closedSingle=document.getElementById('aaClosedSingleDest_'+aa.id);
+    if(closedSingle){
+      var ccv=closedSingle.value;closedSingle.innerHTML=buildDestinationOptions(ccv);
+      var cwrap=document.getElementById('aaClosedSingleDestOtherWrap_'+aa.id);if(cwrap)cwrap.style.display=closedSingle.value==='other'?'block':'none';
+    }
+    (aa.closedOptions||[]).forEach(function(o){
+      var sel=document.getElementById('aaclosedoptdest_'+o.id);
+      if(sel){var cv=sel.value;sel.innerHTML=buildDestinationOptions(cv);}
+    });
+  });
+}
+
+function addAutoAttendant(){
+  var id=nextAaId++;
+  aas.push({
+    id:id,name:'',number:'',numberOther:'',
+    hours:DAYS.map(function(d,i){return{closed:i>=5,open:'09:00',close:'17:00'};}),
+    welcomeEnabled:'no',welcomeMsg:'',closedEnabled:'no',closedMsg:'',
+    routeType:'single',singleDestination:'',singleDestinationOther:'',
+    options:[],
+    closedRouteEnabled:'no',closedRouteType:'single',closedSingleDestination:'',closedSingleDestinationOther:'',
+    closedOptions:[]
+  });
+  renderAAs();
+}
+function removeAutoAttendant(id){aas=aas.filter(function(a){return a.id!==id;});renderAAs();}
+function onAAField(aaId,field,val){var aa=aas.find(function(a){return a.id===aaId;});if(aa)aa[field]=val;}
+
+function buildAAHoursHTML(aa){
+  return DAYS.map(function(d,i){
+    var h=aa.hours[i];
+    return '<div class="hours-row"><span class="day-lbl">'+d+'</span><input type="time" id="aahopen_'+aa.id+'_'+i+'" value="'+esc(h.open)+'" '+(h.closed?'disabled':'')+' onchange="onAAHoursInput('+aa.id+','+i+',\'open\',this.value)"><input type="time" id="aahclose_'+aa.id+'_'+i+'" value="'+esc(h.close)+'" '+(h.closed?'disabled':'')+' onchange="onAAHoursInput('+aa.id+','+i+',\'close\',this.value)"><label class="closed-tog"><input type="checkbox" id="aahclosed_'+aa.id+'_'+i+'" '+(h.closed?'checked':'')+' onchange="toggleAADay('+aa.id+','+i+')">Closed</label></div>';
+  }).join('');
+}
+function toggleAADay(aaId,i){
+  var cl=document.getElementById('aahclosed_'+aaId+'_'+i).checked;
+  document.getElementById('aahopen_'+aaId+'_'+i).disabled=cl;
+  document.getElementById('aahclose_'+aaId+'_'+i).disabled=cl;
+  var aa=aas.find(function(a){return a.id===aaId;});if(aa)aa.hours[i].closed=cl;
+}
+function onAAHoursInput(aaId,i,field,val){var aa=aas.find(function(a){return a.id===aaId;});if(aa)aa.hours[i][field]=val;}
+
+function onAAWelcomeRadio(aaId,val){
+  var aa=aas.find(function(a){return a.id===aaId;});if(!aa)return;aa.welcomeEnabled=val;
+  document.getElementById('aaWelcomeWrap_'+aaId).style.display=val==='yes'?'block':'none';
+  document.getElementById('aa-welcome-yes-opt_'+aaId).classList.toggle('sel',val==='yes');
+  document.getElementById('aa-welcome-no-opt_'+aaId).classList.toggle('sel',val!=='yes');
+}
+function onAAClosedRadio(aaId,val){
+  var aa=aas.find(function(a){return a.id===aaId;});if(!aa)return;aa.closedEnabled=val;
+  document.getElementById('aaClosedWrap_'+aaId).style.display=val==='yes'?'block':'none';
+  document.getElementById('aa-closed-yes-opt_'+aaId).classList.toggle('sel',val==='yes');
+  document.getElementById('aa-closed-no-opt_'+aaId).classList.toggle('sel',val!=='yes');
+}
+function onAARouteRadio(aaId,val){
+  var aa=aas.find(function(a){return a.id===aaId;});if(!aa)return;aa.routeType=val;
+  document.getElementById('aaSingleWrap_'+aaId).style.display=val==='single'?'block':'none';
+  document.getElementById('aaMultiWrap_'+aaId).style.display=val==='multiple'?'block':'none';
+  document.getElementById('aa-route-single-opt_'+aaId).classList.toggle('sel',val==='single');
+  document.getElementById('aa-route-multi-opt_'+aaId).classList.toggle('sel',val==='multiple');
+  if(val==='multiple')refreshAADestinationSelects();
+}
+function onAASingleDestSelect(aaId,val){
+  var aa=aas.find(function(a){return a.id===aaId;});if(!aa)return;aa.singleDestination=val;
+  document.getElementById('aaSingleDestOtherWrap_'+aaId).style.display=val==='other'?'block':'none';
+}
+
+function onAAClosedRouteRadio(aaId,val){
+  var aa=aas.find(function(a){return a.id===aaId;});if(!aa)return;aa.closedRouteEnabled=val;
+  document.getElementById('aaClosedRouteDetail_'+aaId).style.display=val==='yes'?'block':'none';
+  document.getElementById('aa-closedroute-yes-opt_'+aaId).classList.toggle('sel',val==='yes');
+  document.getElementById('aa-closedroute-no-opt_'+aaId).classList.toggle('sel',val!=='yes');
+  if(val==='yes')refreshAADestinationSelects();
+}
+function onAAClosedRouteTypeRadio(aaId,val){
+  var aa=aas.find(function(a){return a.id===aaId;});if(!aa)return;aa.closedRouteType=val;
+  document.getElementById('aaClosedSingleWrap_'+aaId).style.display=val==='single'?'block':'none';
+  document.getElementById('aaClosedMultiWrap_'+aaId).style.display=val==='multiple'?'block':'none';
+  document.getElementById('aa-closedroute-single-opt_'+aaId).classList.toggle('sel',val==='single');
+  document.getElementById('aa-closedroute-multi-opt_'+aaId).classList.toggle('sel',val==='multiple');
+  if(val==='multiple')refreshAADestinationSelects();
+}
+function onAAClosedSingleDestSelect(aaId,val){
+  var aa=aas.find(function(a){return a.id===aaId;});if(!aa)return;aa.closedSingleDestination=val;
+  document.getElementById('aaClosedSingleDestOtherWrap_'+aaId).style.display=val==='other'?'block':'none';
+}
+function addAAClosedOption(aaId){
+  var aa=aas.find(function(a){return a.id===aaId;});if(!aa)return;
+  aa.closedOptions=aa.closedOptions||[];aa.closedOptions.push({id:nextAaOptId++,key:'',destination:'',destinationOther:''});
+  renderAAClosedOptionsFor(aaId);
+}
+function removeAAClosedOption(aaId,optId){
+  var aa=aas.find(function(a){return a.id===aaId;});if(!aa)return;
+  aa.closedOptions=(aa.closedOptions||[]).filter(function(o){return o.id!==optId;});
+  renderAAClosedOptionsFor(aaId);
+}
+function onAAClosedOptionInput(optId,field,val){
+  for(var i=0;i<aas.length;i++){var o=(aas[i].closedOptions||[]).find(function(o){return o.id===optId;});if(o){o[field]=val;return;}}
+}
+function onAAClosedOptionDestSelect(aaId,optId,val){
+  var aa=aas.find(function(a){return a.id===aaId;});if(!aa)return;
+  var o=(aa.closedOptions||[]).find(function(o){return o.id===optId;});if(!o)return;
+  o.destination=val;
+  var wrap=document.getElementById('aaclosedoptdestotherwrap_'+optId);if(wrap)wrap.style.display=val==='other'?'block':'none';
+}
+function renderAAClosedOptionsFor(aaId){
+  var aa=aas.find(function(a){return a.id===aaId;});if(!aa)return;
+  var c=document.getElementById('aaClosedOptionsContainer_'+aaId);if(!c)return;
+  if(!aa.closedOptions||!aa.closedOptions.length){c.innerHTML='<p style="font-size:13px;color:var(--muted)">No options added yet.</p>';return;}
+  c.innerHTML=aa.closedOptions.map(function(o){
+    return '<div style="margin-bottom:10px;padding:10px;background:#fff;border:1px solid var(--border);border-radius:var(--radius)">'
+      +'<div style="display:flex;gap:8px;align-items:flex-end">'
+      +'<div style="flex:0 0 80px"><label style="margin-top:0">Key</label><input type="text" id="aaclosedoptkey_'+o.id+'" placeholder="e.g. 1" value="'+esc(o.key)+'" oninput="onAAClosedOptionInput('+o.id+',\'key\',this.value)"></div>'
+      +'<div style="flex:1"><label style="margin-top:0">Destination</label><select id="aaclosedoptdest_'+o.id+'" onchange="onAAClosedOptionDestSelect('+aaId+','+o.id+',this.value)">'+buildDestinationOptions(o.destination)+'</select></div>'
+      +'<button class="rm-btn ti ti-trash" aria-label="Remove option" onclick="removeAAClosedOption('+aaId+','+o.id+')" style="margin-bottom:1px"></button>'
+    +'</div>'
+    +'<div id="aaclosedoptdestotherwrap_'+o.id+'" style="display:'+(o.destination==='other'?'block':'none')+';margin-top:8px">'
+      +'<input type="text" id="aaclosedoptdestother_'+o.id+'" placeholder="e.g. External number, voicemail box..." style="width:100%" value="'+esc(o.destinationOther)+'" oninput="onAAClosedOptionInput('+o.id+',\'destinationOther\',this.value)">'
+    +'</div></div>';
+  }).join('');
+}
+
+function addAAOption(aaId){
+  var aa=aas.find(function(a){return a.id===aaId;});if(!aa)return;
+  aa.options=aa.options||[];aa.options.push({id:nextAaOptId++,key:'',destination:'',destinationOther:''});
+  renderAAOptionsFor(aaId);
+}
+function removeAAOption(aaId,optId){
+  var aa=aas.find(function(a){return a.id===aaId;});if(!aa)return;
+  aa.options=(aa.options||[]).filter(function(o){return o.id!==optId;});
+  renderAAOptionsFor(aaId);
+}
+function onAAOptionInput(optId,field,val){
+  for(var i=0;i<aas.length;i++){var o=(aas[i].options||[]).find(function(o){return o.id===optId;});if(o){o[field]=val;return;}}
+}
+function onAAOptionDestSelect(aaId,optId,val){
+  var aa=aas.find(function(a){return a.id===aaId;});if(!aa)return;
+  var o=(aa.options||[]).find(function(o){return o.id===optId;});if(!o)return;
+  o.destination=val;
+  var wrap=document.getElementById('aaoptdestotherwrap_'+optId);if(wrap)wrap.style.display=val==='other'?'block':'none';
+}
+function renderAAOptionsFor(aaId){
+  var aa=aas.find(function(a){return a.id===aaId;});if(!aa)return;
+  var c=document.getElementById('aaOptionsContainer_'+aaId);if(!c)return;
+  if(!aa.options||!aa.options.length){c.innerHTML='<p style="font-size:13px;color:var(--muted)">No options added yet.</p>';return;}
+  c.innerHTML=aa.options.map(function(o){
+    return '<div style="margin-bottom:10px;padding:10px;background:#fff;border:1px solid var(--border);border-radius:var(--radius)">'
+      +'<div style="display:flex;gap:8px;align-items:flex-end">'
+      +'<div style="flex:0 0 80px"><label style="margin-top:0">Key</label><input type="text" id="aaoptkey_'+o.id+'" placeholder="e.g. 1" value="'+esc(o.key)+'" oninput="onAAOptionInput('+o.id+',\'key\',this.value)"></div>'
+      +'<div style="flex:1"><label style="margin-top:0">Destination</label><select id="aaoptdest_'+o.id+'" onchange="onAAOptionDestSelect('+aaId+','+o.id+',this.value)">'+buildDestinationOptions(o.destination)+'</select></div>'
+      +'<button class="rm-btn ti ti-trash" aria-label="Remove option" onclick="removeAAOption('+aaId+','+o.id+')" style="margin-bottom:1px"></button>'
+    +'</div>'
+    +'<div id="aaoptdestotherwrap_'+o.id+'" style="display:'+(o.destination==='other'?'block':'none')+';margin-top:8px">'
+      +'<input type="text" id="aaoptdestother_'+o.id+'" placeholder="e.g. External number, voicemail box..." style="width:100%" value="'+esc(o.destinationOther)+'" oninput="onAAOptionInput('+o.id+',\'destinationOther\',this.value)">'
+    +'</div></div>';
+  }).join('');
+}
+
+function buildAABlockHTML(aa){
+  var hoursHTML=buildAAHoursHTML(aa);
+  var numberOptions=buildAANumberOptions(aa.number);
+  var destOptionsSingle=buildDestinationOptions(aa.singleDestination);
+  return '<div class="rg-block">'
+    +'<div class="rg-header"><input type="text" class="rg-name-input" id="aan_'+aa.id+'" placeholder="Auto attendant name (e.g. Main reception, Sales line)" value="'+esc(aa.name)+'" oninput="onAAField('+aa.id+',\'name\',this.value)"><button class="rm-btn ti ti-trash" aria-label="Remove auto attendant" onclick="removeAutoAttendant('+aa.id+')"></button></div>'
+
+    +'<label style="margin-top:0" for="aaNumber_'+aa.id+'">Number that reaches this auto attendant <span style="color:var(--muted);font-weight:400">(optional)</span></label>'
+    +'<select id="aaNumber_'+aa.id+'" style="max-width:300px" onchange="onAANumberSelect('+aa.id+',this.value)">'+numberOptions+'</select>'
+    +'<div id="aaNumberOtherWrap_'+aa.id+'" style="display:'+(aa.number==='other'?'block':'none')+';margin-top:8px">'
+      +'<label style="margin-top:0" for="aaNumberOther_'+aa.id+'">Preferred area code for this new number</label>'
+      +'<input type="text" id="aaNumberOther_'+aa.id+'" placeholder="e.g. 0207 (London), 0161 (Manchester)" style="max-width:280px" value="'+esc(aa.numberOther)+'" oninput="onAAField('+aa.id+',\'numberOther\',this.value)">'
+      +'<p style="font-size:12px;color:var(--muted);margin-top:5px">If this number is being newly claimed rather than ported, let us know the area code you\'d like it to use.</p>'
+    +'</div>'
+
+    +'<hr>'
+    +'<div class="card-title" style="font-size:15px;margin-bottom:4px"><i class="ti ti-clock"></i>Hours</div>'
+    +'<div class="card-sub" style="margin-bottom:10px">When should this auto attendant be active?</div>'
+    +'<div class="hours-head"><span>Day</span><span>Opens</span><span>Closes</span><span>Closed</span></div>'
+    +'<div>'+hoursHTML+'</div>'
+
+    +'<hr>'
+    +'<label style="margin-top:0">Welcome message?</label>'
+    +'<p style="font-size:12px;color:var(--muted);margin-top:-2px;margin-bottom:0">Played to callers when they first connect</p>'
+    +'<div class="radio-group-sm">'
+      +'<label class="radio-opt-sm'+(aa.welcomeEnabled==='yes'?' sel':'')+'" id="aa-welcome-yes-opt_'+aa.id+'"><input type="radio" name="aaWelcomeYN_'+aa.id+'" '+(aa.welcomeEnabled==='yes'?'checked':'')+' onchange="onAAWelcomeRadio('+aa.id+',\'yes\')"><i class="ti ti-check"></i>Yes</label>'
+      +'<label class="radio-opt-sm'+(aa.welcomeEnabled!=='yes'?' sel':'')+'" id="aa-welcome-no-opt_'+aa.id+'"><input type="radio" name="aaWelcomeYN_'+aa.id+'" '+(aa.welcomeEnabled!=='yes'?'checked':'')+' onchange="onAAWelcomeRadio('+aa.id+',\'no\')"><i class="ti ti-x"></i>No</label>'
+    +'</div>'
+    +'<div id="aaWelcomeWrap_'+aa.id+'" style="display:'+(aa.welcomeEnabled==='yes'?'block':'none')+';margin-top:8px">'
+      +'<textarea id="aaWelcomeMsg_'+aa.id+'" placeholder="e.g. Thank you for calling Acme Ltd. Your call is important to us..." oninput="onAAField('+aa.id+',\'welcomeMsg\',this.value)">'+esc(aa.welcomeMsg)+'</textarea>'
+    +'</div>'
+
+    +'<hr>'
+    +'<label style="margin-top:0">Closed / out-of-hours message?</label>'
+    +'<p style="font-size:12px;color:var(--muted);margin-top:-2px;margin-bottom:0">Played when callers ring outside the hours above</p>'
+    +'<div class="radio-group-sm">'
+      +'<label class="radio-opt-sm'+(aa.closedEnabled==='yes'?' sel':'')+'" id="aa-closed-yes-opt_'+aa.id+'"><input type="radio" name="aaClosedYN_'+aa.id+'" '+(aa.closedEnabled==='yes'?'checked':'')+' onchange="onAAClosedRadio('+aa.id+',\'yes\')"><i class="ti ti-check"></i>Yes</label>'
+      +'<label class="radio-opt-sm'+(aa.closedEnabled!=='yes'?' sel':'')+'" id="aa-closed-no-opt_'+aa.id+'"><input type="radio" name="aaClosedYN_'+aa.id+'" '+(aa.closedEnabled!=='yes'?'checked':'')+' onchange="onAAClosedRadio('+aa.id+',\'no\')"><i class="ti ti-x"></i>No</label>'
+    +'</div>'
+    +'<div id="aaClosedWrap_'+aa.id+'" style="display:'+(aa.closedEnabled==='yes'?'block':'none')+';margin-top:8px">'
+      +'<textarea id="aaClosedMsg_'+aa.id+'" placeholder="e.g. Thank you for calling Acme Ltd. Our office is currently closed..." oninput="onAAField('+aa.id+',\'closedMsg\',this.value)">'+esc(aa.closedMsg)+'</textarea>'
+    +'</div>'
+    +'<div style="margin-top:12px">'
+      +'<label style="margin-top:0">Route closed / out-of-hours calls differently?</label>'
+      +'<p style="font-size:12px;color:var(--muted);margin-top:-2px;margin-bottom:0">By default, out-of-hours calls follow the same routing as during open hours (below). Turn this on to send them somewhere different — e.g. straight to voicemail.</p>'
+      +'<div class="radio-group-sm">'
+        +'<label class="radio-opt-sm'+(aa.closedRouteEnabled==='yes'?' sel':'')+'" id="aa-closedroute-yes-opt_'+aa.id+'"><input type="radio" name="aaClosedRouteYN_'+aa.id+'" '+(aa.closedRouteEnabled==='yes'?'checked':'')+' onchange="onAAClosedRouteRadio('+aa.id+',\'yes\')"><i class="ti ti-check"></i>Yes</label>'
+        +'<label class="radio-opt-sm'+(aa.closedRouteEnabled!=='yes'?' sel':'')+'" id="aa-closedroute-no-opt_'+aa.id+'"><input type="radio" name="aaClosedRouteYN_'+aa.id+'" '+(aa.closedRouteEnabled!=='yes'?'checked':'')+' onchange="onAAClosedRouteRadio('+aa.id+',\'no\')"><i class="ti ti-x"></i>No</label>'
+      +'</div>'
+      +'<div id="aaClosedRouteDetail_'+aa.id+'" style="display:'+(aa.closedRouteEnabled==='yes'?'block':'none')+';margin-top:12px">'
+        +'<div class="radio-group">'
+          +'<label class="radio-opt'+(aa.closedRouteType==='single'?' sel':'')+'" id="aa-closedroute-single-opt_'+aa.id+'"><input type="radio" name="aaClosedRouteType_'+aa.id+'" '+(aa.closedRouteType==='single'?'checked':'')+' onchange="onAAClosedRouteTypeRadio('+aa.id+',\'single\')"><i class="ti ti-arrow-right"></i>Single destination</label>'
+          +'<label class="radio-opt'+(aa.closedRouteType==='multiple'?' sel':'')+'" id="aa-closedroute-multi-opt_'+aa.id+'"><input type="radio" name="aaClosedRouteType_'+aa.id+'" '+(aa.closedRouteType==='multiple'?'checked':'')+' onchange="onAAClosedRouteTypeRadio('+aa.id+',\'multiple\')"><i class="ti ti-dialpad"></i>Multiple options (key presses)</label>'
+        +'</div>'
+        +'<div id="aaClosedSingleWrap_'+aa.id+'" style="display:'+(aa.closedRouteType==='single'?'block':'none')+';margin-top:12px">'
+          +'<label for="aaClosedSingleDest_'+aa.id+'" style="margin-top:0">Destination</label>'
+          +'<select id="aaClosedSingleDest_'+aa.id+'" style="max-width:340px" onchange="onAAClosedSingleDestSelect('+aa.id+',this.value)">'+buildDestinationOptions(aa.closedSingleDestination)+'</select>'
+          +'<div id="aaClosedSingleDestOtherWrap_'+aa.id+'" style="display:'+(aa.closedSingleDestination==='other'?'block':'none')+';margin-top:8px">'
+            +'<input type="text" id="aaClosedSingleDestOther_'+aa.id+'" placeholder="e.g. External transfer number, voicemail box..." style="max-width:340px" value="'+esc(aa.closedSingleDestinationOther)+'" oninput="onAAField('+aa.id+',\'closedSingleDestinationOther\',this.value)">'
+          +'</div>'
+        +'</div>'
+        +'<div id="aaClosedMultiWrap_'+aa.id+'" style="display:'+(aa.closedRouteType==='multiple'?'block':'none')+';margin-top:12px">'
+          +'<p style="font-size:12px;color:var(--muted);margin-bottom:8px">e.g. Key 1 → Voicemail, Key 2 → On-call mobile</p>'
+          +'<div id="aaClosedOptionsContainer_'+aa.id+'"></div>'
+          +'<button class="add-btn" onclick="addAAClosedOption('+aa.id+')"><i class="ti ti-plus"></i>Add option</button>'
+        +'</div>'
+      +'</div>'
+    +'</div>'
+
+    +'<hr>'
+    +'<div class="card-title" style="font-size:15px;margin-bottom:4px"><i class="ti ti-route"></i>Routing</div>'
+    +'<div class="card-sub" style="margin-bottom:6px">Where should this auto attendant send callers? Pick from the users, ring groups and call queues you\'ve already set up.</div>'
+    +'<div class="radio-group">'
+      +'<label class="radio-opt'+(aa.routeType==='single'?' sel':'')+'" id="aa-route-single-opt_'+aa.id+'"><input type="radio" name="aaRouteType_'+aa.id+'" '+(aa.routeType==='single'?'checked':'')+' onchange="onAARouteRadio('+aa.id+',\'single\')"><i class="ti ti-arrow-right"></i>Single destination</label>'
+      +'<label class="radio-opt'+(aa.routeType==='multiple'?' sel':'')+'" id="aa-route-multi-opt_'+aa.id+'"><input type="radio" name="aaRouteType_'+aa.id+'" '+(aa.routeType==='multiple'?'checked':'')+' onchange="onAARouteRadio('+aa.id+',\'multiple\')"><i class="ti ti-dialpad"></i>Multiple options (key presses)</label>'
+    +'</div>'
+    +'<div id="aaSingleWrap_'+aa.id+'" style="display:'+(aa.routeType==='single'?'block':'none')+';margin-top:12px">'
+      +'<label for="aaSingleDest_'+aa.id+'" style="margin-top:0">Destination</label>'
+      +'<select id="aaSingleDest_'+aa.id+'" style="max-width:340px" onchange="onAASingleDestSelect('+aa.id+',this.value)">'+destOptionsSingle+'</select>'
+      +'<div id="aaSingleDestOtherWrap_'+aa.id+'" style="display:'+(aa.singleDestination==='other'?'block':'none')+';margin-top:8px">'
+        +'<input type="text" id="aaSingleDestOther_'+aa.id+'" placeholder="e.g. External transfer number, voicemail box..." style="max-width:340px" value="'+esc(aa.singleDestinationOther)+'" oninput="onAAField('+aa.id+',\'singleDestinationOther\',this.value)">'
+      +'</div>'
+    +'</div>'
+    +'<div id="aaMultiWrap_'+aa.id+'" style="display:'+(aa.routeType==='multiple'?'block':'none')+';margin-top:12px">'
+      +'<p style="font-size:12px;color:var(--muted);margin-bottom:8px">e.g. Key 1 → Support ring group, Key 2 → Sales ring group</p>'
+      +'<div id="aaOptionsContainer_'+aa.id+'"></div>'
+      +'<button class="add-btn" onclick="addAAOption('+aa.id+')"><i class="ti ti-plus"></i>Add option</button>'
+    +'</div>'
+  +'</div>';
+}
+function renderAAs(){
+  var c=document.getElementById('aaContainer');
+  if(!aas.length){c.innerHTML='<p style="font-size:13px;color:var(--muted)">No auto attendants added yet.</p>';return;}
+  c.innerHTML=aas.map(buildAABlockHTML).join('');
+  aas.forEach(function(aa){renderAAOptionsFor(aa.id);renderAAClosedOptionsFor(aa.id);});
+}
+
+function resolveDestLabel(val,otherVal,d){
+  if(!val)return 'Not specified';
+  if(val==='voicemail')return 'Voicemail';
+  if(val==='other')return otherVal?otherVal:'Other (not specified)';
+  var parts=val.split(':'),kind=parts[0],id=Number(parts[1]);
+  if(kind==='user'){var u=(d.users||[]).find(function(u){return u.id===id;});return u?('User: '+getUserLabel(u)+(u.ext?' (ext '+u.ext+')':'')):'Unknown user';}
+  if(kind==='rg'){var rg=(d.rgs||[]).find(function(r){return r.id===id;});return rg?('Ring group: '+(rg.name||'Unnamed')):'Unknown ring group';}
+  if(kind==='cq'){var cq=(d.cqs||[]).find(function(c){return c.id===id;});return cq?('Call queue: '+(cq.name||'Unnamed')):'Unknown call queue';}
+  return val;
+}
+function resolveAANumberLabel(aa){
+  if(!aa.number)return 'Not specified';
+  if(aa.number==='other')return aa.numberOther?('New number — area code '+aa.numberOther):'New number (area code not specified)';
+  return aa.number;
+}
+
+function getUserLabel(u){return((u.fn||'').trim()+' '+(u.ln||'').trim()).trim()||'Unnamed user';}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+const PHONE_MODELS=[
+  {v:'poly-edge-e100',l:'Poly Edge E100',g:'Poly / Polycom'},
+  {v:'poly-edge-e220',l:'Poly Edge E220',g:'Poly / Polycom'},
+  {v:'poly-edge-e300',l:'Poly Edge E300',g:'Poly / Polycom'},
+  {v:'poly-edge-e320',l:'Poly Edge E320',g:'Poly / Polycom'},
+  {v:'poly-edge-e350',l:'Poly Edge E350',g:'Poly / Polycom'},
+  {v:'poly-edge-e400',l:'Poly Edge E400',g:'Poly / Polycom'},
+  {v:'poly-edge-e450',l:'Poly Edge E450',g:'Poly / Polycom'},
+  {v:'poly-edge-e500',l:'Poly Edge E500',g:'Poly / Polycom'},
+  {v:'poly-edge-e550',l:'Poly Edge E550',g:'Poly / Polycom'},
+  {v:'polycom-ccx700',l:'Polycom CCX 700',g:'Poly / Polycom'},
+  {v:'polycom-ip6000',l:'Polycom IP 6000 Conference Speakerphone',g:'Poly / Polycom'},
+  {v:'polycom-trio8800',l:'Polycom RealPresence Trio 8800 Conference Phone',g:'Poly / Polycom'},
+  {v:'polycom-rove30',l:'Polycom Rove 30 DECT Handset',g:'Poly / Polycom'},
+  {v:'yealink-t33g',l:'Yealink T33G',g:'Yealink'},
+  {v:'yealink-t42u',l:'Yealink T42U',g:'Yealink'},
+  {v:'yealink-t43u',l:'Yealink T43U',g:'Yealink'},
+  {v:'yealink-t46u',l:'Yealink T46U',g:'Yealink'},
+  {v:'yealink-t48u',l:'Yealink T48U',g:'Yealink'},
+  {v:'yealink-t53',l:'Yealink T53',g:'Yealink'},
+  {v:'yealink-t53w',l:'Yealink T53W',g:'Yealink'},
+  {v:'yealink-t54w',l:'Yealink T54W',g:'Yealink'},
+  {v:'yealink-t57w',l:'Yealink T57W',g:'Yealink'},
+  {v:'yealink-t58w',l:'Yealink T58W',g:'Yealink'},
+  {v:'yealink-t58w-pro',l:'Yealink T58W Pro Media',g:'Yealink'},
+  {v:'yealink-w56h',l:'Yealink W56H DECT Handset',g:'Yealink'},
+  {v:'yealink-w59r',l:'Yealink W59R Rugged DECT Handset',g:'Yealink'},
+  {v:'yealink-w76p',l:'Yealink W76P DECT System (Base + W56H Handset)',g:'Yealink'},
+  {v:'yealink-w77p',l:'Yealink W77P DECT System (Base + Handset)',g:'Yealink'},
+  {v:'yealink-w79p',l:'Yealink W79P DECT System (Base + W59R Handset)',g:'Yealink'},
+  {v:'grandstream-gxv3370',l:'Grandstream GXV3370',g:'Grandstream'},
+  {v:'grandstream-gxv3380',l:'Grandstream GXV3380',g:'Grandstream'},
+  {v:'grandstream-wp820',l:'Grandstream WP820',g:'Grandstream'},
+  {v:'other',l:'Other (please specify)',g:''}
+];
+function phoneModelLabel(v){var m=PHONE_MODELS.find(function(x){return x.v===v;});return m?m.l:'';}
+function buildPhoneModelOptions(selected){
+  var groups={};var order=[];
+  PHONE_MODELS.forEach(function(m){
+    var g=m.g||'';
+    if(!(g in groups)){groups[g]=[];order.push(g);}
+    groups[g].push(m);
+  });
+  var html='<option value="">Select a model...</option>';
+  order.forEach(function(g){
+    if(!g){return;}
+    html+='<optgroup label="'+esc(g)+'">'+groups[g].map(function(m){return '<option value="'+m.v+'" '+(selected===m.v?'selected':'')+'>'+m.l+'</option>';}).join('')+'</optgroup>';
+  });
+  (groups['']||[]).forEach(function(m){html+='<option value="'+m.v+'" '+(selected===m.v?'selected':'')+'>'+m.l+'</option>';});
+  return html;
+}
+
+function blankBlfKeys(){return[{label:'',ext:''},{label:'',ext:''},{label:'',ext:''},{label:'',ext:''}];}
+function addUser(){var id=nextUserId++;users.push({id:id,fn:'',ln:'',em:'',ext:'',deskphone:'no',phoneModel:'',phoneModelOther:'',blf:'no',blfKeyList:[]});renderUsers();}
+function removeUser(id){saveUserInputs();users=users.filter(function(u){return u.id!==id;});rgs.forEach(function(rg){rg.members=(rg.members||[]).filter(function(m){return m!==id;});});cqs.forEach(function(cq){cq.primaryMembers=(cq.primaryMembers||[]).filter(function(m){return m!==id;});cq.secondaryMembers=(cq.secondaryMembers||[]).filter(function(m){return m!==id;});});renderUsers();renderRGs();renderCQs();}
+function saveUserInputs(){users.forEach(function(u){
+  var fn=document.getElementById('ufn_'+u.id),ln=document.getElementById('uln_'+u.id),em=document.getElementById('uem_'+u.id),ext=document.getElementById('uext_'+u.id);
+  if(fn)u.fn=fn.value;if(ln)u.ln=ln.value;if(em)u.em=em.value;if(ext)u.ext=ext.value;
+  var pmo=document.getElementById('upmo_'+u.id);if(pmo)u.phoneModelOther=pmo.value;
+  (u.blfKeyList||[]).forEach(function(k,idx){
+    var lb=document.getElementById('ublfl_'+u.id+'_'+idx),ex=document.getElementById('ublfe_'+u.id+'_'+idx);
+    if(lb)k.label=lb.value;if(ex)k.ext=ex.value;
+  });
+});}
+function onUserInput(id,field,val){var u=users.find(function(u){return u.id===id;});if(u)u[field]=val;refreshChips();refreshCQChips();}
+function onUserRadio(id,field,val){
+  var u=users.find(function(u){return u.id===id;});if(!u)return;u[field]=val;
+  if(field==='deskphone'){
+    document.getElementById('dp-yes-'+id).classList.toggle('sel',val==='yes');
+    document.getElementById('dp-no-'+id).classList.toggle('sel',val!=='yes');
+    document.getElementById('dpWrap_'+id).style.display=val==='yes'?'block':'none';
+  }else if(field==='blf'){
+    document.getElementById('blf-yes-'+id).classList.toggle('sel',val==='yes');
+    document.getElementById('blf-no-'+id).classList.toggle('sel',val!=='yes');
+    document.getElementById('blfWrap_'+id).style.display=val==='yes'?'block':'none';
+    if(val==='yes'&&(!u.blfKeyList||!u.blfKeyList.length)){u.blfKeyList=blankBlfKeys();renderBlfKeys(id);}
+  }
+}
+function onUserModelSelect(id,val){
+  var u=users.find(function(u){return u.id===id;});if(!u)return;u.phoneModel=val;if(val!=='other')u.phoneModelOther='';
+  var w=document.getElementById('otherModelWrap_'+id);if(w){w.style.display=val==='other'?'block':'none';var inp=document.getElementById('upmo_'+id);if(inp)inp.value=u.phoneModelOther;}
+}
+function buildBlfKeysHTML(u){
+  if(!u.blfKeyList||!u.blfKeyList.length)return '<p style="font-size:12px;color:var(--muted)">No keys added yet.</p>';
+  return u.blfKeyList.map(function(k,idx){
+    return '<div class="blf-key-row" style="display:flex;gap:8px;align-items:flex-end;margin-bottom:8px">'
+      +'<div style="flex:0 0 52px"><label style="margin-top:0">Key</label><div style="padding:9px 0 8px;font-size:13px;color:var(--text);font-weight:700">#'+(idx+1)+'</div></div>'
+      +'<div style="flex:1"><label style="margin-top:0">Label</label><input type="text" id="ublfl_'+u.id+'_'+idx+'" placeholder="e.g. Sarah Jones" value="'+esc(k.label)+'" oninput="onBlfKeyInput('+u.id+','+idx+',\'label\',this.value)"></div>'
+      +'<div style="flex:1"><label style="margin-top:0">Extension</label><input type="text" id="ublfe_'+u.id+'_'+idx+'" placeholder="e.g. 1002" value="'+esc(k.ext)+'" oninput="onBlfKeyInput('+u.id+','+idx+',\'ext\',this.value)"></div>'
+      +'<button class="rm-btn ti ti-trash" aria-label="Remove key" style="margin-bottom:1px" onclick="removeBlfKey('+u.id+','+idx+')"></button>'
+    +'</div>';
+  }).join('');
+}
+function onBlfKeyInput(userId,idx,field,val){var u=users.find(function(u){return u.id===userId;});if(!u||!u.blfKeyList||!u.blfKeyList[idx])return;u.blfKeyList[idx][field]=val;}
+function addBlfKey(userId){var u=users.find(function(u){return u.id===userId;});if(!u)return;u.blfKeyList=u.blfKeyList||[];u.blfKeyList.push({label:'',ext:''});renderBlfKeys(userId);}
+function removeBlfKey(userId,idx){var u=users.find(function(u){return u.id===userId;});if(!u||!u.blfKeyList)return;u.blfKeyList.splice(idx,1);renderBlfKeys(userId);}
+function renderBlfKeys(userId){var u=users.find(function(u){return u.id===userId;});if(!u)return;var c=document.getElementById('blfKeysList_'+userId);if(c)c.innerHTML=buildBlfKeysHTML(u);}
+function renderUsers(){
+  var c=document.getElementById('usersContainer');
+  if(!users.length){c.innerHTML='<p style="font-size:13px;color:var(--muted)">No users added yet.</p>';return;}
+  c.innerHTML='';
+  users.forEach(function(u){
+    var row=document.createElement('div');row.className='user-block';
+    var modelOpts=buildPhoneModelOptions(u.phoneModel);
+    row.innerHTML=
+      '<div class="user-top-row">'
+        +'<div><label>First name</label><input type="text" id="ufn_'+u.id+'" placeholder="Jane" value="'+esc(u.fn)+'" oninput="onUserInput('+u.id+',\'fn\',this.value)"></div>'
+        +'<div><label>Last name</label><input type="text" id="uln_'+u.id+'" placeholder="Smith" value="'+esc(u.ln)+'" oninput="onUserInput('+u.id+',\'ln\',this.value)"></div>'
+        +'<div style="flex:0 0 140px"><label>Preferred ext.</label><input type="text" id="uext_'+u.id+'" placeholder="e.g. 1001" value="'+esc(u.ext)+'" oninput="onUserInput('+u.id+',\'ext\',this.value)"></div>'
+        +'<div style="flex:1.3"><label>Email address</label><input type="email" id="uem_'+u.id+'" placeholder="jane@acme.com" value="'+esc(u.em)+'" oninput="onUserInput('+u.id+',\'em\',this.value)"></div>'
+        +'<button class="rm-btn ti ti-trash" aria-label="Remove user" onclick="removeUser('+u.id+')"></button>'
+      +'</div>'
+      +'<div class="user-phone-section">'
+        +'<span class="uq-label">Deskphone required?</span>'
+        +'<div class="radio-group-sm">'
+          +'<label class="radio-opt-sm'+(u.deskphone==='yes'?' sel':'')+'" id="dp-yes-'+u.id+'"><input type="radio" name="dp_'+u.id+'" '+(u.deskphone==='yes'?'checked':'')+' onchange="onUserRadio('+u.id+',\'deskphone\',\'yes\')"><i class="ti ti-check"></i>Yes</label>'
+          +'<label class="radio-opt-sm'+(u.deskphone!=='yes'?' sel':'')+'" id="dp-no-'+u.id+'"><input type="radio" name="dp_'+u.id+'" '+(u.deskphone!=='yes'?'checked':'')+' onchange="onUserRadio('+u.id+',\'deskphone\',\'no\')"><i class="ti ti-x"></i>No — softphone/app only</label>'
+        +'</div>'
+        +'<div id="dpWrap_'+u.id+'" style="display:'+(u.deskphone==='yes'?'block':'none')+';margin-top:10px">'
+          +'<label style="margin-top:0" for="upm_'+u.id+'">Deskphone model</label>'
+          +'<select id="upm_'+u.id+'" style="max-width:320px" onchange="onUserModelSelect('+u.id+',this.value)">'+modelOpts+'</select>'
+          +'<div id="otherModelWrap_'+u.id+'" style="display:'+(u.phoneModel==='other'?'block':'none')+';margin-top:8px">'
+            +'<label style="margin-top:0" for="upmo_'+u.id+'">Please specify model</label>'
+            +'<input type="text" id="upmo_'+u.id+'" placeholder="e.g. Yealink T46U" value="'+esc(u.phoneModelOther)+'" oninput="onUserInput('+u.id+',\'phoneModelOther\',this.value)" style="max-width:280px">'
+          +'</div>'
+        +'</div>'
+        +'<div style="margin-top:14px">'
+          +'<span class="uq-label">Configure BLF keys?</span>'
+          +'<p style="font-size:12px;color:var(--muted);margin:4px 0 0">Busy Lamp Field keys let this user see &amp; one-touch dial colleagues or ring groups.</p>'
+          +'<div class="radio-group-sm">'
+            +'<label class="radio-opt-sm'+(u.blf==='yes'?' sel':'')+'" id="blf-yes-'+u.id+'"><input type="radio" name="blf_'+u.id+'" '+(u.blf==='yes'?'checked':'')+' onchange="onUserRadio('+u.id+',\'blf\',\'yes\')"><i class="ti ti-check"></i>Yes</label>'
+            +'<label class="radio-opt-sm'+(u.blf!=='yes'?' sel':'')+'" id="blf-no-'+u.id+'"><input type="radio" name="blf_'+u.id+'" '+(u.blf!=='yes'?'checked':'')+' onchange="onUserRadio('+u.id+',\'blf\',\'no\')"><i class="ti ti-x"></i>No</label>'
+          +'</div>'
+          +'<div id="blfWrap_'+u.id+'" style="display:'+(u.blf==='yes'?'block':'none')+';margin-top:10px">'
+            +'<label style="margin-top:0">Key assignments</label>'
+            +'<div id="blfKeysList_'+u.id+'">'+buildBlfKeysHTML(u)+'</div>'
+            +'<button type="button" class="add-btn" style="font-size:12px;padding:6px 12px" onclick="addBlfKey('+u.id+')"><i class="ti ti-plus"></i>Add another key</button>'
+          +'</div>'
+        +'</div>'
+      +'</div>';
+    c.appendChild(row);
+  });
+}
+
+function refreshChips(){rgs.forEach(function(rg){var w=document.getElementById('chips_'+rg.id);if(w)w.innerHTML=buildChipsHTML(rg);});}
+function buildChipsHTML(rg){
+  if(!users.length)return '<span style="font-size:12px;color:var(--muted)">Add users first in the previous step</span>';
+  return users.map(function(u){var on=(rg.members||[]).includes(u.id);return '<button class="chip'+(on?' on':'')+'" onclick="toggleMember('+rg.id+','+u.id+')">'+esc(getUserLabel(u))+'</button>';}).join('');
+}
+function addRingGroup(){var id=nextRgId++;rgs.push({id:id,name:'',strategy:'simultaneous',members:[],ringTimeout:'',fwInternetDown:'voicemail',fwInternetDownOther:'',fwAllBusy:'voicemail',fwAllBusyOther:'',fwNoAnswer:'voicemail',fwNoAnswerOther:''});renderRGs();renderCQs();}
+function removeRG(id){saveRGInputs();rgs=rgs.filter(function(r){return r.id!==id;});renderRGs();renderCQs();}
+function saveRGInputs(){rgs.forEach(function(rg){var n=document.getElementById('rgn_'+rg.id),s=document.getElementById('rgs_'+rg.id);if(n)rg.name=n.value;if(s)rg.strategy=s.value;});}
+function onRGName(id,val){var rg=rgs.find(function(r){return r.id===id;});if(rg)rg.name=val;}
+function onRGStrat(id,val){var rg=rgs.find(function(r){return r.id===id;});if(rg)rg.strategy=val;}
+function onRGTimeout(id,val){
+  var rg=rgs.find(function(r){return r.id===id;});if(!rg)return;
+  var n=parseInt(val,10);
+  if(!isNaN(n)&&n>180){n=180;val='180';var el=document.getElementById('rgtimeout_'+id);if(el)el.value=val;}
+  rg.ringTimeout=val;
+}
+function toggleMember(rgId,userId){var rg=rgs.find(function(r){return r.id===rgId;});if(!rg)return;rg.members=rg.members||[];var idx=rg.members.indexOf(userId);if(idx===-1)rg.members.push(userId);else rg.members.splice(idx,1);refreshChips();}
+function renderRGs(){
+  var c=document.getElementById('rgContainer');
+  if(!rgs.length){c.innerHTML='<p style="font-size:13px;color:var(--muted)">No ring groups added yet.</p>';return;}
+  c.innerHTML='';
+  rgs.forEach(function(rg){
+    var div=document.createElement('div');div.className='rg-block';
+    div.innerHTML='<div class="rg-header"><input type="text" class="rg-name-input" id="rgn_'+rg.id+'" placeholder="Ring group name (e.g. Sales team)" value="'+esc(rg.name)+'" oninput="onRGName('+rg.id+',this.value)"><button class="rm-btn ti ti-trash" aria-label="Remove ring group" onclick="removeRG('+rg.id+')"></button></div><label style="margin-top:0;margin-bottom:4px">Ring strategy</label><select id="rgs_'+rg.id+'" style="width:auto;margin-bottom:12px" onchange="onRGStrat('+rg.id+',this.value)"><option value="simultaneous" '+(rg.strategy==='simultaneous'?'selected':'')+'>Simultaneous — all ring at once</option><option value="sequential" '+(rg.strategy==='sequential'?'selected':'')+'>Sequential — ring one by one</option><option value="round-robin" '+(rg.strategy==='round-robin'?'selected':'')+'>Round robin — rotate through members</option></select><label style="margin-top:0;margin-bottom:4px">Members <span style="font-weight:400;color:var(--muted)">(tap to select)</span></label><div class="chips" id="chips_'+rg.id+'">'+buildChipsHTML(rg)+'</div>'
+    +'<hr>'
+    +'<div class="uq-label" style="display:block;margin-bottom:2px">Call forwarding rules</div>'
+    +'<p style="font-size:12px;color:var(--muted);margin:4px 0 12px">Tell us where calls should go in these scenarios. Defaults to voicemail if left unchanged.</p>'
+    +buildFwRuleHTML('rg',rg.id,'fwInternetDown','If internet connection is down, forward calls to:',null,rg.fwInternetDown,rg.fwInternetDownOther)
+    +buildFwRuleHTML('rg',rg.id,'fwAllBusy','If all members are busy, route calls to:',null,rg.fwAllBusy,rg.fwAllBusyOther)
+    +buildFwRuleHTML('rg',rg.id,'fwNoAnswer','If no one in the group answers, forward calls to:',null,rg.fwNoAnswer,rg.fwNoAnswerOther)
+    +'<div style="margin-top:4px">'
+      +'<label style="margin-top:0" for="rgtimeout_'+rg.id+'">How long to offer calls to members (seconds)</label>'
+      +'<input type="number" min="0" max="180" id="rgtimeout_'+rg.id+'" placeholder="e.g. 30" value="'+esc(rg.ringTimeout)+'" oninput="onRGTimeout('+rg.id+',this.value)" style="max-width:140px">'
+      +'<p style="font-size:12px;color:var(--muted);margin-top:4px">Maximum is 180 seconds</p>'
+    +'</div>';
+    c.appendChild(div);
+  });
+}
+
+/* ── Call queues ── */
+function addCallQueue(){
+  var id=nextCqId++;
+  cqs.push({id:id,name:'',maxCalls:'',wrapUpTime:'',delayNotAnswer:'',totalAlertTime:'',allowLogin:'no',repeatInterval:'',customGreeting:'no',customGreetingText:'',moh:'no',mohText:'',repeatingMsg:'no',repeatingMsgText:'',primaryMembers:[],secondaryMembers:[],fwInternetDown:'voicemail',fwInternetDownOther:'',fwQueueFull:'voicemail',fwQueueFullOther:'',fwAllAgentsOut:'voicemail',fwAllAgentsOutOther:''});
+  renderCQs();renderRGs();
+}
+function removeCQ(id){saveCQInputs();cqs=cqs.filter(function(c){return c.id!==id;});renderCQs();renderRGs();}
+function saveCQInputs(){
+  var fieldMap={name:'cqn_',maxCalls:'cqmax_',wrapUpTime:'cqwrap_',delayNotAnswer:'cqdelay_',totalAlertTime:'cqalert_',repeatInterval:'cqrepeat_'};
+  cqs.forEach(function(cq){
+    Object.keys(fieldMap).forEach(function(f){var el=document.getElementById(fieldMap[f]+cq.id);if(el)cq[f]=el.value;});
+    ['customGreetingText','mohText','repeatingMsgText'].forEach(function(f){var el=document.getElementById('cq'+f+'_'+cq.id);if(el)cq[f]=el.value;});
+  });
+}
+function onCQInput(id,field,val){var cq=cqs.find(function(c){return c.id===id;});if(cq)cq[field]=val;}
+function onCQRadio(id,field,val){
+  var cq=cqs.find(function(c){return c.id===id;});if(!cq)return;cq[field]=val;
+  var yesEl=document.getElementById('cq-'+field+'-yes-'+id),noEl=document.getElementById('cq-'+field+'-no-'+id);
+  if(yesEl)yesEl.classList.toggle('sel',val==='yes');
+  if(noEl)noEl.classList.toggle('sel',val!=='yes');
+  var wrap=document.getElementById('cq-'+field+'-wrap-'+id);
+  if(wrap)wrap.style.display=val==='yes'?'block':'none';
+}
+function toggleCQMember(cqId,userId,role){
+  var cq=cqs.find(function(c){return c.id===cqId;});if(!cq)return;
+  cq[role]=cq[role]||[];var idx=cq[role].indexOf(userId);
+  if(idx===-1)cq[role].push(userId);else cq[role].splice(idx,1);
+  refreshCQChips();
+}
+function refreshCQChips(){cqs.forEach(function(cq){
+  var p=document.getElementById('cqpri_'+cq.id);if(p)p.innerHTML=buildCQChipsHTML(cq,'primaryMembers');
+  var s=document.getElementById('cqsec_'+cq.id);if(s)s.innerHTML=buildCQChipsHTML(cq,'secondaryMembers');
+});}
+function buildCQChipsHTML(cq,role){
+  if(!users.length)return '<span style="font-size:12px;color:var(--muted)">Add users first in the Users step</span>';
+  return users.map(function(u){var on=(cq[role]||[]).includes(u.id);return '<button class="chip'+(on?' on':'')+'" onclick="toggleCQMember('+cq.id+','+u.id+',\''+role+'\')">'+esc(getUserLabel(u))+'</button>';}).join('');
+}
+function cqYesNoRow(cq,field,label,hint,placeholder){
+  var val=cq[field],textField=field+'Text';
+  return '<div style="margin-bottom:12px">'
+    +'<span class="uq-label">'+label+'</span>'
+    +(hint?('<p style="font-size:12px;color:var(--muted);margin:4px 0 6px">'+hint+'</p>'):'')
+    +'<div class="radio-group-sm">'
+      +'<label class="radio-opt-sm'+(val==='yes'?' sel':'')+'" id="cq-'+field+'-yes-'+cq.id+'"><input type="radio" name="cq'+field+'_'+cq.id+'" '+(val==='yes'?'checked':'')+' onchange="onCQRadio('+cq.id+',\''+field+'\',\'yes\')"><i class="ti ti-check"></i>Yes</label>'
+      +'<label class="radio-opt-sm'+(val!=='yes'?' sel':'')+'" id="cq-'+field+'-no-'+cq.id+'"><input type="radio" name="cq'+field+'_'+cq.id+'" '+(val!=='yes'?'checked':'')+' onchange="onCQRadio('+cq.id+',\''+field+'\',\'no\')"><i class="ti ti-x"></i>No</label>'
+    +'</div>'
+    +'<div id="cq-'+field+'-wrap-'+cq.id+'" style="display:'+(val==='yes'?'block':'none')+';margin-top:8px">'
+      +'<textarea id="cq'+textField+'_'+cq.id+'" placeholder="'+placeholder+'" style="min-height:60px" oninput="onCQInput('+cq.id+',\''+textField+'\',this.value)">'+esc(cq[textField])+'</textarea>'
+    +'</div>'
+  +'</div>';
+}
+function renderCQs(){
+  var c=document.getElementById('cqContainer');
+  if(!cqs.length){c.innerHTML='<p style="font-size:13px;color:var(--muted)">No call queues added yet.</p>';return;}
+  c.innerHTML='';
+  cqs.forEach(function(cq){
+    var div=document.createElement('div');div.className='rg-block';
+    div.innerHTML=
+      '<div class="rg-header"><input type="text" class="rg-name-input" id="cqn_'+cq.id+'" placeholder="Queue name (e.g. Support queue)" value="'+esc(cq.name)+'" oninput="onCQInput('+cq.id+',\'name\',this.value)"><button class="rm-btn ti ti-trash" aria-label="Remove call queue" onclick="removeCQ('+cq.id+')"></button></div>'
+      +'<div class="cq-grid">'
+        +'<div><label>Maximum calls in queue</label><input type="number" min="0" id="cqmax_'+cq.id+'" placeholder="e.g. 20" value="'+esc(cq.maxCalls)+'" oninput="onCQInput('+cq.id+',\'maxCalls\',this.value)"></div>'
+        +'<div><label>Wrap-up time (seconds)</label><input type="number" min="0" id="cqwrap_'+cq.id+'" placeholder="e.g. 15" value="'+esc(cq.wrapUpTime)+'" oninput="onCQInput('+cq.id+',\'wrapUpTime\',this.value)"></div>'
+        +'<div><label>Delay after not answering (seconds)</label><input type="number" min="0" id="cqdelay_'+cq.id+'" placeholder="e.g. 10" value="'+esc(cq.delayNotAnswer)+'" oninput="onCQInput('+cq.id+',\'delayNotAnswer\',this.value)"></div>'
+        +'<div><label>Total time to alert a member (seconds)</label><input type="number" min="0" id="cqalert_'+cq.id+'" placeholder="e.g. 20" value="'+esc(cq.totalAlertTime)+'" oninput="onCQInput('+cq.id+',\'totalAlertTime\',this.value)"></div>'
+      +'</div>'
+      +'<div style="margin-bottom:14px">'
+        +'<span class="uq-label">Allow agents to log in/out of this queue?</span>'
+        +'<div class="radio-group-sm" style="margin-top:6px">'
+          +'<label class="radio-opt-sm'+(cq.allowLogin==='yes'?' sel':'')+'" id="cq-allowLogin-yes-'+cq.id+'"><input type="radio" name="cqallowLogin_'+cq.id+'" '+(cq.allowLogin==='yes'?'checked':'')+' onchange="onCQRadio('+cq.id+',\'allowLogin\',\'yes\')"><i class="ti ti-check"></i>Yes</label>'
+          +'<label class="radio-opt-sm'+(cq.allowLogin!=='yes'?' sel':'')+'" id="cq-allowLogin-no-'+cq.id+'"><input type="radio" name="cqallowLogin_'+cq.id+'" '+(cq.allowLogin!=='yes'?'checked':'')+' onchange="onCQRadio('+cq.id+',\'allowLogin\',\'no\')"><i class="ti ti-x"></i>No</label>'
+        +'</div>'
+      +'</div>'
+      +'<div style="margin-bottom:4px">'
+        +'<label style="margin-top:0" for="cqrepeat_'+cq.id+'">Repeat queue message interval (seconds)</label>'
+        +'<input type="number" min="5" max="45" id="cqrepeat_'+cq.id+'" placeholder="e.g. 30" value="'+esc(cq.repeatInterval)+'" oninput="onCQInput('+cq.id+',\'repeatInterval\',this.value)" style="max-width:140px">'
+        +'<p style="font-size:12px;color:var(--muted);margin-top:4px">Maximum is 45 seconds</p>'
+      +'</div>'
+      +'<div class="cq-ivr-block">'
+        +'<span class="uq-label">IVR message</span>'
+        +'<p style="font-size:12px;color:var(--muted);margin:4px 0 10px">Let us know which of these you would like a custom recording for</p>'
+        +cqYesNoRow(cq,'customGreeting','Custom initial queue greeting?',null,'e.g. Thank you for calling Acme Ltd, please hold and your call will be answered shortly')
+        +cqYesNoRow(cq,'moh','Custom music-on-hold?',null,'e.g. Provide the name/link of your own MOH track, or tell us if you would like a standard hold track')
+        +cqYesNoRow(cq,'repeatingMsg','Repeating queue message?',null,'e.g. Thank you for holding, your call is important to us and will be answered as soon as possible')
+      +'</div>'
+      +'<div style="margin-top:4px">'
+        +'<label style="margin-top:0;margin-bottom:4px">Primary users <span style="font-weight:400;color:var(--muted)">(tap to select)</span></label>'
+        +'<div class="chips" id="cqpri_'+cq.id+'">'+buildCQChipsHTML(cq,'primaryMembers')+'</div>'
+      +'</div>'
+      +'<div style="margin-top:12px">'
+        +'<label style="margin-top:0;margin-bottom:4px">Secondary users <span style="font-weight:400;color:var(--muted)">(tap to select — overflow/backup agents)</span></label>'
+        +'<div class="chips" id="cqsec_'+cq.id+'">'+buildCQChipsHTML(cq,'secondaryMembers')+'</div>'
+      +'</div>'
+      +'<hr>'
+      +'<div class="uq-label" style="display:block;margin-bottom:2px">Call forwarding rules</div>'
+      +'<p style="font-size:12px;color:var(--muted);margin:4px 0 12px">Tell us where calls should go in these scenarios. Defaults to voicemail if left unchanged.</p>'
+      +buildFwRuleHTML('cq',cq.id,'fwInternetDown','If internet connection is down, forward calls to:',null,cq.fwInternetDown,cq.fwInternetDownOther)
+      +buildFwRuleHTML('cq',cq.id,'fwQueueFull','If the queue is full, forward calls to:',null,cq.fwQueueFull,cq.fwQueueFullOther)
+      +buildFwRuleHTML('cq',cq.id,'fwAllAgentsOut','If all agents are logged out or set to server-side DND, forward calls to:',null,cq.fwAllAgentsOut,cq.fwAllAgentsOutOther);
+    c.appendChild(div);
+  });
+}
+
+
+
+function updateCallerIdUI(){var v=document.querySelector('input[name="callerIdYN"]:checked').value;document.getElementById('callerIdInput').style.display=v==='yes'?'block':'none';document.getElementById('ci-yes-opt').classList.toggle('sel',v==='yes');document.getElementById('ci-no-opt').classList.toggle('sel',v==='no');}
+function updateCallRecUI(){var v=document.querySelector('input[name="callRecYN"]:checked').value;document.getElementById('callRecNotice').style.display=v==='yes'?'block':'none';document.getElementById('cr-yes-opt').classList.toggle('sel',v==='yes');document.getElementById('cr-no-opt').classList.toggle('sel',v==='no');}
+function updateNumType(){var v=document.querySelector('input[name="numType"]:checked').value;document.getElementById('portSection').style.display=(v==='port'||v==='both')?'block':'none';document.getElementById('newSection').style.display=(v==='new'||v==='both')?'block':'none';['port','new','both'].forEach(function(x){document.getElementById('ropt-'+x).classList.toggle('sel',x===v);});}
+
+function validateStep(){
+  if(cur===0){
+    var ok=true;
+    [[document.getElementById('companyName'),'fw0',function(v){return v.trim().length>0;}],[document.getElementById('contactName'),'fw1',function(v){return v.trim().length>0;}],[document.getElementById('contactEmail'),'fw2',function(v){return /^[^@]+@[^@]+\.[^@]+$/.test(v.trim());}]].forEach(function(a){var pass=a[2](a[0].value);document.getElementById(a[1]).classList.toggle('has-err',!pass);if(!pass)ok=false;});
+    return ok;
+  }
+  return true;
+}
+
+function showStep(n){
+  document.querySelectorAll('.step').forEach(function(s,i){s.classList.toggle('active',i===n);});
+  var nav=document.getElementById('mainNav');
+  nav.style.display=(n>=5)?'none':'flex';
+  document.getElementById('backBtn').style.visibility=n===0?'hidden':'visible';
+  document.getElementById('stepLabel').innerHTML=n<6?'Step <strong>'+(n+1)+' of '+SNAMES.length+'</strong> — '+SNAMES[n]:'';
+  document.querySelectorAll('.pb').forEach(function(p,i){p.className='pb'+(i<n?' done':i===n?' active':'');});
+  if(n===4){refreshAllNumberSelects();refreshAADestinationSelects();}
+}
+function goNext(){if(!validateStep())return;if(cur<5){cur++;showStep(cur);}}
+function goBack(){if(cur>0){cur--;showStep(cur);}}
+function goBackToEdit(){cur=5;showStep(5);}
+
+function collectData(){
+  saveUserInputs();saveRGInputs();saveCQInputs();
+  var aaEnabled=document.querySelector('input[name="aaEnabled"]:checked').value;
+  var aasData=aas.map(function(aa){
+    return{
+      id:aa.id,name:aa.name,number:aa.number,numberOther:aa.numberOther,
+      hours:aa.hours.map(function(h){return{closed:h.closed,open:h.open,close:h.close};}),
+      welcomeEnabled:aa.welcomeEnabled,welcomeMsg:aa.welcomeMsg,
+      closedEnabled:aa.closedEnabled,closedMsg:aa.closedMsg,
+      routeType:aa.routeType,singleDestination:aa.singleDestination,singleDestinationOther:aa.singleDestinationOther,
+      options:(aa.options||[]).slice(),
+      closedRouteEnabled:aa.closedRouteEnabled,closedRouteType:aa.closedRouteType,
+      closedSingleDestination:aa.closedSingleDestination,closedSingleDestinationOther:aa.closedSingleDestinationOther,
+      closedOptions:(aa.closedOptions||[]).slice()
+    };
+  });
+  return{
+    company:document.getElementById('companyName').value,contact:document.getElementById('contactName').value,email:document.getElementById('contactEmail').value,
+    aaEnabled:aaEnabled,aas:aasData,voicemailMsg:document.getElementById('voicemailMsg').value,
+    users:users.slice(),rgs:rgs.slice(),cqs:cqs.slice(),numType:document.querySelector('input[name="numType"]:checked').value,
+    portNumbers:document.getElementById('portNumbers').value,currentProvider:document.getElementById('currentProvider').value,
+    areaCode:document.getElementById('areaCode').value,numQty:document.getElementById('numQty').value,
+    callerIdYN:document.querySelector('input[name="callerIdYN"]:checked').value,callerIdNumber:document.getElementById('callerIdNumber').value,
+    callRecording:document.querySelector('input[name="callRecYN"]:checked').value,additionalNotes:document.getElementById('additionalNotes').value
+  };
+}
+
+function buildOverview(d){
+  var nd={port:'Porting existing numbers',new:'Claiming new numbers',both:'Both porting & new numbers'}[d.numType]||'';
+  var aaH;
+  if(d.aaEnabled==='yes'){
+    if(!d.aas.length){
+      aaH='<p style="font-size:13px;color:var(--muted)">Auto attendant requested but none configured yet.</p>';
+    }else{
+      aaH=d.aas.map(function(aa,idx){
+        var aaHoursH='<div class="hours-ov">';
+        aa.hours.forEach(function(h,i){aaHoursH+='<div class="hours-day'+(h.closed?' closed':'')+'"><div class="hd-name">'+DAYS[i]+'</div><div class="hd-time">'+(h.closed?'Closed':h.open+' – '+h.close)+'</div></div>';});
+        aaHoursH+='</div>';
+        var aaOpen=aa.hours.filter(function(h){return!h.closed;}).length;
+        var aaRouteH;
+        if(aa.routeType==='single'){
+          aaRouteH='<div class="sum-card" style="grid-column:1/-1"><div class="sum-lbl">Destination</div><div class="sum-val">'+esc(resolveDestLabel(aa.singleDestination,aa.singleDestinationOther,d))+'</div></div>';
+        }else{
+          aaRouteH=(aa.options&&aa.options.length)?aa.options.map(function(o){return '<div class="sum-card"><div class="sum-lbl">Key '+(esc(o.key)||'—')+'</div><div class="sum-val">'+esc(resolveDestLabel(o.destination,o.destinationOther,d))+'</div></div>';}).join(''):'<div class="sum-card" style="grid-column:1/-1"><div class="sum-val" style="color:var(--muted)">No options added.</div></div>';
+        }
+        return '<div class="rg-ov" style="margin-bottom:14px"><div class="rg-ov-name" style="font-size:14px;margin-bottom:8px">'+(idx+1)+'. '+(esc(aa.name)||'Unnamed auto attendant')+'</div>'
+          +'<div class="sum-grid" style="margin-bottom:12px"><div class="sum-card"><div class="sum-lbl">Number</div><div class="sum-val">'+esc(resolveAANumberLabel(aa))+'</div></div><div class="sum-card"><div class="sum-lbl">Routing type</div><div class="sum-val">'+(aa.routeType==='single'?'Single destination':'Multiple options (key press)')+'</div></div></div>'
+          +'<div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Hours ('+aaOpen+' open day'+(aaOpen!==1?'s':'')+')</div>'+aaHoursH
+          +'<div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin:12px 0 6px">Messages</div><div class="sum-grid"><div class="sum-card"><div class="sum-lbl">Welcome</div><div class="sum-val-sm">'+(aa.welcomeEnabled==='yes'?(esc(aa.welcomeMsg)||'<i style="color:var(--muted)">Requested, not provided</i>'):'<i style="color:var(--muted)">Not requested</i>')+'</div></div><div class="sum-card"><div class="sum-lbl">Closed</div><div class="sum-val-sm">'+(aa.closedEnabled==='yes'?(esc(aa.closedMsg)||'<i style="color:var(--muted)">Requested, not provided</i>'):'<i style="color:var(--muted)">Not requested</i>')+'</div></div></div>'
+          +'<div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin:12px 0 6px">Routing</div><div class="sum-grid">'+aaRouteH+'</div>'
+          +'</div>';
+      }).join('');
+    }
+  }else{
+    aaH='<p style="font-size:13px;color:var(--muted)">No auto attendant requested.</p>';
+  }
+  var usersH=d.users.length?'<div class="user-card-grid">'+d.users.map(function(u){
+    var nameLine=esc(getUserLabel(u))+(u.ext?' <span style="font-weight:400;color:var(--muted)">(ext '+esc(u.ext)+')</span>':'');
+    var phoneLine=u.deskphone==='yes'?('<div class="uc-extra"><i class="ti ti-phone"></i>'+esc(u.phoneModel==='other'?(u.phoneModelOther||'Model not specified'):(phoneModelLabel(u.phoneModel)||'Model not specified'))+'</div>'):'<div class="uc-extra" style="color:var(--muted)"><i class="ti ti-device-mobile"></i>Softphone/app only</div>';
+    var filledKeys=(u.blfKeyList||[]).filter(function(k){return(k.label&&k.label.trim())||(k.ext&&k.ext.trim());});
+    var blfLine=u.blf==='yes'?('<div class="uc-extra"><i class="ti ti-grid-dots"></i>BLF: '+filledKeys.length+' key'+(filledKeys.length!==1?'s':'')+' configured</div>'):'';
+    return'<div class="user-card"><div class="uc-name">'+nameLine+'</div><div class="uc-email">'+(u.em?esc(u.em):'<i style="color:var(--muted)">No email</i>')+'</div>'+phoneLine+blfLine+'</div>';
+  }).join('')+'</div>':'<p style="font-size:13px;color:var(--muted)">No users added.</p>';
+  var rgsH=d.rgs.length?d.rgs.map(function(rg){var m=rg.members.map(function(mid){var u=d.users.find(function(u){return u.id===mid;});return u?getUserLabel(u):'Unknown';}).join(', ')||'No members';
+    var fw='Internet down &rarr; '+esc(resolveDestLabel(rg.fwInternetDown,rg.fwInternetDownOther,d))+' &bull; All busy &rarr; '+esc(resolveDestLabel(rg.fwAllBusy,rg.fwAllBusyOther,d))+' &bull; No answer &rarr; '+esc(resolveDestLabel(rg.fwNoAnswer,rg.fwNoAnswerOther,d))+' &bull; Offer time: '+(esc(rg.ringTimeout)||'—')+'s';
+    return'<div class="rg-ov"><div class="rg-ov-name">'+(esc(rg.name)||'Unnamed group')+'</div><div class="rg-ov-info">Strategy: '+rg.strategy+' &bull; Members: '+esc(m)+'</div><div class="rg-ov-info">'+fw+'</div></div>';}).join(''):'<p style="font-size:13px;color:var(--muted)">No ring groups added.</p>';
+  var cqsH=d.cqs.length?d.cqs.map(function(cq){
+    var pm=(cq.primaryMembers||[]).map(function(mid){var u=d.users.find(function(u){return u.id===mid;});return u?getUserLabel(u):'Unknown';}).join(', ')||'None';
+    var sm=(cq.secondaryMembers||[]).map(function(mid){var u=d.users.find(function(u){return u.id===mid;});return u?getUserLabel(u):'Unknown';}).join(', ')||'None';
+    var extras=[];
+    if(cq.customGreeting==='yes')extras.push('Custom greeting: '+(esc(cq.customGreetingText)||'Requested, not specified'));
+    if(cq.moh==='yes')extras.push('Custom MOH: '+(esc(cq.mohText)||'Requested, not specified'));
+    if(cq.repeatingMsg==='yes')extras.push('Repeating message: '+(esc(cq.repeatingMsgText)||'Requested, not specified'));
+    var fw='Internet down &rarr; '+esc(resolveDestLabel(cq.fwInternetDown,cq.fwInternetDownOther,d))+' &bull; Queue full &rarr; '+esc(resolveDestLabel(cq.fwQueueFull,cq.fwQueueFullOther,d))+' &bull; All agents out/DND &rarr; '+esc(resolveDestLabel(cq.fwAllAgentsOut,cq.fwAllAgentsOutOther,d));
+    return '<div class="rg-ov"><div class="rg-ov-name">'+(esc(cq.name)||'Unnamed queue')+'</div>'
+      +'<div class="rg-ov-info">Max calls: '+(esc(cq.maxCalls)||'—')+' &bull; Wrap-up: '+(esc(cq.wrapUpTime)||'—')+'s &bull; Delay: '+(esc(cq.delayNotAnswer)||'—')+'s &bull; Alert time: '+(esc(cq.totalAlertTime)||'—')+'s &bull; Agent login: '+(cq.allowLogin==='yes'?'Yes':'No')+' &bull; Repeat: '+(esc(cq.repeatInterval)||'—')+'s</div>'
+      +'<div class="rg-ov-info">Primary: '+esc(pm)+'</div>'
+      +'<div class="rg-ov-info">Secondary: '+esc(sm)+'</div>'
+      +'<div class="rg-ov-info">'+fw+'</div>'
+      +(extras.length?'<div class="rg-ov-info">'+extras.join(' &bull; ')+'</div>':'')
+      +'</div>';
+  }).join(''):'<p style="font-size:13px;color:var(--muted)">No call queues added.</p>';
+  var numH='<div class="sum-grid"><div class="sum-card"><div class="sum-lbl">Type</div><div class="sum-val">'+nd+'</div></div>';
+  if(d.numType==='port'||d.numType==='both'){numH+='<div class="sum-card"><div class="sum-lbl">Current provider</div><div class="sum-val">'+(esc(d.currentProvider)||'—')+'</div></div>';}
+  if(d.numType==='new'||d.numType==='both'){numH+='<div class="sum-card"><div class="sum-lbl">Area code</div><div class="sum-val">'+(esc(d.areaCode)||'—')+'</div></div><div class="sum-card"><div class="sum-lbl">Qty needed</div><div class="sum-val">'+(esc(d.numQty)||'—')+'</div></div>';}
+  if(d.numType==='port'||d.numType==='both'){numH+='<div class="sum-card" style="grid-column:1/-1"><div class="sum-lbl">Numbers to port</div><div class="sum-val-sm" style="white-space:pre-wrap">'+(esc(d.portNumbers)||'—')+'</div></div>';}
+  numH+='</div>';
+  return '<div class="ov-section"><div class="ov-title"><i class="ti ti-building"></i>Company &amp; Contact</div><div class="sum-grid"><div class="sum-card"><div class="sum-lbl">Company</div><div class="sum-val">'+esc(d.company)+'</div></div><div class="sum-card"><div class="sum-lbl">Contact</div><div class="sum-val">'+esc(d.contact)+'</div></div><div class="sum-card" style="grid-column:1/-1"><div class="sum-lbl">Email</div><div class="sum-val">'+esc(d.email)+'</div></div></div></div>'
+    +'<div class="ov-section"><div class="ov-title"><i class="ti ti-device-mobile"></i>Phone Numbers</div>'+numH+'</div>'
+    +'<div class="ov-section"><div class="ov-title"><i class="ti ti-users"></i>Users ('+d.users.length+')</div>'+usersH+'</div>'
+    +'<div class="ov-section"><div class="ov-title"><i class="ti ti-phone-incoming"></i>Ring Groups ('+d.rgs.length+')</div>'+rgsH+'</div>'
+    +'<div class="ov-section"><div class="ov-title"><i class="ti ti-headset"></i>Call Queues ('+d.cqs.length+')</div>'+cqsH+'</div>'
+    +'<div class="ov-section"><div class="ov-title"><i class="ti ti-phone-check"></i>Auto Attendants ('+(d.aaEnabled==='yes'?d.aas.length:0)+')</div>'+aaH+'</div>'
+    +'<div class="ov-section"><div class="ov-title"><i class="ti ti-microphone"></i>Voicemail</div><div class="sum-grid"><div class="sum-card" style="grid-column:1/-1"><div class="sum-lbl">Greeting</div><div class="sum-val-sm">'+(esc(d.voicemailMsg)||'<i style="color:var(--muted)">Not provided</i>')+'</div></div></div></div>'
+    +'<div class="ov-section"><div class="ov-title"><i class="ti ti-settings"></i>Additional Settings</div><div class="sum-grid"><div class="sum-card"><div class="sum-lbl">External caller ID</div><div class="sum-val">'+(d.callerIdYN==='yes'?(esc(d.callerIdNumber)||'Yes (number not specified)'):'No – individual numbers')+'</div></div><div class="sum-card"><div class="sum-lbl">Call recording</div><div class="sum-val">'+(d.callRecording==='yes'?'Yes – all calls recorded':'No recording')+'</div></div></div></div>'
+    +(d.additionalNotes?'<div class="ov-section"><div class="ov-title"><i class="ti ti-notes"></i>Additional Notes</div><div class="sum-card" style="grid-column:1/-1"><div class="sum-val-sm" style="white-space:pre-wrap">'+esc(d.additionalNotes)+'</div></div></div>':'');
+}
+
+function downloadPDF(){
+  var d=_pdfData;if(!d)return;
+  var doc=new window.jspdf.jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  var pw=210,pl=18,pr=18,cw=pw-pl-pr,y=18;
+  doc.setFillColor(58,181,74);doc.rect(0,0,210,22,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(14);doc.setFont('helvetica','bold');
+  doc.text('8x8 / Callswitch One — System Setup Configuration',pl,14);
+  doc.setFontSize(8.5);doc.setFont('helvetica','normal');
+  doc.text('Generated '+new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}),pw-pr,14,{align:'right'});
+  y=30;
+  function sectionTitle(t){if(y>272){doc.addPage();y=18;}doc.setFillColor(234,247,236);doc.rect(pl,y,cw,7,'F');doc.setDrawColor(182,229,188);doc.rect(pl,y,cw,7,'S');doc.setTextColor(42,144,56);doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.text(t.toUpperCase(),pl+3,y+4.8);y+=10;doc.setTextColor(28,35,48);doc.setFont('helvetica','normal');}
+  function row(lbl,val,alt){if(y>272){doc.addPage();y=18;}if(alt){doc.setFillColor(249,250,251);doc.rect(pl,y,cw,6.5,'F');}doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.setTextColor(90,99,120);doc.text(lbl,pl+2,y+4.5);doc.setFont('helvetica','normal');doc.setTextColor(28,35,48);var w=doc.splitTextToSize(String(val||'—'),cw-54);doc.text(w,pl+54,y+4.5);y+=Math.max(6.5,w.length*5);}
+  function multiRow(lbl,txt){if(y>266){doc.addPage();y=18;}doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.setTextColor(90,99,120);doc.text(lbl,pl+2,y+4.5);doc.setFont('helvetica','normal');doc.setTextColor(28,35,48);var w=doc.splitTextToSize(txt,cw-54);doc.text(w,pl+54,y+4.5);y+=Math.max(6.5,w.length*5)+2;}
+  sectionTitle('Company & Contact');row('Company',d.company,false);row('Contact name',d.contact,true);row('Contact email',d.email,false);y+=3;
+  sectionTitle('Phone Numbers');var nd={port:'Porting existing numbers',new:'Claiming new numbers',both:'Both porting & new numbers'}[d.numType]||'';row('Type',nd,false);if(d.numType==='port'||d.numType==='both'){row('Current provider',d.currentProvider||'Not provided',true);var nums=(d.portNumbers||'').split('\n').filter(function(n){return n.trim();});multiRow('Numbers to port',nums.length?nums.join('\n'):'None listed');}if(d.numType==='new'||d.numType==='both'){row('Area code',d.areaCode||'Not provided',true);row('Quantity needed',d.numQty||'Not provided',false);}y+=3;
+  sectionTitle('Users ('+d.users.length+')');if(!d.users.length){row('','No users added.',false);}else{d.users.forEach(function(u,i){
+    var bits=[u.em||'No email'];
+    if(u.deskphone==='yes'){bits.push('Deskphone: '+(u.phoneModel==='other'?(u.phoneModelOther||'Not specified'):(phoneModelLabel(u.phoneModel)||'Not specified')));}
+    else{bits.push('No deskphone (softphone/app only)');}
+    if(u.blf==='yes'){
+      var keys=(u.blfKeyList||[]).map(function(k,ki){return{k:k,n:ki+1};}).filter(function(o){return(o.k.label&&o.k.label.trim())||(o.k.ext&&o.k.ext.trim());});
+      bits.push('BLF keys: '+(keys.length?keys.map(function(o){return 'Key '+o.n+' '+(o.k.label||'—')+(o.k.ext?' ('+o.k.ext+')':'');}).join(' | '):'Requested, not yet specified'));
+    }
+    var label=(i+1)+'. '+getUserLabel(u)+(u.ext?' (ext '+u.ext+')':'');
+    multiRow(label,bits.join('  |  '));
+  });}y+=3;
+  sectionTitle('Ring Groups ('+d.rgs.length+')');if(!d.rgs.length){row('','No ring groups added.',false);}
+  else{d.rgs.forEach(function(rg,i){
+    if(y>255){doc.addPage();y=18;}
+    var m=rg.members.map(function(mid){var u=d.users.find(function(u){return u.id===mid;});return u?getUserLabel(u):'Unknown';}).join(', ')||'No members';
+    var mw=doc.splitTextToSize('Strategy: '+rg.strategy+' | Members: '+m,cw-4);
+    var fwText='Internet down: '+resolveDestLabel(rg.fwInternetDown,rg.fwInternetDownOther,d)+' | All busy: '+resolveDestLabel(rg.fwAllBusy,rg.fwAllBusyOther,d)+' | No answer: '+resolveDestLabel(rg.fwNoAnswer,rg.fwNoAnswerOther,d)+' | Offer time: '+(rg.ringTimeout||'—')+'s';
+    var fww=doc.splitTextToSize(fwText,cw-4);
+    var blockH=9.5+mw.length*5+fww.length*5+2;
+    if(i%2===1){doc.setFillColor(249,250,251);doc.rect(pl,y,cw,blockH,'F');}
+    doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.setTextColor(28,35,48);doc.text((i+1)+'. '+(rg.name||'Unnamed group'),pl+2,y+4.5);
+    doc.setFont('helvetica','normal');doc.setTextColor(90,99,120);doc.text(mw,pl+2,y+9.5);
+    doc.text(fww,pl+2,y+9.5+mw.length*5);
+    y+=blockH+2;
+  });}y+=3;
+  sectionTitle('Call Queues ('+d.cqs.length+')');if(!d.cqs.length){row('','No call queues added.',false);}
+  else{d.cqs.forEach(function(cq,i){
+    var pm=(cq.primaryMembers||[]).map(function(mid){var u=d.users.find(function(u){return u.id===mid;});return u?getUserLabel(u):'Unknown';}).join(', ')||'None';
+    var sm=(cq.secondaryMembers||[]).map(function(mid){var u=d.users.find(function(u){return u.id===mid;});return u?getUserLabel(u):'Unknown';}).join(', ')||'None';
+    var bits=['Max calls: '+(cq.maxCalls||'—'),'Wrap-up: '+(cq.wrapUpTime||'—')+'s','Delay: '+(cq.delayNotAnswer||'—')+'s','Alert time: '+(cq.totalAlertTime||'—')+'s','Agent login: '+(cq.allowLogin==='yes'?'Yes':'No'),'Repeat interval: '+(cq.repeatInterval||'—')+'s','Primary: '+pm,'Secondary: '+sm];
+    if(cq.customGreeting==='yes')bits.push('Custom greeting: '+(cq.customGreetingText||'Requested, not specified'));
+    if(cq.moh==='yes')bits.push('Custom MOH: '+(cq.mohText||'Requested, not specified'));
+    if(cq.repeatingMsg==='yes')bits.push('Repeating message: '+(cq.repeatingMsgText||'Requested, not specified'));
+    bits.push('Internet down: '+resolveDestLabel(cq.fwInternetDown,cq.fwInternetDownOther,d));
+    bits.push('Queue full: '+resolveDestLabel(cq.fwQueueFull,cq.fwQueueFullOther,d));
+    bits.push('All agents out/DND: '+resolveDestLabel(cq.fwAllAgentsOut,cq.fwAllAgentsOutOther,d));
+    multiRow((i+1)+'. '+(cq.name||'Unnamed queue'),bits.join('  |  '));
+  });}y+=3;
+  sectionTitle('Auto Attendants');row('Requested',d.aaEnabled==='yes'?'Yes':'No',false);y+=3;
+  if(d.aaEnabled==='yes'){
+    if(!d.aas.length){row('','Requested but none configured yet.',false);y+=3;}
+    else{
+      d.aas.forEach(function(aa,idx){
+        sectionTitle('Auto Attendant '+(idx+1)+': '+(aa.name||'Unnamed'));
+        row('Number',resolveAANumberLabel(aa),false);
+        row('Routing type',aa.routeType==='single'?'Single destination':'Multiple options (key press)',true);y+=2;
+        aa.hours.forEach(function(h,i){row(DAYS[i],h.closed?'Closed':h.open+' – '+h.close,i%2===1);});y+=2;
+        multiRow('Welcome message',aa.welcomeEnabled==='yes'?(aa.welcomeMsg||'Requested, not provided'):'Not requested');
+        multiRow('Closed message',aa.closedEnabled==='yes'?(aa.closedMsg||'Requested, not provided'):'Not requested');y+=2;
+        if(aa.routeType==='single'){row('Destination',resolveDestLabel(aa.singleDestination,aa.singleDestinationOther,d),false);}
+        else if(!aa.options||!aa.options.length){row('','No options added.',false);}
+        else{aa.options.forEach(function(o,i){row('Key '+(o.key||'—'),resolveDestLabel(o.destination,o.destinationOther,d),i%2===1);});}
+        y+=3;
+      });
+    }
+  }
+  sectionTitle('Voicemail');multiRow('Greeting',d.voicemailMsg||'Not provided');y+=3;
+  sectionTitle('Additional Settings');row('External caller ID',d.callerIdYN==='yes'?'Yes – '+(d.callerIdNumber||'not specified'):'No – individual numbers',false);row('Call recording',d.callRecording==='yes'?'Yes – all calls recorded':'No recording',true);
+  if(d.callRecording==='yes'){if(y>268){doc.addPage();y=18;}doc.setFillColor(255,251,235);doc.rect(pl,y,cw,12,'F');doc.setDrawColor(245,200,66);doc.rect(pl,y,cw,12,'S');doc.setFontSize(8);doc.setFont('helvetica','bolditalic');doc.setTextColor(122,88,0);var nw=doc.splitTextToSize('Note: Callers must be informed that calls are recorded. Please include a notification in your welcome message, e.g. "Calls may be recorded for training and quality purposes."',cw-6);doc.text(nw,pl+3,y+4.5);y+=Math.max(12,nw.length*4.5)+3;}
+  if(d.additionalNotes){y+=3;sectionTitle('Additional Notes');if(y>268){doc.addPage();y=18;}var aw=doc.splitTextToSize(d.additionalNotes,cw-6);doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(28,35,48);doc.text(aw,pl+2,y+4.5);y+=Math.max(8,aw.length*5)+3;}
+  var tp=doc.internal.getNumberOfPages();for(var p=1;p<=tp;p++){doc.setPage(p);doc.setFillColor(245,246,248);doc.rect(0,287,210,10,'F');doc.setFontSize(7.5);doc.setTextColor(140,140,140);doc.setFont('helvetica','normal');doc.text('Please email this PDF to ccsupport@zest4.com or attach it to a ticket at www.zest4customers.com',pl,293);doc.text('Page '+p+' of '+tp,pw-pr,293,{align:'right'});}
+  doc.save('8x8-setup-'+d.company.replace(/[^a-zA-Z0-9]/g,'-').toLowerCase()+'.pdf');
+  var conf=document.getElementById('dlConfirm');conf.style.display='flex';
+}
+
+function submitForm(){
+  var data=collectData();_pdfData=data;cur=6;
+  document.querySelectorAll('.pb').forEach(function(p){p.className='pb done';});
+  var el=document.getElementById('emailLink');
+  if(el){el.href='mailto:ccsupport@zest4.com?subject='+encodeURIComponent('8x8/Callswitch One Setup Configuration - '+data.company)+'&body='+encodeURIComponent('Hi CC Support,\n\nPlease find my 8x8/Callswitch One setup configuration attached as a PDF.\n\nKind regards,\n'+data.contact);}
+  showStep(6);document.getElementById('overviewOut').innerHTML=buildOverview(data);
+}
+
+function resetForm(){
+  cur=0;users=[];rgs=[];cqs=[];aas=[];nextUserId=1;nextRgId=1;nextCqId=1;nextAaId=1;nextAaOptId=1;_pdfData=null;
+  ['companyName','contactName','contactEmail','voicemailMsg','portNumbers','currentProvider','areaCode','numQty','callerIdNumber','additionalNotes'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  ['fw0','fw1','fw2'].forEach(function(id){document.getElementById(id).classList.remove('has-err');});
+  renderUsers();renderRGs();renderCQs();renderAAs();
+  document.querySelector('input[name="aaEnabled"][value="no"]').checked=true;
+  document.querySelector('input[name="numType"][value="port"]').checked=true;
+  document.querySelector('input[name="callerIdYN"][value="yes"]').checked=true;
+  document.querySelector('input[name="callRecYN"][value="no"]').checked=true;
+  updateAAUI();updateNumType();updateCallerIdUI();updateCallRecUI();showStep(0);
+}
+
+document.getElementById('progBar').innerHTML=SNAMES.map(function(_,i){return'<div class="pb'+(i===0?' active':'')+'"></div>';}).join('');
+renderUsers();renderRGs();renderCQs();renderAAs();updateNumType();updateCallerIdUI();updateCallRecUI();showStep(0);
+</script>
+</body>
+</html>
