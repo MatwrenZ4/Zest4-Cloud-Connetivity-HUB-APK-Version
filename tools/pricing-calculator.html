@@ -1588,20 +1588,56 @@ const RESELLER_APP_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+Cj
 
     // Keep the iframe tall enough for its content since it has no scroll of
     // its own inside the calculator's page chrome.
+    //
+    // IMPORTANT (mobile auto-scroll fix): resizing the iframe while a field
+    // *inside* it is focused makes mobile browsers "helpfully" re-scroll the
+    // page to keep that field in view - which feels like the page is
+    // randomly jumping down while typing. So we skip/defer the resize
+    // entirely while the iframe contains a focused text field, and we only
+    // resize in response to real layout changes (ResizeObserver) rather
+    // than polling on a timer, which was triggering this on every tick.
     iframe.addEventListener('load', () => {
       try {
-        const resize = () => {
-          const doc = iframe.contentDocument;
-          if(!doc) return;
+        const doc = iframe.contentDocument;
+        if(!doc) return;
+
+        let pendingResize = false;
+        const isTypingTarget = (el) => {
+          if(!el) return false;
+          const tag = el.tagName;
+          return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable;
+        };
+        const activeElIsTyping = () => isTypingTarget(doc.activeElement);
+
+        const applyResize = () => {
+          pendingResize = false;
+          if(activeElIsTyping()) {
+            // Field is focused (mobile keyboard likely open) - defer until
+            // it loses focus so we don't yank the page around mid-keystroke.
+            return;
+          }
           const h = Math.max(doc.documentElement.scrollHeight, doc.body ? doc.body.scrollHeight : 0);
           iframe.style.height = (h + 40) + 'px';
         };
-        resize();
+
+        const requestResize = () => {
+          if(pendingResize) return;
+          pendingResize = true;
+          (iframe.contentWindow.requestAnimationFrame || window.requestAnimationFrame)(applyResize);
+        };
+
+        requestResize();
+
         // Content height can change as the reseller app re-renders (adding
-        // products, opening the settings modal, etc.), so keep checking.
-        new (iframe.contentWindow.ResizeObserver || function(){ return { observe(){} }; })(resize)
-          .observe(iframe.contentDocument.body);
-        setInterval(resize, 500);
+        // products, opening the settings modal, etc.) - resize in response
+        // to those real changes only, never on a blind timer.
+        new (iframe.contentWindow.ResizeObserver || function(){ return { observe(){} }; })(requestResize)
+          .observe(doc.body);
+
+        // Once a focused field blurs, catch up on any resize we skipped.
+        doc.addEventListener('focusout', () => {
+          setTimeout(requestResize, 50);
+        }, true);
       } catch(e){ /* cross-origin safety net; srcdoc is same-origin so this shouldn't fire */ }
     });
   }
