@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>8x8 / Callswitch One System Setup Configuration | Zest4</title>
 <link rel="icon" href="https://i0.wp.com/zest4.com/wp-content/uploads/2018/10/cropped-4-site-icon.png?fit=32%2C32&ssl=1">
 <link rel="stylesheet" href="../assets/vendor/tabler-icons/tabler-icons.min.css">
@@ -26,26 +26,6 @@
   --radius-lg:12px;
 }
 body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
-
-/* ── Utility bar ── */
-.topbar{background:#0a1020;padding:8px 0;font-size:12px}
-.topbar-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-.topbar a{color:#7a8499;text-decoration:none;transition:color .15s}
-.topbar a:hover{color:#fff}
-.topbar-left{display:flex;align-items:center;gap:16px}
-.topbar-right{display:flex;align-items:center;gap:16px}
-.topbar-phone{color:#7a8499;display:flex;align-items:center;gap:5px}
-.topbar-phone i{color:var(--green);font-size:13px}
-
-/* ── Main nav ── */
-.mainnav{background:var(--navy2);border-bottom:1px solid rgba(255,255,255,0.05)}
-.mainnav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:72px}
-.nav-logo img{height:40px;display:block}
-.nav-links{display:flex;align-items:center;gap:32px;list-style:none}
-.nav-links a{color:#b8c0d4;text-decoration:none;font-size:14px;font-weight:500;transition:color .15s}
-.nav-links a:hover{color:#fff}
-.nav-cta{background:var(--green);color:#fff!important;padding:9px 22px;border-radius:6px;font-size:13px;font-weight:600;transition:background .15s}
-.nav-cta:hover{background:var(--green-dark)!important}
 
 /* ── Hero ── */
 .hero{background:linear-gradient(135deg,#0f1929 0%,#162540 50%,#0f1929 100%);border-bottom:3px solid var(--green);padding:44px 24px 0}
@@ -173,24 +153,66 @@ input[type=time]:disabled,select:disabled{opacity:.38;pointer-events:none}
 .check-circle{width:56px;height:56px;background:var(--green-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;border:2px solid #b6e5bc}
 .check-circle i{font-size:28px;color:var(--green)}
 
-/* ── Footer ── */
-.footer{background:#090e1a;border-top:1px solid rgba(255,255,255,0.04);padding:48px 24px 28px}
-.footer-inner{max-width:1200px;margin:0 auto}
-.footer-grid{display:flex;flex-wrap:wrap;gap:48px;margin-bottom:40px}
-.footer-brand{flex:1;min-width:200px}
-.footer-brand img{height:30px;display:block;margin-bottom:14px;opacity:.9}
-.footer-brand p{font-size:12px;line-height:1.7;color:#4a5268}
-.footer-brand .phone{font-size:12px;color:#4a5268;margin-top:12px;display:flex;align-items:center;gap:5px}
-.footer-brand .phone i{color:var(--green);font-size:12px}
-.footer-brand .phone a{color:#4a5268;text-decoration:none}
-.footer-col{min-width:140px}
-.footer-col h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#c0c8dc;margin-bottom:14px}
-.footer-col a{display:block;color:#4a5268;text-decoration:none;font-size:12px;margin-bottom:9px;transition:color .15s}
-.footer-col a:hover{color:#fff}
-.footer-bottom{border-top:1px solid #151d30;padding-top:22px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center}
-.footer-bottom span{font-size:12px;color:#2e3650}
-.footer-bottom a{font-size:12px;color:#2e3650;text-decoration:none;margin-left:18px}
-.footer-bottom a:hover{color:#fff}
+/* ══════════════════════════════════════════ */
+/* Mobile                                      */
+/* ══════════════════════════════════════════ */
+@media (max-width:600px){
+  /* Prevent iOS auto-zoom on focus (inputs need >=16px) */
+  input[type=text],input[type=email],input[type=time],select,textarea{font-size:16px}
+
+  .hero{padding:28px 16px 0}
+  .hero h1{font-size:23px}
+  .hero p{font-size:13.5px;margin-bottom:20px}
+  .hero-pill{font-size:11px;padding:4px 13px;margin-bottom:14px}
+
+  .content{padding:20px 12px 40px}
+  .card{padding:1.1rem;border-radius:10px}
+  .card-title{font-size:15px}
+
+  /* Company/user rows: stack fields instead of squeezing them side by side */
+  .user-top-row{flex-direction:column;align-items:stretch}
+  .user-top-row>div{flex:1 1 auto!important;width:100%}
+  .user-top-row .rm-btn{align-self:flex-end;margin-top:-6px}
+  .user-row{flex-wrap:wrap}
+  .user-row>div{flex:1 1 140px!important}
+
+  /* Call queue fields: one column instead of two */
+  .cq-grid{grid-template-columns:1fr}
+
+  /* Summary cards: one column instead of two */
+  .sum-grid{grid-template-columns:1fr}
+
+  /* Opening hours: card-style row instead of a cramped 4-column grid */
+  .hours-head{display:none}
+  .hours-row{
+    grid-template-columns:1fr 1fr;
+    grid-template-areas:"day day" "open close" "tog tog";
+    row-gap:8px;padding:10px;margin-bottom:8px;
+    background:#f7f8fa;border-radius:var(--radius);border:1px solid var(--border);
+  }
+  .hours-row>*:nth-child(1){grid-area:day;font-weight:600;align-self:center}
+  .hours-row>*:nth-child(2){grid-area:open}
+  .hours-row>*:nth-child(3){grid-area:close}
+  .hours-row>*:nth-child(4){grid-area:tog}
+
+  /* Bigger, easier-to-tap controls */
+  .btn{padding:11px 18px;min-height:44px}
+  .btn-row{gap:10px}
+  .btn-row .btn{flex:1;justify-content:center}
+  .add-btn{padding:10px 14px;min-height:40px}
+  .rm-btn{padding:9px;font-size:20px}
+  .chip{padding:8px 15px}
+  .radio-opt{padding:10px 14px}
+  .radio-opt-sm{padding:8px 13px}
+
+  .user-card-grid{grid-template-columns:1fr}
+  .hours-ov{grid-template-columns:1fr 1fr}
+}
+
+@media (max-width:400px){
+  .hero h1{font-size:20px}
+  .hours-ov{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -216,43 +238,6 @@ input[type=time]:disabled,select:disabled{opacity:.38;pointer-events:none}
   #zest4BackToHub:active { background: #033B66; }
 </style>
 <a id="zest4BackToHub" href="../index.html" aria-label="Back to Cloud &amp; Connectivity Hub">&larr; Back to Hub</a>
-
-<!-- ══════════════════════════════════════════ -->
-<!-- UTILITY BAR                               -->
-<!-- ══════════════════════════════════════════ -->
-<div class="topbar">
-  <div class="topbar-inner">
-    <div class="topbar-left">
-      <span class="topbar-phone"><i class="ti ti-phone"></i><a href="tel:+441619563300">0161 956 3300</a></span>
-      <a href="https://zest4.com/log-a-fault/">Log a Fault</a>
-      <a href="https://zest4.com/service-status/">Service Status</a>
-    </div>
-    <div class="topbar-right">
-      <a href="https://portal.zest4partners.com/">Partner Portal</a>
-      <a href="https://www.zest4customers.com/">Customer Portal</a>
-      <a href="https://zest4connect.com/login.htm">Zest4 Connect</a>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════ -->
-<!-- MAIN NAV                                  -->
-<!-- ══════════════════════════════════════════ -->
-<nav class="mainnav">
-  <div class="mainnav-inner">
-    <a href="https://zest4.com/" class="nav-logo">
-      <img src="https://zest4.com/wp-content/uploads/2018/10/Zest4-Logo-New.svg" alt="Zest4">
-    </a>
-    <ul class="nav-links">
-      <li><a href="https://zest4.com/business-mobile/">Business Mobile</a></li>
-      <li><a href="https://zest4.com/cloud-telephony/">Cloud Telephony</a></li>
-      <li><a href="https://zest4.com/iot/">IoT &amp; Data</a></li>
-      <li><a href="https://zest4.com/about/">About Us</a></li>
-      <li><a href="https://zest4.com/contact/">Contact</a></li>
-      <li><a href="https://zest4.com/become-a-partner/" class="nav-cta">Become a Partner</a></li>
-    </ul>
-  </div>
-</nav>
 
 <!-- ══════════════════════════════════════════ -->
 <!-- HERO BANNER                               -->
@@ -473,53 +458,6 @@ input[type=time]:disabled,select:disabled{opacity:.38;pointer-events:none}
 
 </div><!-- /wrap -->
 </div><!-- /content -->
-
-<!-- ══════════════════════════════════════════ -->
-<!-- FOOTER                                    -->
-<!-- ══════════════════════════════════════════ -->
-<footer class="footer">
-  <div class="footer-inner">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <img src="https://zest4.com/wp-content/uploads/2018/10/Zest4-Logo-New.svg" alt="Zest4">
-        <p>UK-based wholesale telecoms provider offering mobile, IoT, cloud telephony and unified communications solutions for resellers.</p>
-        <div class="phone"><i class="ti ti-phone"></i><a href="tel:+441619563300">0161 956 3300</a></div>
-      </div>
-      <div class="footer-col">
-        <h4>Products</h4>
-        <a href="https://zest4.com/business-mobile/">Business Mobile</a>
-        <a href="https://zest4.com/cloud-telephony/">Cloud Telephony</a>
-        <a href="https://zest4.com/iot/">IoT &amp; Mobile Data</a>
-        <a href="https://zest4.com/bulk-sms/">Bulk SMS</a>
-        <a href="https://zest4.com/pci-compliance/">PCI Compliance</a>
-      </div>
-      <div class="footer-col">
-        <h4>Company</h4>
-        <a href="https://zest4.com/about/">About Us</a>
-        <a href="https://zest4.com/meet-the-team/">Meet the Team</a>
-        <a href="https://zest4.com/awards-and-recognition/">Awards</a>
-        <a href="https://zest4.com/news/">News &amp; Blog</a>
-        <a href="https://zest4.com/careers/">Careers</a>
-        <a href="https://zest4.com/sustainability/">Sustainability</a>
-      </div>
-      <div class="footer-col">
-        <h4>Support</h4>
-        <a href="https://zest4.com/log-a-fault/">Log a Fault</a>
-        <a href="https://zest4.com/service-status/">Service Status</a>
-        <a href="https://www.zest4customers.com/">Customer Portal</a>
-        <a href="https://portal.zest4partners.com/">Partner Portal</a>
-        <a href="https://zest4connect.com/login.htm">Zest4 Connect</a>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>&copy; 2025 Zest4 Ltd. All rights reserved.</span>
-      <div>
-        <a href="https://zest4.com/privacy-policy/">Privacy Policy</a>
-        <a href="https://zest4.com/contact/">Contact Us</a>
-      </div>
-    </div>
-  </div>
-</footer>
 
 <script>
 const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
